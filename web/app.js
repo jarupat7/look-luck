@@ -85,6 +85,7 @@ const AppState = {
     isLoggedIn: false,
     displayName: '',
     email: '',
+    gender: 'female', // 'female', 'male', 'unisex'
     birthDay: 'จันทร์',
     zodiac: 'ราศีพฤษภ',
     personalColor: 'Spring',
@@ -92,6 +93,7 @@ const AppState = {
     token: null
   },
   currentGoal: 'work', // 'work', 'money', 'love', 'casual'
+  bottomStyle: 'pants', // 'pants', 'skirt'
   apiUrl: localStorage.getItem('LUCKY_API_URL') || '',
   activeTab: 'tabHome'
 };
@@ -114,6 +116,7 @@ const DOM = {
   authRegPassword: document.getElementById('authRegPassword'),
   authRegBirthDay: document.getElementById('authRegBirthDay'),
   authRegPersonalColor: document.getElementById('authRegPersonalColor'),
+  authRegGender: document.getElementById('authRegGender'),
   authRegPdpaConsent: document.getElementById('authRegPdpaConsent'),
   btnGuestPreview: document.getElementById('btnGuestPreview'),
   btnOpenConfigFromAuth: document.getElementById('btnOpenConfigFromAuth'),
@@ -123,6 +126,7 @@ const DOM = {
   displayUserName: document.getElementById('displayUserName'),
   badgeBirthDay: document.getElementById('badgeBirthDay'),
   badgeSeason: document.getElementById('badgeSeason'),
+  badgeGender: document.getElementById('badgeGender'),
   badgePlan: document.getElementById('badgePlan'),
   btnSwitchToProfile: document.getElementById('btnSwitchToProfile'),
   btnOpenConfig: document.getElementById('btnOpenConfig'),
@@ -135,10 +139,19 @@ const DOM = {
   swatchWork: document.getElementById('swatchWork'),
   swatchMoney: document.getElementById('swatchMoney'),
   swatchLove: document.getElementById('swatchLove'),
-  flatlayTop: document.getElementById('flatlayTop'),
-  flatlayBottom: document.getElementById('flatlayBottom'),
-  flatlayAcc: document.getElementById('flatlayAcc'),
+  
+  // Flat-lay Clothing SVG Elements
+  bottomStyleToggle: document.getElementById('bottomStyleToggle'),
+  btnStylePants: document.getElementById('btnStylePants'),
+  btnStyleSkirt: document.getElementById('btnStyleSkirt'),
+  itemPants: document.getElementById('itemPants'),
+  itemSkirt: document.getElementById('itemSkirt'),
+  pathShirt: document.getElementById('pathShirt'),
+  pathPants: document.getElementById('pathPants'),
+  pathSkirt: document.getElementById('pathSkirt'),
   flatlayCaptionText: document.getElementById('flatlayCaptionText'),
+  flatlayAcc: document.getElementById('flatlayAcc'),
+
   txtAdviceTitle: document.getElementById('txtAdviceTitle'),
   txtAdviceDescription: document.getElementById('txtAdviceDescription'),
   adviceColorBar: document.getElementById('adviceColorBar'),
@@ -181,7 +194,9 @@ const DOM = {
   selectBirthDay: document.getElementById('selectBirthDay'),
   selectZodiac: document.getElementById('selectZodiac'),
   selectPersonalColor: document.getElementById('selectPersonalColor'),
+  selectGender: document.getElementById('selectGender'),
   btnSaveProfile: document.getElementById('btnSaveProfile'),
+
   btnLogout: document.getElementById('btnLogout'),
 
   // Navigation
@@ -325,11 +340,21 @@ function setupEventListeners() {
       AppState.currentUser.birthDay = DOM.selectBirthDay.value;
       AppState.currentUser.zodiac = DOM.selectZodiac.value;
       AppState.currentUser.personalColor = DOM.selectPersonalColor.value;
+      if (DOM.selectGender) {
+        AppState.currentUser.gender = DOM.selectGender.value;
+      }
       saveUserToStorage();
       renderApp();
       alert('บันทึกข้อมูลดวงชะตาเรียบร้อยแล้ว!');
     });
   }
+
+  // --- Style Selector: กางเกง vs กระโปรง ---
+  if (DOM.btnStylePants && DOM.btnStyleSkirt) {
+    DOM.btnStylePants.addEventListener('click', () => setBottomStyle('pants'));
+    DOM.btnStyleSkirt.addEventListener('click', () => setBottomStyle('skirt'));
+  }
+
 
   // --- Logout Button ---
   if (DOM.btnLogout) {
@@ -485,6 +510,7 @@ async function handleMainRegister() {
           isLoggedIn: true,
           displayName: data.user.displayName,
           email: data.user.email,
+          gender: gender,
           birthDay: data.user.birthDay,
           zodiac: data.user.zodiac || 'ราศีพฤษภ',
           personalColor: data.user.personalColor || personalColor,
@@ -509,6 +535,7 @@ async function handleMainRegister() {
     isLoggedIn: true,
     displayName: name,
     email: email,
+    gender: gender,
     birthDay: birthDay,
     zodiac: 'ราศีพฤษภ',
     personalColor: personalColor,
@@ -534,12 +561,15 @@ function switchTab(tabId) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-
 function updateHeaderBadges() {
   const u = AppState.currentUser;
   if (!u || !u.isLoggedIn) return;
 
+  const gender = u.gender || 'female';
+  const genderLabels = { female: 'เพศ: หญิง', male: 'เพศ: ชาย', unisex: 'เพศ: ยูนิเซ็กส์' };
+
   DOM.displayUserName.textContent = u.displayName || 'ผู้ใช้งาน';
+  if (DOM.badgeGender) DOM.badgeGender.textContent = genderLabels[gender] || 'เพศ: หญิง';
   DOM.badgeBirthDay.textContent = `เกิดวัน${u.birthDay}`;
   DOM.badgeSeason.textContent = `Personal Color: ${u.personalColor}`;
   DOM.badgePlan.textContent = u.plan === 'premium' ? '👑 Premium Member' : 'Free Member';
@@ -551,13 +581,25 @@ function updateHeaderBadges() {
   DOM.selectBirthDay.value = u.birthDay;
   DOM.selectZodiac.value = u.zodiac || 'ราศีพฤษภ';
   DOM.selectPersonalColor.value = u.personalColor || 'Spring';
+  if (DOM.selectGender) DOM.selectGender.value = gender;
   DOM.profPlanTag.textContent = u.plan === 'premium' ? '👑 สมาชิกพรีเมียม (VIP)' : 'สมาชิกฟรี (Free)';
+
+  // Gender specific clothing toggle behavior:
+  if (DOM.btnStyleSkirt) {
+    if (gender === 'male') {
+      DOM.btnStyleSkirt.style.display = 'none';
+      setBottomStyle('pants');
+    } else {
+      DOM.btnStyleSkirt.style.display = 'inline-block';
+    }
+  }
 
   // Sync Season Grid in Wardrobe
   DOM.seasonCards.forEach(c => {
     c.classList.toggle('active', c.getAttribute('data-season') === u.personalColor);
   });
 }
+
 
 function renderApp() {
   updateViewMode();
@@ -577,6 +619,39 @@ function updateCurrentDate() {
   const monthName = months[now.getMonth()];
   const yearTh = now.getFullYear() + 543;
   DOM.currentDateDisplay.textContent = `${dayName}ที่ ${dateNum} ${monthName} ${yearTh}`;
+}
+
+function setBottomStyle(style) {
+  AppState.bottomStyle = style;
+  if (style === 'skirt') {
+    if (DOM.btnStyleSkirt) DOM.btnStyleSkirt.classList.add('active');
+    if (DOM.btnStylePants) DOM.btnStylePants.classList.remove('active');
+    if (DOM.itemSkirt) DOM.itemSkirt.style.display = 'block';
+    if (DOM.itemPants) DOM.itemPants.style.display = 'none';
+  } else {
+    if (DOM.btnStylePants) DOM.btnStylePants.classList.add('active');
+    if (DOM.btnStyleSkirt) DOM.btnStyleSkirt.classList.remove('active');
+    if (DOM.itemPants) DOM.itemPants.style.display = 'block';
+    if (DOM.itemSkirt) DOM.itemSkirt.style.display = 'none';
+  }
+  updateFlatlayCaption();
+  // อัปเดตคำแนะนำสไตล์ท่อนล่างในเนื้อหา
+  updateDailyColorsAndAdvice();
+}
+
+function updateFlatlayCaption() {
+  if (!DOM.flatlayCaptionText) return;
+  const user = AppState.currentUser;
+  const gender = (user && user.gender) || 'female';
+  let bottomName = '';
+  if (gender === 'male') {
+    bottomName = 'กางเกงสแล็คสีเบจ';
+  } else if (AppState.bottomStyle === 'skirt') {
+    bottomName = 'กระโปรงทรงเอสีเบจ';
+  } else {
+    bottomName = 'กางเกงสแล็คทรงสวย';
+  }
+  DOM.flatlayCaptionText.textContent = `เสื้อสีมงคล + ${bottomName}`;
 }
 
 function updateDailyColorsAndAdvice() {
@@ -600,28 +675,38 @@ function updateDailyColorsAndAdvice() {
   let activeColors = '';
   let activeHex = [];
   let headline = '';
-  let outfitDesc = '';
+  const userGender = user.gender || 'female';
+  let bottomText = '';
+  if (userGender === 'male') {
+    bottomText = 'กางเกงสแล็คหรือกางเกงชิโน่สีเบจ/ครีม';
+  } else if (userGender === 'female') {
+    bottomText = AppState.bottomStyle === 'skirt' ? 'กระโปรงทรงเอสีเบจ/ครีม' : 'กางเกงสแล็คทรงโมเดิร์นสีเบจ/ครีม';
+  } else {
+    bottomText = 'กางเกงขายาวทรงกระบอกหรือกระโปรงมินิมอลสีเบจ';
+  }
 
   if (goal === 'work') {
     activeColors = rules.work.name;
     activeHex = rules.work.hex;
     headline = 'แนะนำลุคเสริมการงาน &amp; เจรจา (เดช)';
-    outfitDesc = `เลือกสวมใส่ชิ้นบนด้วยสี ${activeColors} จับคู่กับกางเกงหรือกระโปรงทรงโมเดิร์นสีเบจหรือครีม ให้บุคลิกดูภูมิฐาน ทรงอำนาจ และเจรจาราบรื่น`;
+    outfitDesc = userGender === 'male'
+      ? `เลือกสวมใส่เสื้อเชิ้ตหรือเสื้อโปโลสี ${activeColors} จับคู่กับ${bottomText} ให้บุคลิกดูภูมิฐาน น่าเชื่อถือ และเจรจาราบรื่น`
+      : `เลือกสวมใส่เสื้อเชิ้ตหรือเบลเซอร์สี ${activeColors} จับคู่กับ${bottomText} ให้บุคลิกดูสง่างาม ทรงอำนาจ และเจรจาสำเร็จ`;
   } else if (goal === 'money') {
     activeColors = rules.money.name;
     activeHex = rules.money.hex;
     headline = 'แนะนำลุคเรียกทรัพย์ &amp; โชคลาภ (ศรี)';
-    outfitDesc = `ดึงดูดเงินทองด้วยเสื้อผ้ากลุ่มสี ${activeColors} เลือกเนื้อผ้าที่มีประกายหรือสัมผัสซาติน เสริมเครื่องประดับเพื่อรวมพลังความมั่งคั่ง`;
+    outfitDesc = `ดึงดูดเงินทองด้วยเสื้อผ้ากลุ่มสี ${activeColors} จับคู่กับ${bottomText} เสริมเครื่องประดับเพื่อรวมพลังความมั่งคั่ง`;
   } else if (goal === 'love') {
     activeColors = rules.love.name;
     activeHex = rules.love.hex;
     headline = 'แนะนำลุคเสริมความรัก &amp; เสน่ห์เมตตา';
-    outfitDesc = `สวมใส่โทนสีละมุน ${activeColors} ดีไซน์พริ้วไหว สบายตา ช่วยให้ผู้คนรอบข้างรู้สึกเข้าถึงง่ายและเกิดความรักใคร่เอ็นดู`;
+    outfitDesc = `สวมใส่เสื้อผ้าโทนสีละมุน ${activeColors} ดีไซน์สบายตา จับคู่กับ${bottomText} ช่วยให้ผู้คนรอบข้างรู้สึกเข้าถึงง่ายและเกิดความรักใคร่เอ็นดู`;
   } else {
     activeColors = 'ขาว, ครีม, เทาอ่อน, เขียวธรรมชาติ';
     activeHex = ['#FFFDD0', '#E0E0E0', '#81C784'];
     headline = 'แนะนำลุควันพักผ่อน &amp; ผ่อนคลายจิตใจ';
-    outfitDesc = `เน้นเนื้อผ้าคอตตอนหรือลินินสีเอิร์ธโทนและพาสเทล เพื่อบำบัดความเหนื่อยล้า คืนพลังงานบริสุทธิ์ให้ร่างกาย`;
+    outfitDesc = `เน้นเสื้อผ้าเนื้อผ้าคอตตอนหรือลินินสี ${activeColors} สวมคู่กับ${bottomText} เพื่อบำบัดความเหนื่อยล้า คืนพลังงานบริสุทธิ์ให้ร่างกาย`;
   }
 
   // Personal Color Adaptation
@@ -639,13 +724,14 @@ function updateDailyColorsAndAdvice() {
   DOM.txtAdviceTitle.innerHTML = headline;
   DOM.txtAdviceDescription.textContent = outfitDesc + seasonNote;
 
-  // Flat-lay visual colors
-  if (activeHex.length > 0) {
-    DOM.flatlayTop.style.background = activeHex[0];
+  // Flat-lay visual SVG clothing update
+  if (activeHex.length > 0 && DOM.pathShirt) {
+    DOM.pathShirt.setAttribute('fill', activeHex[0]);
   }
-  DOM.flatlayBottom.style.background = '#E8DFD8';
-  DOM.flatlayAcc.style.background = '#C5A059';
-  DOM.flatlayCaptionText.textContent = `ชุดแนะนำ: ชิ้นหลัก ${activeColors.split(',')[0]}`;
+  if (DOM.pathPants) DOM.pathPants.setAttribute('fill', '#E8DFD8');
+  if (DOM.pathSkirt) DOM.pathSkirt.setAttribute('fill', '#E8DFD8');
+  updateFlatlayCaption();
+
 
   // Render color dots
   DOM.adviceColorBar.innerHTML = '';

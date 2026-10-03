@@ -105,6 +105,16 @@
             </select>
           </div>
 
+          <div class="form-group">
+            <label class="form-label">เพศ (เพื่อแนะนำเสื้อผ้าตรงตามสรีระ)</label>
+            <select class="form-select" id="authRegGender">
+              <option value="female" selected>หญิง (แนะนำเสื้อ + กางเกง/กระโปรง)</option>
+              <option value="male">ชาย (แนะนำเสื้อ + กางเกง)</option>
+              <option value="unisex">ไม่ระบุ / ยูนิเซ็กส์</option>
+            </select>
+          </div>
+
+
           <!-- PDPA Consent Checkbox -->
           <div class="pdpa-consent-group">
             <label class="checkbox-container">
@@ -157,10 +167,12 @@
             <span class="greeting-prefix">ยินดีต้อนรับ</span>
             <strong class="user-name" id="displayUserName">คุณมิ้นท์</strong>
             <div class="user-badges">
+              <span class="badge badge-gender" id="badgeGender">เพศ: หญิง</span>
               <span class="badge badge-day" id="badgeBirthDay">เกิดวันจันทร์</span>
               <span class="badge badge-season" id="badgeSeason">Personal Color: Spring</span>
               <span class="badge badge-plan" id="badgePlan">Free Member</span>
             </div>
+
           </div>
           <button class="btn-auth-switch" id="btnSwitchToProfile">โปรไฟล์</button>
         </div>
@@ -219,17 +231,61 @@
 
               <!-- Suggested Outfit Flat-Lay Illustration / Card -->
               <div class="outfit-flatlay-box">
-                <div class="flatlay-art">
-                  <div class="flatlay-hanger"></div>
-                  <div class="flatlay-top" id="flatlayTop" style="background: #9C27B0;"></div>
-                  <div class="flatlay-bottom" id="flatlayBottom" style="background: #E8DFD8;"></div>
-                  <div class="flatlay-acc" id="flatlayAcc" style="background: #D4AF37;"></div>
+                <!-- Style Selector: กางเกง vs กระโปรง -->
+                <div class="bottom-style-toggle" id="bottomStyleToggle">
+                  <button type="button" class="btn-toggle-style active" data-style="pants" id="btnStylePants" title="กางเกง">👖 กางเกง</button>
+                  <button type="button" class="btn-toggle-style" data-style="skirt" id="btnStyleSkirt" title="กระโปรง">👗 กระโปรง</button>
                 </div>
+
+                <div class="flatlay-art">
+                  <div class="flatlay-hanger">
+                    <svg viewBox="0 0 40 14" width="34" height="12">
+                      <path d="M20 2 C23 2 24 6 20 7 L4 12 L36 12 Z" fill="none" stroke="#78716C" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+
+                  <!-- เสื้อ (Shirt / Blouse SVG) -->
+                  <div class="flatlay-clothing-item top-item">
+                    <svg id="svgShirt" viewBox="0 0 100 85" width="76" height="65">
+                      <!-- Shirt shape with sleeves and collar -->
+                      <path id="pathShirt" d="M32 6 C38 15 62 15 68 6 L95 24 L82 40 L70 32 L70 82 C70 84 30 84 30 82 L30 32 L18 40 L5 24 Z" fill="#9C27B0" stroke="#3E1A47" stroke-width="1.2" stroke-linejoin="round"/>
+                      <!-- Collar & Placket Lines -->
+                      <path d="M42 8 L50 20 L58 8" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round"/>
+                      <line x1="50" y1="20" x2="50" y2="78" stroke="rgba(255,255,255,0.45)" stroke-width="1.2" stroke-dasharray="2 3"/>
+                    </svg>
+                  </div>
+
+                  <!-- ท่อนล่าง: กางเกง (Trousers/Pants SVG) -->
+                  <div class="flatlay-clothing-item bottom-item" id="itemPants">
+                    <svg id="svgPants" viewBox="0 0 80 100" width="60" height="75">
+                      <!-- Pants shape -->
+                      <path id="pathPants" d="M12 4 L68 4 L65 96 L45 96 L40 38 L35 96 L15 96 Z" fill="#E8DFD8" stroke="#78716C" stroke-width="1.2" stroke-linejoin="round"/>
+                      <line x1="12" y1="12" x2="68" y2="12" stroke="rgba(0,0,0,0.15)" stroke-width="1.2"/>
+                      <line x1="40" y1="12" x2="40" y2="38" stroke="rgba(0,0,0,0.15)" stroke-width="1"/>
+                    </svg>
+                  </div>
+
+                  <!-- ท่อนล่าง: กระโปรง (A-Line Skirt SVG) -->
+                  <div class="flatlay-clothing-item bottom-item" id="itemSkirt" style="display: none;">
+                    <svg id="svgSkirt" viewBox="0 0 80 90" width="66" height="72">
+                      <!-- Flared A-Line Skirt shape -->
+                      <path id="pathSkirt" d="M22 6 L58 6 L76 86 C60 90 20 90 4 86 Z" fill="#E8DFD8" stroke="#78716C" stroke-width="1.2" stroke-linejoin="round"/>
+                      <line x1="22" y1="14" x2="58" y2="14" stroke="rgba(0,0,0,0.15)" stroke-width="1.2"/>
+                      <path d="M40 14 Q40 50 40 88" fill="none" stroke="rgba(0,0,0,0.08)" stroke-width="1"/>
+                      <path d="M28 14 Q26 50 22 86" fill="none" stroke="rgba(0,0,0,0.08)" stroke-width="1"/>
+                      <path d="M52 14 Q54 50 58 86" fill="none" stroke="rgba(0,0,0,0.08)" stroke-width="1"/>
+                    </svg>
+                  </div>
+
+                  <div class="flatlay-acc" id="flatlayAcc" title="เครื่องประดับเสริมมงคล"></div>
+                </div>
+
                 <div class="flatlay-caption">
                   <span class="tag-style">AI STYLED</span>
-                  <p id="flatlayCaptionText">จับคู่เสื้อสีมงคลกับกางเกงสีเบจ</p>
+                  <p id="flatlayCaptionText">เสื้อสีมงคล + กางเกงสีเบจ</p>
                 </div>
               </div>
+
             </div>
 
             <!-- สีกาลกิณี (แจ้งเตือนเพื่อหลีกเลี่ยง) -->
@@ -572,7 +628,17 @@
               </select>
             </div>
 
+            <div class="form-group">
+              <label class="form-label">เพศ (สำหรับการแนะนำชุด)</label>
+              <select class="form-select" id="selectGender">
+                <option value="female" selected>หญิง (แนะนำเสื้อ + กางเกง/กระโปรง)</option>
+                <option value="male">ชาย (แนะนำเสื้อ + กางเกง)</option>
+                <option value="unisex">ไม่ระบุ / ยูนิเซ็กส์</option>
+              </select>
+            </div>
+
             <button class="btn-primary" id="btnSaveProfile">บันทึกการเปลี่ยนแปลง</button>
+
           </div>
 
           <div class="action-buttons-wrap">
