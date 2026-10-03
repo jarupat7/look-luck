@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>โชคดีทุกวัน | Everyday Lucky - AI & Fashion Astrology</title>
+  
+  <!-- Google Fonts: Sarabun & Cormorant Garamond / Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Mobile Container Wrapper -->
+  <div class="app-viewport">
+    
+    <!-- Top Bar -->
+    <header class="app-header">
+      <div class="header-top">
+        <span class="brand-tag">ASTROLOGY &amp; FASHION</span>
+        <button class="settings-btn" id="btnOpenConfig" title="ตั้งค่าการเชื่อมต่อ Google Sheets">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+      </div>
+      <h1 class="app-title">โชคดีทุกวัน</h1>
+      <p class="app-subtitle" id="currentDateDisplay">วันจันทร์ที่ 3 ตุลาคม 2569</p>
+      
+      <!-- User Greeting Bar -->
+      <div class="user-greeting-card" id="userGreetingCard">
+        <div class="user-info-text">
+          <span class="greeting-prefix">สวัสดีคุณ</span>
+          <strong class="user-name" id="displayUserName">ผู้เยี่ยมชม</strong>
+          <div class="user-badges">
+            <span class="badge badge-day" id="badgeBirthDay">เกิดวันจันทร์</span>
+            <span class="badge badge-season" id="badgeSeason">Personal Color: Spring</span>
+            <span class="badge badge-plan" id="badgePlan">Free Member</span>
+          </div>
+        </div>
+        <button class="btn-auth-switch" id="btnAuthAction">เข้าสู่ระบบ</button>
+      </div>
+    </header>
+
+    <!-- Main Content Area (Dynamic Tabs) -->
+    <main class="app-body">
+      
+      <!-- TAB 1: หน้าแรก (โชคดีวันนี้) -->
+      <section class="tab-page active" id="tabHome">
+        
+        <!-- Hero Section: สีมงคลวันนี้ & Visual Outfit -->
+        <div class="card fashion-hero-card">
+          <div class="card-header-fashion">
+            <span class="section-label">DAILY PALETTE</span>
+            <h2 class="section-title">สีมงคลวันนี้</h2>
+            <p class="section-desc">คำนวณตามหลักมหาทักษา &amp; เทวดานพเคราะห์</p>
+          </div>
+
+          <!-- Color Swatches & Outfit Graphic -->
+          <div class="hero-palette-showcase">
+            <div class="swatches-column">
+              <!-- งาน -->
+              <div class="swatch-item">
+                <div class="swatch-pill-group">
+                  <div class="color-pill" id="swatchWork" style="background: linear-gradient(135deg, #FF9800, #F57C00);"></div>
+                </div>
+                <div class="swatch-meta">
+                  <span class="swatch-category">งาน / เดช</span>
+                  <strong class="swatch-names" id="txtWorkColors">ส้ม, น้ำตาล, ฟ้า</strong>
+                </div>
+              </div>
+
+              <!-- เงิน -->
+              <div class="swatch-item">
+                <div class="swatch-pill-group">
+                  <div class="color-pill" id="swatchMoney" style="background: linear-gradient(135deg, #9C27B0, #7B1FA2);"></div>
+                </div>
+                <div class="swatch-meta">
+                  <span class="swatch-category">เงิน / ศรี</span>
+                  <strong class="swatch-names" id="txtMoneyColors">ดำ, ม่วง, เหลืองทอง</strong>
+                </div>
+              </div>
+
+              <!-- ความรัก -->
+              <div class="swatch-item">
+                <div class="swatch-pill-group">
+                  <div class="color-pill" id="swatchLove" style="background: linear-gradient(135deg, #4CAF50, #2E7D32);"></div>
+                </div>
+                <div class="swatch-meta">
+                  <span class="swatch-category">ความรัก / เมตตา</span>
+                  <strong class="swatch-names" id="txtLoveColors">เขียว, ขาว, ครีม</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Suggested Outfit Flat-Lay Illustration / Card -->
+            <div class="outfit-flatlay-box">
+              <div class="flatlay-art">
+                <div class="flatlay-hanger"></div>
+                <div class="flatlay-top" id="flatlayTop" style="background: #9C27B0;"></div>
+                <div class="flatlay-bottom" id="flatlayBottom" style="background: #E8DFD8;"></div>
+                <div class="flatlay-acc" id="flatlayAcc" style="background: #D4AF37;"></div>
+              </div>
+              <div class="flatlay-caption">
+                <span class="tag-style">AI STYLED</span>
+                <p id="flatlayCaptionText">จับคู่เสื้อสีมงคลกับกางเกงสีเบจ</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- สีกาลกิณี (แจ้งเตือนเพื่อหลีกเลี่ยง) -->
+          <div class="kalakini-warning-pill">
+            <div class="warning-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z"/></svg>
+            </div>
+            <div class="warning-content">
+              <span class="warning-title">สีกาลกิณี (ควรหลีกเลี่ยง):</span>
+              <strong class="warning-colors" id="txtKalakiniColors">แดงสด, แดงเพลิง</strong>
+            </div>
+            <button class="btn-text-link" id="btnGoToRemedy">วิธีแก้เคล็ด &rsaquo;</button>
+          </div>
+        </div>
+
+        <!-- Goal Selection Chips (สิ่งที่อยากเสริมวันนี้) -->
+        <div class="section-container">
+          <div class="section-title-wrap">
+            <h3 class="subsection-title">เลือกสิ่งที่อยากเสริมวันนี้</h3>
+            <span class="subsection-sub">ระบบจะปรับสูตรสีและชุดให้ตรงเป้าหมาย</span>
+          </div>
+
+          <div class="chips-scroll">
+            <button class="chip-btn active" data-goal="work">
+              <span class="chip-icon">💼</span>
+              <span class="chip-label">เจรจางาน</span>
+            </button>
+            <button class="chip-btn" data-goal="money">
+              <span class="chip-icon">💰</span>
+              <span class="chip-label">โชคลาภเงิน</span>
+            </button>
+            <button class="chip-btn" data-goal="love">
+              <span class="chip-icon">💖</span>
+              <span class="chip-label">ออกเดต / เมตตา</span>
+            </button>
+            <button class="chip-btn" data-goal="casual">
+              <span class="chip-icon">🌿</span>
+              <span class="chip-label">พักผ่อนสบาย</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Recommendation Card for Today -->
+        <div class="card outfit-advice-card">
+          <div class="card-tag" id="tagPersonalColorMatch">PERSONAL COLOR COMPATIBLE</div>
+          <h4 class="advice-headline" id="txtAdviceTitle">แนะนำการแต่งกายเจรจางาน</h4>
+          <p class="advice-desc" id="txtAdviceDescription">แมตช์เสื้อเชิ้ตหรือเบลเซอร์สีส้มพีชกับกางเกงสแล็คสีครีม เสริมสร้อยหรือนาฬิกาสีทองนวล ช่วยเสริมความมั่นใจและการเจรจาต่อรองให้ราบรื่น</p>
+          
+          <div class="advice-color-bar" id="adviceColorBar">
+            <!-- Dynamic color chips -->
+          </div>
+        </div>
+
+        <!-- Deity of the Day Card (เกร็ดความรู้เทวดานพเคราะห์) -->
+        <div class="card deity-card">
+          <div class="deity-badge">เทวดานพเคราะห์ประจำวัน</div>
+          <div class="deity-header">
+            <h4 class="deity-name" id="txtDeityName">พระจันทร์</h4>
+            <span class="deity-trait" id="txtDeityTrait">พลังแห่งเสน่ห์ ความรักใคร่ และการปรับตัว</span>
+          </div>
+          <p class="deity-story" id="txtDeityStory">สร้างจากเทพธิดา 15 นาง ห่อด้วยผ้าสีขาวนวล จึงมีสีกายขาวนวล อ่อนโยน มีเสน่ห์ เมตตามหานิยม</p>
+        </div>
+
+      </section>
+
+      <!-- TAB 2: ตู้เสื้อผ้า & Personal Color -->
+      <section class="tab-page" id="tabWardrobe">
+        <div class="card-header-fashion">
+          <span class="section-label">SMART WARDROBE</span>
+          <h2 class="section-title">ตู้เสื้อผ้า &amp; Personal Color</h2>
+          <p class="section-desc">จับคู่สีมงคลเข้ากับอันเดอร์โทนผิวของคุณอย่างลงตัว</p>
+        </div>
+
+        <!-- Personal Color Season Selector -->
+        <div class="card">
+          <h3 class="card-heading">ฤดูกาลความงามของคุณ</h3>
+          <p class="card-subtext">ช่วยให้คุณเลือกสีมงคลที่ไม่ทำให้หน้าหมองคล้ำ</p>
+          
+          <div class="season-grid">
+            <div class="season-card active" data-season="Spring">
+              <div class="season-swatches">
+                <span style="background: #FFA07A"></span>
+                <span style="background: #FFD700"></span>
+                <span style="background: #98FB98"></span>
+              </div>
+              <strong class="season-title">Spring (ใบไม้ผลิ)</strong>
+              <small>Warm Tone สว่าง สดใส</small>
+            </div>
+            
+            <div class="season-card" data-season="Autumn">
+              <div class="season-swatches">
+                <span style="background: #CD5C5C"></span>
+                <span style="background: #8B4513"></span>
+                <span style="background: #556B2F"></span>
+              </div>
+              <strong class="season-title">Autumn (ใบไม้ร่วง)</strong>
+              <small>Warm Tone เข้ม เอิร์ธโทน</small>
+            </div>
+
+            <div class="season-card" data-season="Summer">
+              <div class="season-swatches">
+                <span style="background: #B0E0E6"></span>
+                <span style="background: #E6E6FA"></span>
+                <span style="background: #FFB6C1"></span>
+              </div>
+              <strong class="season-title">Summer (ฤดูร้อน)</strong>
+              <small>Cool Tone สว่าง พาสเทล</small>
+            </div>
+
+            <div class="season-card" data-season="Winter">
+              <div class="season-swatches">
+                <span style="background: #000080"></span>
+                <span style="background: #800020"></span>
+                <span style="background: #111111"></span>
+              </div>
+              <strong class="season-title">Winter (ฤดูหนาว)</strong>
+              <small>Cool Tone เข้ม คมชัด</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Items In Wardrobe (MVP Demo) -->
+        <div class="card">
+          <div class="wardrobe-header">
+            <h3 class="card-heading">เสื้อผ้าในตู้ของคุณ (ตัวอย่าง)</h3>
+            <span class="wardrobe-count">4 ไอเทม</span>
+          </div>
+          
+          <div class="wardrobe-list" id="wardrobeList">
+            <div class="wardrobe-item">
+              <div class="item-color-box" style="background:#FF9800;"></div>
+              <div class="item-info">
+                <strong>เสื้อเบลเซอร์ผ้าลินินสีส้มคอรัล</strong>
+                <span>ตรงกับสีเสริม: การงาน (เดช)</span>
+              </div>
+              <span class="item-status lucky">สีมงคล</span>
+            </div>
+            <div class="wardrobe-item">
+              <div class="item-color-box" style="background:#9C27B0;"></div>
+              <div class="item-info">
+                <strong>เสื้อเชิ้ตซาตินสีม่วงพาสเทล</strong>
+                <span>ตรงกับสีเสริม: การเงิน (ศรี)</span>
+              </div>
+              <span class="item-status lucky">สีมงคล</span>
+            </div>
+            <div class="wardrobe-item">
+              <div class="item-color-box" style="background:#D50000;"></div>
+              <div class="item-info">
+                <strong>เดรสคอวีสีแดงสด</strong>
+                <span>ตรวจพบ: สีกาลกิณีประจำวันจันทร์</span>
+              </div>
+              <span class="item-status bad">เลี่ยงวันนี้</span>
+            </div>
+            <div class="wardrobe-item">
+              <div class="item-color-box" style="background:#E0D8CC;"></div>
+              <div class="item-info">
+                <strong>กางเกงสแล็คทรงกระบอกสีเบจ</strong>
+                <span>ไอเทมเบสิกกลาง (Neutral) แมตช์ง่าย</span>
+              </div>
+              <span class="item-status neutral">กลาง</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: กลยุทธ์แก้เคล็ด (Remedies) -->
+      <section class="tab-page" id="tabRemedies">
+        <div class="card-header-fashion">
+          <span class="section-label">KALAKINI REMEDIATION</span>
+          <h2 class="section-title">วิธีแก้เคล็ด หลีกหนีโชคร้าย</h2>
+          <p class="section-desc">เมื่อจำเป็นต้องสวมใส่เสื้อผ้าสีกาลกิณี ใช้ 3 กลยุทธ์นี้เพื่อเสริมเกราะคุ้มกัน</p>
+        </div>
+
+        <!-- Strategy 1: Hidden Shield -->
+        <div class="remedy-card">
+          <div class="remedy-badge">กลยุทธ์ที่ 1</div>
+          <h3 class="remedy-title">เกราะป้องกันพลังงานซ่อนเร้น (The Hidden Shield)</h3>
+          <p class="remedy-desc">สวมใส่เสื้อซับใน ชุดชั้นใน ถุงเท้า หรือพกผ้าเช็ดหน้าในโทนสีมงคลสูงสุด (เช่น สีขาว ครีม หรือสีเสริมเดช) ซ่อนไว้ภายใต้เสื้อผ้าสีกาลกิณี เพื่อสร้างเกราะป้องกันพลังงานบวกแนบชิดร่างกาย</p>
+        </div>
+
+        <!-- Strategy 2: Accessory Diversion -->
+        <div class="remedy-card">
+          <div class="remedy-badge">กลยุทธ์ที่ 2</div>
+          <h3 class="remedy-title">การเบี่ยงเบนสายตาด้วยเครื่องประดับ (Accessory Diversion)</h3>
+          <p class="remedy-desc">ใช้นาฬิกาข้อมือ เนกไท เข็มขัด ผ้าพันคอ หรือเคสมือถือที่เป็นสีมงคลโดดเด่น เป็นจุดรวมสายตา (Focal Point) เพื่อกระจายพลังงานบวกและหักล้างอิทธิพลของสีเสื้อผ้าหลัก</p>
+        </div>
+
+        <!-- Strategy 3: Wu Xing Suppression -->
+        <div class="remedy-card">
+          <div class="remedy-badge">กลยุทธ์ที่ 3</div>
+          <h3 class="remedy-title">ปัญจธาตุพิชิต (Wu Xing Elemental Suppression)</h3>
+          <p class="remedy-desc">ใช้หลักการธาตุข่มตามศาสตร์ฮวงจุ้ยจีน:</p>
+          <ul class="remedy-list">
+            <li><strong>จำเป็นต้องใส่สีแดง (ไฟ):</strong> ให้สวมเครื่องประดับสีน้ำเงินหรือดำ (น้ำ) เพื่อ "น้ำดับไฟ"</li>
+            <li><strong>จำเป็นต้องใส่สีเหลือง/น้ำตาล (ดิน):</strong> ให้สวมแจ็กเก็ตสีเขียว (ไม้) ทับด้านนอก "ไม้ข่มดิน"</li>
+            <li><strong>จำเป็นต้องใส่สีขาว/ทอง (ทอง):</strong> ให้พกพาไอเทมสีแดงหรือชมพู (ไฟ) "ไฟหลอมทอง"</li>
+          </ul>
+        </div>
+
+        <!-- Extra Ecosystem: กระเป๋าสตางค์ & อัญมณี -->
+        <div class="card ecosystem-card">
+          <h3 class="card-heading">✨ เสริมดวงรอบด้าน (กระเป๋าสตางค์ &amp; อัญมณี)</h3>
+          <div class="eco-grid">
+            <div class="eco-box">
+              <span class="eco-title">กระเป๋าสตางค์เรียกทรัพย์</span>
+              <p class="eco-text" id="txtWalletLucky">เหลืองเข้ม, ทอง</p>
+              <small class="eco-avoid" id="txtWalletAvoid">เลี่ยง: สีส้ม, แดง</small>
+            </div>
+            <div class="eco-box">
+              <span class="eco-title">อัญมณีและหินมงคล</span>
+              <p class="eco-text" id="txtGemstone">ไข่มุก (Pearl), มุกดาหาร</p>
+              <small class="eco-desc" id="txtGemstoneProp">เสริมเสน่ห์ ความรักใคร่เอ็นดู และโชคลาภ</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: ข้อมูลโปรไฟล์ & บัญชี -->
+      <section class="tab-page" id="tabProfile">
+        <div class="card-header-fashion">
+          <span class="section-label">ACCOUNT &amp; SETTINGS</span>
+          <h2 class="section-title">ข้อมูลส่วนตัว</h2>
+        </div>
+
+        <div class="card profile-info-card">
+          <div class="profile-avatar-circle" id="profileAvatar">ม</div>
+          <div class="profile-details">
+            <h3 class="profile-name" id="profDisplayName">คุณมิ้นท์</h3>
+            <span class="profile-email" id="profEmail">user@example.com</span>
+            <div class="profile-tags">
+              <span class="plan-tag" id="profPlanTag">สมาชิกฟรี (Free)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Premium Upsell Teaser (พร้อมรองรับการชำระเงินในอนาคต) -->
+        <div class="card premium-card">
+          <div class="premium-header">
+            <span class="crown-icon">👑</span>
+            <div class="premium-text">
+              <h4 class="premium-title">อัปเกรดเป็นสมาชิกพรีเมียม (เร็วๆ นี้)</h4>
+              <p class="premium-desc">ปลดล็อก AI วิเคราะห์ลัคนาราศีผสม 2569, วอลเปเปอร์สายมู และการแจ้งเตือนเสื้อผ้าทาง LINE ทุกคืน 20:30 น.</p>
+            </div>
+          </div>
+          <button class="btn-premium-coming" disabled>เตรียมเปิดรับสมาชิกชำระเงินเร็วๆ นี้</button>
+        </div>
+
+        <!-- Edit Profile Form -->
+        <div class="card">
+          <h3 class="card-heading">แก้ไขข้อมูลดวงชะตา</h3>
+          
+          <div class="form-group">
+            <label class="form-label">วันเกิดประจำสัปดาห์</label>
+            <select class="form-select" id="selectBirthDay">
+              <option value="อาทิตย์">วันอาทิตย์</option>
+              <option value="จันทร์" selected>วันจันทร์</option>
+              <option value="อังคาร">วันอังคาร</option>
+              <option value="พุธ (กลางวัน)">วันพุธ (กลางวัน 06:00 - 17:59)</option>
+              <option value="พุธ (กลางคืน)">วันพุธ (กลางคืน 18:00 - 05:59)</option>
+              <option value="พฤหัสบดี">วันพฤหัสบดี</option>
+              <option value="ศุกร์">วันศุกร์</option>
+              <option value="เสาร์">วันเสาร์</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">ลัคนาราศี (อิงปี 2569)</label>
+            <select class="form-select" id="selectZodiac">
+              <option value="ราศีเมษ">ราศีเมษ (ธาตุไฟ)</option>
+              <option value="ราศีพฤษภ" selected>ราศีพฤษภ (ธาตุดิน)</option>
+              <option value="ราศีเมถุน">ราศีเมถุน (ธาตุลม)</option>
+              <option value="ราศีกรกฎ">ราศีกรกฎ (ธาตุน้ำ)</option>
+              <option value="ราศีสิงห์">ราศีสิงห์ (ธาตุไฟ)</option>
+              <option value="ราศีกันย์">ราศีกันย์ (ธาตุดิน)</option>
+              <option value="ราศีตุลย์">ราศีตุลย์ (ธาตุลม)</option>
+              <option value="ราศีพิจิก">ราศีพิจิก (ธาตุน้ำ)</option>
+              <option value="ราศีธนู">ราศีธนู (ธาตุไฟ)</option>
+              <option value="ราศีมังกร">ราศีมังกร (ธาตุดิน)</option>
+              <option value="ราศีกุมภ์">ราศีกุมภ์ (ธาตุลม)</option>
+              <option value="ราศีมีน">ราศีมีน (ธาตุน้ำ)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Personal Color Season</label>
+            <select class="form-select" id="selectPersonalColor">
+              <option value="Spring" selected>Spring (ผิวขาวเหลือง/โทนอุ่นสว่าง)</option>
+              <option value="Autumn">Autumn (ผิวสองสี/โทนอุ่นเข้มเอิร์ธโทน)</option>
+              <option value="Summer">Summer (ผิวขาวอมชมพู/โทนเย็นพาสเทล)</option>
+              <option value="Winter">Winter (ผิวคมเข้มหรือขาวซีด/โทนเย็นคอนทราสต์)</option>
+            </select>
+          </div>
+
+          <button class="btn-primary" id="btnSaveProfile">บันทึกการเปลี่ยนแปลง</button>
+        </div>
+
+        <div class="action-buttons-wrap">
+          <button class="btn-secondary" id="btnLogout">ออกจากระบบ</button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Navigation Bar (4 Menus as Mockup B) -->
+    <nav class="app-bottom-nav">
+      <button class="nav-item active" data-tab="tabHome">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <span class="nav-label">หน้าแรก</span>
+      </button>
+
+      <button class="nav-item" data-tab="tabWardrobe">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a1 1 0 00.99.84H6v10a2 2 0 002 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.47a2 2 0 00-1.34-2.23z"/></svg>
+        <span class="nav-label">ตู้เสื้อผ้า</span>
+      </button>
+
+      <button class="nav-item" data-tab="tabRemedies">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        <span class="nav-label">แก้เคล็ด</span>
+      </button>
+
+      <button class="nav-item" data-tab="tabProfile">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <span class="nav-label">โปรไฟล์</span>
+      </button>
+    </nav>
+
+    <!-- Modal: Auth (Login & Register) -->
+    <div class="modal-overlay" id="modalAuth">
+      <div class="modal-sheet">
+        <div class="modal-drag-bar"></div>
+        <button class="modal-close-btn" id="btnCloseAuthModal">&times;</button>
+        
+        <div class="auth-tabs">
+          <button class="auth-tab-btn active" id="tabBtnLogin">เข้าสู่ระบบ</button>
+          <button class="auth-tab-btn" id="tabBtnRegister">สมัครสมาชิก</button>
+        </div>
+
+        <!-- Form: Login -->
+        <form class="auth-form active" id="formLogin">
+          <div class="form-group">
+            <label class="form-label">อีเมล</label>
+            <input type="email" class="form-input" id="loginEmail" placeholder="your@email.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">รหัสผ่าน</label>
+            <input type="password" class="form-input" id="loginPassword" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn-primary" id="btnSubmitLogin">เข้าสู่ระบบ</button>
+        </form>
+
+        <!-- Form: Register -->
+        <form class="auth-form" id="formRegister">
+          <div class="form-group">
+            <label class="form-label">ชื่อที่ต้องการให้เรียก</label>
+            <input type="text" class="form-input" id="regName" placeholder="เช่น คุณมิ้นท์" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">อีเมล</label>
+            <input type="email" class="form-input" id="regEmail" placeholder="your@email.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">รหัสผ่าน</label>
+            <input type="password" class="form-input" id="regPassword" placeholder="อย่างน้อย 6 ตัวอักษร" required minlength="6">
+          </div>
+          <div class="form-group">
+            <label class="form-label">วันเกิดประจำสัปดาห์</label>
+            <select class="form-select" id="regBirthDay">
+              <option value="อาทิตย์">วันอาทิตย์</option>
+              <option value="จันทร์" selected>วันจันทร์</option>
+              <option value="อังคาร">วันอังคาร</option>
+              <option value="พุธ (กลางวัน)">วันพุธ (กลางวัน 06:00 - 17:59)</option>
+              <option value="พุธ (กลางคืน)">วันพุธ (กลางคืน 18:00 - 05:59)</option>
+              <option value="พฤหัสบดี">วันพฤหัสบดี</option>
+              <option value="ศุกร์">วันศุกร์</option>
+              <option value="เสาร์">วันเสาร์</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Personal Color</label>
+            <select class="form-select" id="regPersonalColor">
+              <option value="Spring" selected>Spring (Warm สว่าง สดใส)</option>
+              <option value="Autumn">Autumn (Warm เข้ม เอิร์ธโทน)</option>
+              <option value="Summer">Summer (Cool สว่าง พาสเทล)</option>
+              <option value="Winter">Winter (Cool เข้ม คมชัด)</option>
+            </select>
+          </div>
+
+          <!-- PDPA Consent Checkbox -->
+          <div class="pdpa-consent-group">
+            <label class="checkbox-container">
+              <input type="checkbox" id="regPdpaConsent" required>
+              <span class="checkmark"></span>
+              <span class="pdpa-label-text">
+                ข้าพเจ้ายินยอมให้ประมวลผลข้อมูลวันเกิดและรสนิยมสีเพื่อรับคำแนะนำตามหลัก พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล (PDPA)
+              </span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-primary" id="btnSubmitRegister">สร้างบัญชีสมาชิก</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal: Google Apps Script API Connection Settings -->
+    <div class="modal-overlay" id="modalConfig">
+      <div class="modal-sheet">
+        <div class="modal-drag-bar"></div>
+        <button class="modal-close-btn" id="btnCloseConfigModal">&times;</button>
+        <h3 class="card-heading">การเชื่อมต่อ Google Sheets</h3>
+        <p class="card-subtext">คุณสามารถใช้งานในโหมดทดลองทันที หรือเชื่อมต่อ Web App URL จาก Google Apps Script ได้</p>
+
+        <div class="form-group">
+          <label class="form-label">Google Apps Script Web App URL</label>
+          <input type="url" class="form-input" id="inputApiUrl" placeholder="https://script.google.com/macros/s/.../exec">
+          <small class="helper-text">หากเว้นว่างไว้ ระบบจะทำงานในโหมด "สาธิตออฟไลน์ (Local Demo Mode)" ให้ทดสอบฟีเจอร์ได้ทันที</small>
+        </div>
+
+        <div class="api-status-badge" id="apiStatusBadge">
+          สถานะ: โหมดสาธิตออฟไลน์ (ทำงานได้ครบทุกฟังก์ชัน)
+        </div>
+
+        <button class="btn-primary" id="btnSaveApiConfig">บันทึกการตั้งค่า</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
