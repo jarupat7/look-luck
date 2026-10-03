@@ -146,6 +146,23 @@ const DOM = {
   txtDeityTrait: document.getElementById('txtDeityTrait'),
   txtDeityStory: document.getElementById('txtDeityStory'),
   
+  // Radar Chart Elements
+  radarChartCanvas: document.getElementById('radarChartCanvas'),
+  radarTotalScore: document.getElementById('radarTotalScore'),
+  radarScoreLevel: document.getElementById('radarScoreLevel'),
+  valScoreWork: document.getElementById('valScoreWork'),
+  valScoreMoney: document.getElementById('valScoreMoney'),
+  valScoreLove: document.getElementById('valScoreLove'),
+  valScoreHealth: document.getElementById('valScoreHealth'),
+  valScoreWisdom: document.getElementById('valScoreWisdom'),
+  radarInsightText: document.getElementById('radarInsightText'),
+  itemScoreWork: document.getElementById('itemScoreWork'),
+  itemScoreMoney: document.getElementById('itemScoreMoney'),
+  itemScoreLove: document.getElementById('itemScoreLove'),
+  itemScoreHealth: document.getElementById('itemScoreHealth'),
+  itemScoreWisdom: document.getElementById('itemScoreWisdom'),
+
+  
   // Tab Wardrobe
   seasonCards: document.querySelectorAll('.season-card'),
   
@@ -348,7 +365,15 @@ function setupEventListeners() {
     DOM.modalConfig.classList.remove('active');
     alert('บันทึกการตั้งค่า API แล้ว');
   });
+
+  // --- Resize Listener for Radar Chart ---
+  window.addEventListener('resize', () => {
+    if (AppState.currentUser && AppState.currentUser.isLoggedIn && AppState.activeTab === 'tabHome') {
+      renderRadarChart();
+    }
+  });
 }
+
 
 function switchMainAuthTab(mode) {
   if (mode === 'login') {
@@ -503,8 +528,12 @@ function switchTab(tabId) {
   DOM.tabPages.forEach(p => {
     p.classList.toggle('active', p.id === tabId);
   });
+  if (tabId === 'tabHome') {
+    setTimeout(renderRadarChart, 60);
+  }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
 
 function updateHeaderBadges() {
   const u = AppState.currentUser;
@@ -640,7 +669,188 @@ function updateDailyColorsAndAdvice() {
   DOM.txtWalletAvoid.textContent = `เลี่ยง: ${wg.walletAvoid}`;
   DOM.txtGemstone.textContent = wg.gem;
   DOM.txtGemstoneProp.textContent = wg.gemProp;
+
+  // 5. Render Radar Chart (ดัชนีคะแนนพลังดวง 5 มิติ)
+  renderRadarChart();
 }
+
+/**
+ * ฟังก์ชันวาดกราฟเรดาร์ (Spider/Radar Chart) แสดงคะแนนพลังดวง 5 มิติ
+ */
+function renderRadarChart() {
+  const canvas = DOM.radarChartCanvas;
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const user = AppState.currentUser;
+  const dayKey = (user && user.birthDay) ? user.birthDay : 'จันทร์';
+  const goal = AppState.currentGoal || 'work';
+
+  // ฐานคะแนนดวงรายวันตามวันเกิด (ดาวครองเรือน)
+  const baseScores = {
+    'อาทิตย์': { work: 92, money: 84, love: 82, health: 85, wisdom: 88 },
+    'จันทร์': { work: 84, money: 90, love: 95, health: 82, wisdom: 86 },
+    'อังคาร': { work: 94, money: 86, love: 79, health: 91, wisdom: 83 },
+    'พุธ (กลางวัน)': { work: 86, money: 88, love: 85, health: 81, wisdom: 96 },
+    'พุธ (กลางคืน)': { work: 88, money: 94, love: 83, health: 79, wisdom: 89 },
+    'พฤหัสบดี': { work: 89, money: 85, love: 87, health: 86, wisdom: 97 },
+    'ศุกร์': { work: 83, money: 93, love: 96, health: 85, wisdom: 88 },
+    'เสาร์': { work: 91, money: 88, love: 80, health: 89, wisdom: 86 }
+  };
+
+  const scores = Object.assign({}, baseScores[dayKey] || baseScores['จันทร์']);
+
+  // บูสต์คะแนนตามเป้าหมายที่ผู้ใช้เลือกในวันนั้น (Goal Alignment)
+  if (goal === 'work') scores.work = Math.min(99, scores.work + 6);
+  else if (goal === 'money') scores.money = Math.min(99, scores.money + 6);
+  else if (goal === 'love') scores.love = Math.min(99, scores.love + 6);
+  else if (goal === 'casual') scores.health = Math.min(99, scores.health + 6);
+
+  // อัปเดตตัวเลขในกล่อง Badge ด้านล่างกราฟ
+  if (DOM.valScoreWork) DOM.valScoreWork.textContent = scores.work + '%';
+  if (DOM.valScoreMoney) DOM.valScoreMoney.textContent = scores.money + '%';
+  if (DOM.valScoreLove) DOM.valScoreLove.textContent = scores.love + '%';
+  if (DOM.valScoreHealth) DOM.valScoreHealth.textContent = scores.health + '%';
+  if (DOM.valScoreWisdom) DOM.valScoreWisdom.textContent = scores.wisdom + '%';
+
+  // ไฮไลต์ป้ายคะแนนด้านที่ตรงกับเป้าหมาย
+  const mapItem = { work: DOM.itemScoreWork, money: DOM.itemScoreMoney, love: DOM.itemScoreLove, casual: DOM.itemScoreHealth };
+  [DOM.itemScoreWork, DOM.itemScoreMoney, DOM.itemScoreLove, DOM.itemScoreHealth, DOM.itemScoreWisdom].forEach(el => {
+    if (el) el.classList.remove('active');
+  });
+  if (mapItem[goal]) mapItem[goal].classList.add('active');
+
+  // คำนวณคะแนนรวมเฉลี่ย
+  const totalAvg = Math.round((scores.work + scores.money + scores.love + scores.health + scores.wisdom) / 5);
+  if (DOM.radarTotalScore) DOM.radarTotalScore.textContent = totalAvg + '%';
+  if (DOM.radarScoreLevel) {
+    if (totalAvg >= 88) DOM.radarScoreLevel.textContent = 'เกณฑ์ดีเยี่ยม';
+    else if (totalAvg >= 78) DOM.radarScoreLevel.textContent = 'เกณฑ์ดีมาก';
+    else DOM.radarScoreLevel.textContent = 'เกณฑ์ปานกลาง';
+  }
+
+  // คำทำนายเชิงลึกตามมิติที่เด่นที่สุด
+  if (DOM.radarInsightText) {
+    if (goal === 'money' || scores.money >= 92) {
+      DOM.radarInsightText.textContent = `วันนี้คลื่นพลังการเงิน (${scores.money}%) พุ่งสูงเป็นพิเศษ แนะนำสวมใส่สีเสริมทรัพย์เพื่อกระตุ้นโชคลาภและการค้าขาย`;
+    } else if (goal === 'work' || scores.work >= 92) {
+      DOM.radarInsightText.textContent = `วันนี้คลื่นพลังอำนาจบารมี (${scores.work}%) โดดเด่น หนุนนำให้การเจรจาและการตัดสินใจได้รับความเชื่อมั่น`;
+    } else if (goal === 'love' || scores.love >= 92) {
+      DOM.radarInsightText.textContent = `วันนี้เสน่ห์เมตตามหานิยม (${scores.love}%) ส่องประกาย ช่วยให้การประสานงานและการออกเดตราบรื่นน่าประทับใจ`;
+    } else {
+      DOM.radarInsightText.textContent = `วันนี้ความสมดุลกายใจ (${scores.health}%) และสติปัญญา (${scores.wisdom}%) ยอดเยี่ยม เหมาะแก่การวางแผนระยะยาว`;
+    }
+  }
+
+  // รองรับหน้าจอ Retina / High DPI
+  const dpr = window.devicePixelRatio || 1;
+  const width = 340;
+  const height = 280;
+  canvas.width = width * dpr;
+  canvas.height = height * dpr;
+  canvas.style.width = width + 'px';
+  canvas.style.height = height + 'px';
+  ctx.scale(dpr, dpr);
+
+  ctx.clearRect(0, 0, width, height);
+
+  const cx = width / 2;
+  const cy = height / 2 + 6;
+  const radius = 86;
+  const axes = [
+    { label: 'การงาน', score: scores.work, key: 'work' },
+    { label: 'การเงิน', score: scores.money, key: 'money' },
+    { label: 'ความรัก', score: scores.love, key: 'love' },
+    { label: 'สุขภาพ', score: scores.health, key: 'health' },
+    { label: 'สติปัญญา', score: scores.wisdom, key: 'wisdom' }
+  ];
+  const numAxes = axes.length;
+  const angleStep = (Math.PI * 2) / numAxes;
+  const startAngle = -Math.PI / 2; // เริ่มจากด้านบน
+
+  // 1. วาดโครงร่างใยแมงมุม 5 ระดับ (20%, 40%, 60%, 80%, 100%)
+  const levels = [0.2, 0.4, 0.6, 0.8, 1.0];
+  levels.forEach((lvl, idx) => {
+    ctx.beginPath();
+    for (let i = 0; i < numAxes; i++) {
+      const a = startAngle + i * angleStep;
+      const x = cx + radius * lvl * Math.cos(a);
+      const y = cy + radius * lvl * Math.sin(a);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = idx === levels.length - 1 ? '#D7CFBE' : '#EFEAE0';
+    ctx.lineWidth = idx === levels.length - 1 ? 1.5 : 1;
+    ctx.stroke();
+  });
+
+  // 2. วาดแกนกิ่งเชื่อมจากจุดกึ่งกลาง (Axis Spokes)
+  for (let i = 0; i < numAxes; i++) {
+    const a = startAngle + i * angleStep;
+    const x = cx + radius * Math.cos(a);
+    const y = cy + radius * Math.sin(a);
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(x, y);
+    ctx.strokeStyle = '#EAE4D7';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // 3. วาดรูปร่างพื้นที่คะแนนดวง (Filled Radar Polygon)
+  ctx.beginPath();
+  const points = [];
+  for (let i = 0; i < numAxes; i++) {
+    const a = startAngle + i * angleStep;
+    const norm = Math.max(0.15, Math.min(1.0, axes[i].score / 100));
+    const r = radius * norm;
+    const x = cx + r * Math.cos(a);
+    const y = cy + r * Math.sin(a);
+    points.push({ x, y, score: axes[i].score, label: axes[i].label, key: axes[i].key });
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+
+  // ลงสีไล่ระดับแสงทองนวลแฟชั่น
+  const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, radius);
+  grad.addColorStop(0, 'rgba(197, 160, 89, 0.45)');
+  grad.addColorStop(1, 'rgba(235, 196, 142, 0.16)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  ctx.strokeStyle = '#9C7238';
+  ctx.lineWidth = 2.4;
+  ctx.stroke();
+
+  // 4. วาดจุดมาร์กเกอร์และตัวหนังสือรอบด้าน
+  points.forEach((pt, i) => {
+    // จุดวงกลมบนยอดมุม
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, 4.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fill();
+    ctx.strokeStyle = '#9C7238';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // ตำแหน่งชื่อป้ายรอบนอก
+    const a = startAngle + i * angleStep;
+    const labelDist = radius + 22;
+    const lx = cx + labelDist * Math.cos(a);
+    const ly = cy + labelDist * Math.sin(a) + 3;
+
+    ctx.font = '600 11px Prompt, Sarabun, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const isHighlighted = (pt.key === goal || (goal === 'casual' && pt.key === 'health'));
+    ctx.fillStyle = isHighlighted ? '#8C6239' : '#332D29';
+    ctx.fillText(`${pt.label} ${pt.score}%`, lx, ly);
+  });
+}
+
 
 function updateApiStatusBadge() {
   if (AppState.apiUrl) {

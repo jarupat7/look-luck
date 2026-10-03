@@ -245,6 +245,55 @@
             </div>
           </div>
 
+          <!-- Radar Chart Section: ดัชนีคะแนนพลังดวง 5 มิติ -->
+          <div class="card radar-card">
+            <div class="radar-card-header">
+              <div>
+                <span class="section-label">ENERGY SPECTRUM</span>
+                <h3 class="section-title">ดัชนีพลังดวงวันนี้</h3>
+                <p class="section-desc">วิเคราะห์คลื่นพลังงาน 5 มิติตามดาวเสวยอายุ</p>
+              </div>
+              <div class="total-score-badge">
+                <span class="score-num" id="radarTotalScore">88%</span>
+                <small id="radarScoreLevel">เกณฑ์ดีเยี่ยม</small>
+              </div>
+            </div>
+
+            <!-- Canvas Container -->
+            <div class="radar-canvas-container">
+              <canvas id="radarChartCanvas" width="340" height="280"></canvas>
+            </div>
+
+            <!-- Radar Score Badges Grid -->
+            <div class="radar-scores-grid" id="radarScoresGrid">
+              <div class="radar-score-item" id="itemScoreWork">
+                <span class="score-tag">การงาน</span>
+                <strong class="score-val" id="valScoreWork">85%</strong>
+              </div>
+              <div class="radar-score-item" id="itemScoreMoney">
+                <span class="score-tag">การเงิน</span>
+                <strong class="score-val" id="valScoreMoney">92%</strong>
+              </div>
+              <div class="radar-score-item" id="itemScoreLove">
+                <span class="score-tag">ความรัก</span>
+                <strong class="score-val" id="valScoreLove">88%</strong>
+              </div>
+              <div class="radar-score-item" id="itemScoreHealth">
+                <span class="score-tag">สุขภาพ</span>
+                <strong class="score-val" id="valScoreHealth">78%</strong>
+              </div>
+              <div class="radar-score-item" id="itemScoreWisdom">
+                <span class="score-tag">สติปัญญา</span>
+                <strong class="score-val" id="valScoreWisdom">90%</strong>
+              </div>
+            </div>
+
+            <div class="radar-insight-box">
+              <span class="insight-icon">✨</span>
+              <p id="radarInsightText">วันนี้พลังงานด้านการเงินและสติปัญญาสูงเด่น เหมาะแก่การเจรจาธุรกิจและคว้าโอกาสใหม่</p>
+            </div>
+          </div>
+
           <!-- Goal Selection Chips (สิ่งที่อยากเสริมวันนี้) -->
           <div class="section-container">
             <div class="section-title-wrap">

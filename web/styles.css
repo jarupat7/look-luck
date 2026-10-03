@@ -1216,3 +1216,125 @@ body {
   padding-top: 16px;
 }
 
+/* =========================================
+   Radar Chart: Energy Spectrum Styling
+   ========================================= */
+.radar-card {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FDFBF7 100%);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.radar-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.total-score-badge {
+  background: linear-gradient(135deg, #FFF9EB 0%, #F6ECDA 100%);
+  border: 1px solid #EADBBA;
+  border-radius: var(--radius-md);
+  padding: 6px 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(197, 160, 89, 0.12);
+}
+
+.score-num {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--brand-gold-dark);
+  line-height: 1;
+}
+
+.total-score-badge small {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #78350F;
+  margin-top: 2px;
+}
+
+.radar-canvas-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 0 10px 0;
+  overflow: hidden;
+}
+
+#radarChartCanvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.radar-scores-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.radar-score-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px 2px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s;
+}
+
+.radar-score-item.active {
+  border-color: var(--brand-gold);
+  background: #FFFDF8;
+  box-shadow: 0 2px 8px rgba(197, 160, 89, 0.2);
+}
+
+.score-tag {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.score-val {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: 2px;
+}
+
+.radar-insight-box {
+  background-color: #FBF8F2;
+  border: 1px solid #EFE8DC;
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.insight-icon {
+  font-size: 1.1rem;
+}
+
+.radar-insight-box p {
+  font-size: 0.76rem;
+  color: #6D4C41;
+  line-height: 1.4;
+  margin: 0;
+}
+
+
