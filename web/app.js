@@ -83,8 +83,8 @@ const LOCAL_WALLETS = {
 const AppState = {
   currentUser: {
     isLoggedIn: false,
-    displayName: 'คุณมิ้นท์',
-    email: 'mint@example.com',
+    displayName: '',
+    email: '',
     birthDay: 'จันทร์',
     zodiac: 'ราศีพฤษภ',
     personalColor: 'Spring',
@@ -98,12 +98,34 @@ const AppState = {
 
 // DOM Elements
 const DOM = {
+  // Views
+  viewAuth: document.getElementById('viewAuth'),
+  viewMain: document.getElementById('viewMain'),
+
+  // Auth Landing View
+  btnTabLogin: document.getElementById('btnTabLogin'),
+  btnTabRegister: document.getElementById('btnTabRegister'),
+  formMainLogin: document.getElementById('formMainLogin'),
+  formMainRegister: document.getElementById('formMainRegister'),
+  authLoginEmail: document.getElementById('authLoginEmail'),
+  authLoginPassword: document.getElementById('authLoginPassword'),
+  authRegName: document.getElementById('authRegName'),
+  authRegEmail: document.getElementById('authRegEmail'),
+  authRegPassword: document.getElementById('authRegPassword'),
+  authRegBirthDay: document.getElementById('authRegBirthDay'),
+  authRegPersonalColor: document.getElementById('authRegPersonalColor'),
+  authRegPdpaConsent: document.getElementById('authRegPdpaConsent'),
+  btnGuestPreview: document.getElementById('btnGuestPreview'),
+  btnOpenConfigFromAuth: document.getElementById('btnOpenConfigFromAuth'),
+
+  // Main View Header
   currentDateDisplay: document.getElementById('currentDateDisplay'),
   displayUserName: document.getElementById('displayUserName'),
   badgeBirthDay: document.getElementById('badgeBirthDay'),
   badgeSeason: document.getElementById('badgeSeason'),
   badgePlan: document.getElementById('badgePlan'),
-  btnAuthAction: document.getElementById('btnAuthAction'),
+  btnSwitchToProfile: document.getElementById('btnSwitchToProfile'),
+  btnOpenConfig: document.getElementById('btnOpenConfig'),
   
   // Tab Home Elements
   txtWorkColors: document.getElementById('txtWorkColors'),
@@ -150,17 +172,8 @@ const DOM = {
   tabPages: document.querySelectorAll('.tab-page'),
   chipBtns: document.querySelectorAll('.chip-btn'),
 
-  // Modals
-  modalAuth: document.getElementById('modalAuth'),
-  btnCloseAuthModal: document.getElementById('btnCloseAuthModal'),
-  tabBtnLogin: document.getElementById('tabBtnLogin'),
-  tabBtnRegister: document.getElementById('tabBtnRegister'),
-  formLogin: document.getElementById('formLogin'),
-  formRegister: document.getElementById('formRegister'),
-
   // Config Modal
   modalConfig: document.getElementById('modalConfig'),
-  btnOpenConfig: document.getElementById('btnOpenConfig'),
   btnCloseConfigModal: document.getElementById('btnCloseConfigModal'),
   inputApiUrl: document.getElementById('inputApiUrl'),
   btnSaveApiConfig: document.getElementById('btnSaveApiConfig'),
@@ -178,7 +191,10 @@ function loadSavedUser() {
   const saved = localStorage.getItem('LUCKY_USER');
   if (saved) {
     try {
-      AppState.currentUser = JSON.parse(saved);
+      const parsed = JSON.parse(saved);
+      if (parsed && typeof parsed.isLoggedIn === 'boolean') {
+        AppState.currentUser = parsed;
+      }
     } catch(e) {
       console.warn('Failed to parse saved user', e);
     }
@@ -189,8 +205,65 @@ function saveUserToStorage() {
   localStorage.setItem('LUCKY_USER', JSON.stringify(AppState.currentUser));
 }
 
+function updateViewMode() {
+  const isAuth = AppState.currentUser && AppState.currentUser.isLoggedIn;
+  if (isAuth) {
+    DOM.viewAuth.style.display = 'none';
+    DOM.viewMain.style.display = 'block';
+  } else {
+    DOM.viewAuth.style.display = 'flex';
+    DOM.viewMain.style.display = 'none';
+  }
+}
+
 function setupEventListeners() {
-  // Navigation Tabs
+  // --- Auth Screen Tabs (Login / Register Switch) ---
+  if (DOM.btnTabLogin && DOM.btnTabRegister) {
+    DOM.btnTabLogin.addEventListener('click', () => switchMainAuthTab('login'));
+    DOM.btnTabRegister.addEventListener('click', () => switchMainAuthTab('register'));
+  }
+
+  // --- Auth Form Submissions ---
+  if (DOM.formMainLogin) {
+    DOM.formMainLogin.addEventListener('submit', (e) => {
+      e.preventDefault();
+      handleMainLogin();
+    });
+  }
+
+  if (DOM.formMainRegister) {
+    DOM.formMainRegister.addEventListener('submit', (e) => {
+      e.preventDefault();
+      handleMainRegister();
+    });
+  }
+
+  // --- Guest Mode Link ---
+  if (DOM.btnGuestPreview) {
+    DOM.btnGuestPreview.addEventListener('click', () => {
+      AppState.currentUser = {
+        isLoggedIn: true,
+        displayName: 'คุณผู้เยี่ยมชม',
+        email: 'guest@everydaylucky.app',
+        birthDay: 'จันทร์',
+        zodiac: 'ราศีพฤษภ',
+        personalColor: 'Spring',
+        plan: 'free',
+        token: 'GUEST_' + Date.now()
+      };
+      saveUserToStorage();
+      renderApp();
+    });
+  }
+
+  // --- Header Profile Button ---
+  if (DOM.btnSwitchToProfile) {
+    DOM.btnSwitchToProfile.addEventListener('click', () => {
+      switchTab('tabProfile');
+    });
+  }
+
+  // --- Navigation Tabs in Main View ---
   DOM.navItems.forEach(item => {
     item.addEventListener('click', () => {
       const targetTab = item.getAttribute('data-tab');
@@ -198,7 +271,7 @@ function setupEventListeners() {
     });
   });
 
-  // Goal Chips
+  // --- Goal Chips ---
   DOM.chipBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       DOM.chipBtns.forEach(b => b.classList.remove('active'));
@@ -208,7 +281,7 @@ function setupEventListeners() {
     });
   });
 
-  // Personal Color Season Cards in Wardrobe
+  // --- Personal Color Season Cards in Wardrobe ---
   DOM.seasonCards.forEach(card => {
     card.addEventListener('click', () => {
       DOM.seasonCards.forEach(c => c.classList.remove('active'));
@@ -222,69 +295,46 @@ function setupEventListeners() {
     });
   });
 
-  // Quick button to Remedies
+  // --- Quick button to Remedies ---
   if (DOM.btnGoToRemedy) {
     DOM.btnGoToRemedy.addEventListener('click', () => {
       switchTab('tabRemedies');
     });
   }
 
-  // Auth Button (Header)
-  DOM.btnAuthAction.addEventListener('click', () => {
-    if (AppState.currentUser.isLoggedIn) {
-      switchTab('tabProfile');
-    } else {
-      openAuthModal('login');
-    }
-  });
+  // --- Save Profile (From Profile Tab) ---
+  if (DOM.btnSaveProfile) {
+    DOM.btnSaveProfile.addEventListener('click', () => {
+      AppState.currentUser.birthDay = DOM.selectBirthDay.value;
+      AppState.currentUser.zodiac = DOM.selectZodiac.value;
+      AppState.currentUser.personalColor = DOM.selectPersonalColor.value;
+      saveUserToStorage();
+      renderApp();
+      alert('บันทึกข้อมูลดวงชะตาเรียบร้อยแล้ว!');
+    });
+  }
 
-  // Modals Close
-  DOM.btnCloseAuthModal.addEventListener('click', () => closeAuthModal());
-  DOM.modalAuth.addEventListener('click', (e) => {
-    if (e.target === DOM.modalAuth) closeAuthModal();
-  });
+  // --- Logout Button ---
+  if (DOM.btnLogout) {
+    DOM.btnLogout.addEventListener('click', () => {
+      AppState.currentUser.isLoggedIn = false;
+      AppState.currentUser.token = null;
+      saveUserToStorage();
+      renderApp();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
 
-  // Auth Tab Switch
-  DOM.tabBtnLogin.addEventListener('click', () => switchAuthForm('login'));
-  DOM.tabBtnRegister.addEventListener('click', () => switchAuthForm('register'));
-
-  // Submit Login
-  DOM.formLogin.addEventListener('submit', (e) => {
-    e.preventDefault();
-    handleLoginSubmit();
-  });
-
-  // Submit Register
-  DOM.formRegister.addEventListener('submit', (e) => {
-    e.preventDefault();
-    handleRegisterSubmit();
-  });
-
-  // Save Profile (From Profile Tab)
-  DOM.btnSaveProfile.addEventListener('click', () => {
-    AppState.currentUser.birthDay = DOM.selectBirthDay.value;
-    AppState.currentUser.zodiac = DOM.selectZodiac.value;
-    AppState.currentUser.personalColor = DOM.selectPersonalColor.value;
-    saveUserToStorage();
-    renderApp();
-    alert('บันทึกข้อมูลดวงชะตาเรียบร้อยแล้ว!');
-  });
-
-  // Logout
-  DOM.btnLogout.addEventListener('click', () => {
-    AppState.currentUser.isLoggedIn = false;
-    AppState.currentUser.token = null;
-    saveUserToStorage();
-    renderApp();
-    alert('ออกจากระบบเรียบร้อยแล้ว');
-  });
-
-  // Config Modal
-  DOM.btnOpenConfig.addEventListener('click', () => {
+  // --- Config Modal Events ---
+  const openConfigModal = () => {
     DOM.inputApiUrl.value = AppState.apiUrl;
     updateApiStatusBadge();
     DOM.modalConfig.classList.add('active');
-  });
+  };
+
+  if (DOM.btnOpenConfig) DOM.btnOpenConfig.addEventListener('click', openConfigModal);
+  if (DOM.btnOpenConfigFromAuth) DOM.btnOpenConfigFromAuth.addEventListener('click', openConfigModal);
+
   DOM.btnCloseConfigModal.addEventListener('click', () => {
     DOM.modalConfig.classList.remove('active');
   });
@@ -300,6 +350,151 @@ function setupEventListeners() {
   });
 }
 
+function switchMainAuthTab(mode) {
+  if (mode === 'login') {
+    DOM.btnTabLogin.classList.add('active');
+    DOM.btnTabRegister.classList.remove('active');
+    DOM.formMainLogin.classList.add('active');
+    DOM.formMainRegister.classList.remove('active');
+  } else {
+    DOM.btnTabLogin.classList.remove('active');
+    DOM.btnTabRegister.classList.add('active');
+    DOM.formMainLogin.classList.remove('active');
+    DOM.formMainRegister.classList.add('active');
+  }
+}
+
+async function handleMainLogin() {
+  const email = DOM.authLoginEmail.value.trim();
+  const password = DOM.authLoginPassword.value;
+
+  if (!email || !password) {
+    alert('กรุณากรอกอีเมลและรหัสผ่าน');
+    return;
+  }
+
+  if (AppState.apiUrl) {
+    try {
+      const res = await fetch(AppState.apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'login', email, password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        AppState.currentUser = {
+          isLoggedIn: true,
+          displayName: data.user.displayName,
+          email: data.user.email,
+          birthDay: data.user.birthDay,
+          zodiac: data.user.zodiac || 'ราศีพฤษภ',
+          personalColor: data.user.personalColor || 'Spring',
+          plan: data.user.plan || 'free',
+          token: data.token
+        };
+        saveUserToStorage();
+        renderApp();
+        alert(data.message);
+        return;
+      } else {
+        alert(data.message);
+        return;
+      }
+    } catch(err) {
+      console.warn('API connection failed, falling back to local demo login', err);
+    }
+  }
+
+  // Local Demo Login fallback
+  AppState.currentUser = {
+    isLoggedIn: true,
+    displayName: email.split('@')[0],
+    email: email,
+    birthDay: AppState.currentUser.birthDay || 'จันทร์',
+    zodiac: AppState.currentUser.zodiac || 'ราศีพฤษภ',
+    personalColor: AppState.currentUser.personalColor || 'Spring',
+    plan: 'free',
+    token: 'DEMO_TOKEN_' + Date.now()
+  };
+  saveUserToStorage();
+  renderApp();
+  alert(`เข้าสู่ระบบสำเร็จ ยินดีต้อนรับคุณ ${AppState.currentUser.displayName}`);
+}
+
+async function handleMainRegister() {
+  const name = DOM.authRegName.value.trim();
+  const email = DOM.authRegEmail.value.trim();
+  const password = DOM.authRegPassword.value;
+  const birthDay = DOM.authRegBirthDay.value;
+  const personalColor = DOM.authRegPersonalColor.value;
+  const pdpaConsent = DOM.authRegPdpaConsent.checked;
+
+  if (!name || !email || !password) {
+    alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+    return;
+  }
+
+  if (!pdpaConsent) {
+    alert('กรุณายินยอมเงื่อนไขการคุ้มครองข้อมูลส่วนบุคคล (PDPA)');
+    return;
+  }
+
+  if (AppState.apiUrl) {
+    try {
+      const res = await fetch(AppState.apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: 'register',
+          displayName: name,
+          email: email,
+          password: password,
+          birthDay: birthDay,
+          personalColor: personalColor,
+          pdpaConsent: true
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        AppState.currentUser = {
+          isLoggedIn: true,
+          displayName: data.user.displayName,
+          email: data.user.email,
+          birthDay: data.user.birthDay,
+          zodiac: data.user.zodiac || 'ราศีพฤษภ',
+          personalColor: data.user.personalColor || personalColor,
+          plan: 'free',
+          token: data.token
+        };
+        saveUserToStorage();
+        renderApp();
+        alert(data.message);
+        return;
+      } else {
+        alert(data.message);
+        return;
+      }
+    } catch(err) {
+      console.warn('API connection failed, falling back to local demo register', err);
+    }
+  }
+
+  // Local Demo Register fallback
+  AppState.currentUser = {
+    isLoggedIn: true,
+    displayName: name,
+    email: email,
+    birthDay: birthDay,
+    zodiac: 'ราศีพฤษภ',
+    personalColor: personalColor,
+    plan: 'free',
+    token: 'DEMO_TOKEN_' + Date.now()
+  };
+  saveUserToStorage();
+  renderApp();
+  alert(`สมัครสมาชิกสำเร็จ! ยินดีต้อนรับคุณ ${name} สู่โชคดีทุกวัน`);
+}
+
 function switchTab(tabId) {
   AppState.activeTab = tabId;
   DOM.navItems.forEach(n => {
@@ -313,19 +508,20 @@ function switchTab(tabId) {
 
 function updateHeaderBadges() {
   const u = AppState.currentUser;
-  DOM.displayUserName.textContent = u.displayName || 'ผู้เยี่ยมชม';
+  if (!u || !u.isLoggedIn) return;
+
+  DOM.displayUserName.textContent = u.displayName || 'ผู้ใช้งาน';
   DOM.badgeBirthDay.textContent = `เกิดวัน${u.birthDay}`;
   DOM.badgeSeason.textContent = `Personal Color: ${u.personalColor}`;
   DOM.badgePlan.textContent = u.plan === 'premium' ? '👑 Premium Member' : 'Free Member';
-  DOM.btnAuthAction.textContent = u.isLoggedIn ? 'โปรไฟล์' : 'เข้าสู่ระบบ';
 
   // Profile Page
-  DOM.profDisplayName.textContent = u.displayName || 'ผู้เยี่ยมชม';
+  DOM.profDisplayName.textContent = u.displayName || 'ผู้ใช้งาน';
   DOM.profEmail.textContent = u.email || 'user@example.com';
-  DOM.profileAvatar.textContent = (u.displayName || 'ม').charAt(0);
+  DOM.profileAvatar.textContent = (u.displayName || 'ช').charAt(0);
   DOM.selectBirthDay.value = u.birthDay;
-  DOM.selectZodiac.value = u.zodiac;
-  DOM.selectPersonalColor.value = u.personalColor;
+  DOM.selectZodiac.value = u.zodiac || 'ราศีพฤษภ';
+  DOM.selectPersonalColor.value = u.personalColor || 'Spring';
   DOM.profPlanTag.textContent = u.plan === 'premium' ? '👑 สมาชิกพรีเมียม (VIP)' : 'สมาชิกฟรี (Free)';
 
   // Sync Season Grid in Wardrobe
@@ -335,9 +531,12 @@ function updateHeaderBadges() {
 }
 
 function renderApp() {
-  updateCurrentDate();
-  updateHeaderBadges();
-  updateDailyColorsAndAdvice();
+  updateViewMode();
+  if (AppState.currentUser && AppState.currentUser.isLoggedIn) {
+    updateCurrentDate();
+    updateHeaderBadges();
+    updateDailyColorsAndAdvice();
+  }
 }
 
 function updateCurrentDate() {
@@ -353,10 +552,10 @@ function updateCurrentDate() {
 
 function updateDailyColorsAndAdvice() {
   const user = AppState.currentUser;
-  const dayKey = user.birthDay || 'จันทร์';
+  const dayKey = (user && user.birthDay) ? user.birthDay : 'จันทร์';
   const rules = LOCAL_COLOR_RULES[dayKey] || LOCAL_COLOR_RULES['จันทร์'];
   const goal = AppState.currentGoal;
-  const season = user.personalColor || 'Spring';
+  const season = (user && user.personalColor) ? user.personalColor : 'Spring';
 
   // 1. Swatches Text & Pill Visuals
   DOM.txtWorkColors.textContent = rules.work.name;
@@ -441,155 +640,6 @@ function updateDailyColorsAndAdvice() {
   DOM.txtWalletAvoid.textContent = `เลี่ยง: ${wg.walletAvoid}`;
   DOM.txtGemstone.textContent = wg.gem;
   DOM.txtGemstoneProp.textContent = wg.gemProp;
-}
-
-// Auth Handlers
-function openAuthModal(mode) {
-  switchAuthForm(mode);
-  DOM.modalAuth.classList.add('active');
-}
-
-function closeAuthModal() {
-  DOM.modalAuth.classList.remove('active');
-}
-
-function switchAuthForm(mode) {
-  if (mode === 'login') {
-    DOM.tabBtnLogin.classList.add('active');
-    DOM.tabBtnRegister.classList.remove('active');
-    DOM.formLogin.classList.add('active');
-    DOM.formRegister.classList.remove('active');
-  } else {
-    DOM.tabBtnLogin.classList.remove('active');
-    DOM.tabBtnRegister.classList.add('active');
-    DOM.formLogin.classList.remove('active');
-    DOM.formRegister.classList.add('active');
-  }
-}
-
-async function handleLoginSubmit() {
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value;
-
-  if (AppState.apiUrl) {
-    try {
-      const res = await fetch(AppState.apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'login', email, password })
-      });
-      const data = await res.json();
-      if (data.success) {
-        AppState.currentUser = {
-          isLoggedIn: true,
-          displayName: data.user.displayName,
-          email: data.user.email,
-          birthDay: data.user.birthDay,
-          zodiac: data.user.zodiac || 'ราศีพฤษภ',
-          personalColor: data.user.personalColor || 'Spring',
-          plan: data.user.plan || 'free',
-          token: data.token
-        };
-        saveUserToStorage();
-        closeAuthModal();
-        renderApp();
-        alert(data.message);
-        return;
-      } else {
-        alert(data.message);
-        return;
-      }
-    } catch(err) {
-      console.warn('API connection failed, falling back to local demo login', err);
-    }
-  }
-
-  // Local Demo Login fallback
-  AppState.currentUser = {
-    isLoggedIn: true,
-    displayName: email.split('@')[0],
-    email: email,
-    birthDay: AppState.currentUser.birthDay || 'จันทร์',
-    zodiac: AppState.currentUser.zodiac || 'ราศีพฤษภ',
-    personalColor: AppState.currentUser.personalColor || 'Spring',
-    plan: 'free',
-    token: 'DEMO_TOKEN_' + Date.now()
-  };
-  saveUserToStorage();
-  closeAuthModal();
-  renderApp();
-  alert(`เข้าสู่ระบบสำเร็จ (โหมดทดลอง) ยินดีต้อนรับคุณ ${AppState.currentUser.displayName}`);
-}
-
-async function handleRegisterSubmit() {
-  const name = document.getElementById('regName').value.trim();
-  const email = document.getElementById('regEmail').value.trim();
-  const password = document.getElementById('regPassword').value;
-  const birthDay = document.getElementById('regBirthDay').value;
-  const personalColor = document.getElementById('regPersonalColor').value;
-  const pdpaConsent = document.getElementById('regPdpaConsent').checked;
-
-  if (!pdpaConsent) {
-    alert('กรุณายินยอมเงื่อนไขการคุ้มครองข้อมูลส่วนบุคคล (PDPA)');
-    return;
-  }
-
-  if (AppState.apiUrl) {
-    try {
-      const res = await fetch(AppState.apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: 'register',
-          displayName: name,
-          email: email,
-          password: password,
-          birthDay: birthDay,
-          personalColor: personalColor,
-          pdpaConsent: true
-        })
-      });
-      const data = await res.json();
-      if (data.success) {
-        AppState.currentUser = {
-          isLoggedIn: true,
-          displayName: data.user.displayName,
-          email: data.user.email,
-          birthDay: data.user.birthDay,
-          zodiac: data.user.zodiac || 'ราศีพฤษภ',
-          personalColor: data.user.personalColor || personalColor,
-          plan: 'free',
-          token: data.token
-        };
-        saveUserToStorage();
-        closeAuthModal();
-        renderApp();
-        alert(data.message);
-        return;
-      } else {
-        alert(data.message);
-        return;
-      }
-    } catch(err) {
-      console.warn('API connection failed, falling back to local demo register', err);
-    }
-  }
-
-  // Local Demo Register fallback
-  AppState.currentUser = {
-    isLoggedIn: true,
-    displayName: name,
-    email: email,
-    birthDay: birthDay,
-    zodiac: 'ราศีพฤษภ',
-    personalColor: personalColor,
-    plan: 'free',
-    token: 'DEMO_TOKEN_' + Date.now()
-  };
-  saveUserToStorage();
-  closeAuthModal();
-  renderApp();
-  alert(`สมัครสมาชิกสำเร็จ! ยินดีต้อนรับคุณ ${name} สู่โชคดีทุกวัน`);
 }
 
 function updateApiStatusBadge() {
