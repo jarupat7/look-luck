@@ -570,7 +570,7 @@ async function handleMainLogin() {
       submitBtn.textContent = originalBtnText;
     }
     console.error('Login error:', err);
-    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ Google Sheets กรุณาลองใหม่อีกครั้ง');
+    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ Google Sheets: ' + (err.message || 'โปรดตรวจสอบสัญญาณอินเทอร์เน็ตแล้วลองใหม่อีกครั้ง'));
   }
 }
 
@@ -650,7 +650,7 @@ async function handleMainRegister() {
       submitBtn.textContent = originalBtnText;
     }
     console.error('Register error:', err);
-    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ Google Sheets กรุณาลองใหม่อีกครั้ง');
+    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ Google Sheets: ' + (err.message || 'โปรดตรวจสอบสัญญาณอินเทอร์เน็ตแล้วลองใหม่อีกครั้ง'));
   }
 }
 
