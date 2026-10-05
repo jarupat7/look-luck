@@ -5,57 +5,131 @@
  * 2. โหมด Live Google Sheets API (เมื่อผู้ใช้ใส่ Web App URL ของ Apps Script)
  */
 
-// ฐานข้อมูลดวงและสีมงคลในเครื่อง (Client-side Astrological Knowledge Base)
-const LOCAL_COLOR_RULES = {
+// ฐานข้อมูลดวงและสีมงคลประจำวัน 2569 (สำหรับวันที่สวมใส่ในแต่ละวัน: อาทิตย์ - เสาร์)
+const DAILY_TRANSITING_RULES = {
   'อาทิตย์': {
-    work: { name: 'ม่วงเปลือกมังคุด, ดำ, แดง', hex: ['#4A154B', '#1A1A1A', '#D32F2F'] },
-    money: { name: 'เขียวสด, เขียวอ่อน, เทา', hex: ['#2E7D32', '#81C784', '#9E9E9E'] },
-    love: { name: 'ชมพู, ขาว, ครีม, เบจ', hex: ['#F48FB1', '#FFFFFF', '#FFFDD0', '#F5F5DC'] },
+    dayName: 'วันอาทิตย์',
+    planet: 'พระอาทิตย์',
+    work: { name: 'ส้ม, เทา, ม่วงเปลือกมังคุด', hex: ['#FF9800', '#9E9E9E', '#4A154B'] },
+    money: { name: 'เขียวสด, ม่วง, ดำ', hex: ['#2E7D32', '#7B1FA2', '#212121'] },
+    love: { name: 'ชมพู, ขาว, ครีม', hex: ['#F48FB1', '#FFFFFF', '#FFFDD0'] },
     kalakini: { name: 'น้ำเงิน, ฟ้า, คราม', hex: ['#1565C0', '#42A5F5', '#1A237E'] }
   },
   'จันทร์': {
-    work: { name: 'ส้ม, น้ำตาล, ฟ้า, เทาเข้ม', hex: ['#FF9800', '#795548', '#42A5F5', '#424242'] },
-    money: { name: 'ดำ, ม่วง, เหลืองทอง', hex: ['#1A1A1A', '#7B1FA2', '#FFD700'] },
-    love: { name: 'เขียว, ขาว, ครีม, น้ำเงิน', hex: ['#388E3C', '#FFFFFF', '#FFFDD0', '#1976D2'] },
+    dayName: 'วันจันทร์',
+    planet: 'พระจันทร์',
+    work: { name: 'เขียวสด, เขียวใบไม้, เทาเข้ม', hex: ['#388E3C', '#2E7D32', '#616161'] },
+    money: { name: 'ม่วง, ส้มอิฐ, ดำ', hex: ['#7B1FA2', '#D84315', '#212121'] },
+    love: { name: 'ฟ้า, น้ำเงิน, ครีม', hex: ['#42A5F5', '#1976D2', '#FFFDD0'] },
     kalakini: { name: 'แดงสด, แดงเพลิง', hex: ['#D50000', '#FF1744'] }
   },
   'อังคาร': {
-    work: { name: 'ม่วง, ชมพู, น้ำเงินเข้ม, แดง', hex: ['#7B1FA2', '#F06292', '#0D47A1', '#D32F2F'] },
-    money: { name: 'ส้ม, น้ำตาล, ทอง', hex: ['#FF9800', '#6D4C41', '#FFD700'] },
-    love: { name: 'ชมพู, แดงสด, ดำ', hex: ['#EC407A', '#C62828', '#212121'] },
-    kalakini: { name: 'เหลือง, ขาว, เทาอ่อน', hex: ['#FBC02D', '#FAFAFA', '#E0E0E0'] }
+    dayName: 'วันอังคาร',
+    planet: 'พระอังคาร',
+    work: { name: 'ม่วง, ดำ, น้ำเงินเข้ม', hex: ['#7B1FA2', '#212121', '#0D47A1'] },
+    money: { name: 'ส้ม, ทอง, น้ำตาล', hex: ['#FF9800', '#FFD700', '#6D4C41'] },
+    love: { name: 'แดง, ชมพู', hex: ['#D32F2F', '#F06292'] },
+    kalakini: { name: 'เหลือง, ขาว, ครีม', hex: ['#FBC02D', '#FFFFFF', '#FFFDD0'] }
   },
-  'พุธ (กลางวัน)': {
-    work: { name: 'น้ำเงิน, กรมท่า, ส้มแสด', hex: ['#1976D2', '#1A237E', '#FF6D00'] },
-    money: { name: 'ม่วง, เทาควันบุหรี่, ดำ', hex: ['#8E24AA', '#757575', '#212121'] },
-    love: { name: 'ส้ม, น้ำตาล, ขาว, เหลือง', hex: ['#FB8C00', '#795548', '#FFFFFF', '#FDD835'] },
-    kalakini: { name: 'ชมพู, โอรส', hex: ['#F48FB1', '#FFAB91'] }
-  },
-  'พุธ (กลางคืน)': {
-    work: { name: 'ดำ, เหลือง, ส้มแสด', hex: ['#212121', '#FBC02D', '#FF6D00'] },
-    money: { name: 'แดง, ชมพู', hex: ['#D32F2F', '#F06292'] },
-    love: { name: 'เทา, ม่วงพาสเทล', hex: ['#757575', '#CE93D8'] },
-    kalakini: { name: 'เหลืองเข้ม, ทอง', hex: ['#F57F17', '#FFD700'] }
+  'พุธ': {
+    dayName: 'วันพุธ',
+    planet: 'พระพุธ',
+    work: { name: 'ส้ม, ทอง, แสด', hex: ['#FF9800', '#FFD700', '#FF6D00'] },
+    money: { name: 'ดำ, เทาควันบุหรี่, ม่วง', hex: ['#212121', '#757575', '#8E24AA'] },
+    love: { name: 'ขาว, ครีม, เหลือง', hex: ['#FFFFFF', '#FFFDD0', '#FDD835'] },
+    kalakini: { name: 'ชมพู, โอรส, บานเย็น', hex: ['#F48FB1', '#FFAB91', '#C2185B'] }
   },
   'พฤหัสบดี': {
-    work: { name: 'เหลือง, ขาว, เทา, มุก', hex: ['#FBC02D', '#FFFFFF', '#9E9E9E', '#ECEFF1'] },
-    money: { name: 'แดงเลือดหมู, ชมพู', hex: ['#880E4F', '#F48FB1'] },
-    love: { name: 'ฟ้า, น้ำเงิน, เขียวทุกโทน', hex: ['#42A5F5', '#1565C0', '#2E7D32'] },
+    dayName: 'วันพฤหัสบดี',
+    planet: 'พระพฤหัสบดี',
+    work: { name: 'ฟ้า, น้ำเงิน, คราม', hex: ['#42A5F5', '#1565C0', '#1A237E'] },
+    money: { name: 'แดง, ส้มอิฐ, ทอง', hex: ['#C62828', '#D84315', '#FFD700'] },
+    love: { name: 'เขียว, ขาว, มุก', hex: ['#2E7D32', '#FFFFFF', '#ECEFF1'] },
     kalakini: { name: 'ม่วง, ดำ, น้ำตาลเข้ม', hex: ['#6A1B9A', '#212121', '#3E2723'] }
   },
   'ศุกร์': {
-    work: { name: 'เขียวมิ้นต์, ม่วง, ส้ม', hex: ['#80CBC4', '#7B1FA2', '#FF9800'] },
-    money: { name: 'ชมพูพาสเทล, ฟ้า', hex: ['#F8BBD0', '#64B5F6'] },
-    love: { name: 'เหลือง, ขาว, เทา, น้ำเงิน', hex: ['#FDD835', '#FFFFFF', '#9E9E9E', '#1565C0'] },
-    kalakini: { name: 'ดำ, เทาเข้ม, น้ำตาล', hex: ['#212121', '#424242', '#5D4037'] }
+    dayName: 'วันศุกร์',
+    planet: 'พระศุกร์',
+    work: { name: 'ขาว, ครีม, เหลืองอ่อน', hex: ['#FFFFFF', '#FFFDD0', '#FFF59D'] },
+    money: { name: 'ชมพู, แดงกุหลาบ, เขียวมิ้นต์', hex: ['#F48FB1', '#E91E63', '#80CBC4'] },
+    love: { name: 'ส้ม, ฟ้า, ทอง', hex: ['#FF9800', '#42A5F5', '#FFD700'] },
+    kalakini: { name: 'เทาเข้ม, ดำหม่น, น้ำตาล', hex: ['#424242', '#212121', '#5D4037'] }
   },
   'เสาร์': {
-    work: { name: 'แดงเข้ม, ชมพู, ทับทิม', hex: ['#B71C1C', '#F06292', '#C2185B'] },
-    money: { name: 'น้ำเงิน, ฟ้าคราม', hex: ['#1565C0', '#0288D1'] },
-    love: { name: 'ม่วง, ดำ, เทา', hex: ['#7B1FA2', '#212121', '#757575'] },
+    dayName: 'วันเสาร์',
+    planet: 'พระเสาร์',
+    work: { name: 'เทา, เทาเข้ม, ดำ', hex: ['#757575', '#424242', '#212121'] },
+    money: { name: 'ฟ้า, น้ำเงิน, แดงสด', hex: ['#42A5F5', '#1565C0', '#D32F2F'] },
+    love: { name: 'ชมพู, ม่วงพาสเทล', hex: ['#F06292', '#BA68C8'] },
     kalakini: { name: 'เขียวทุกเฉด', hex: ['#2E7D32', '#4CAF50', '#81C784'] }
   }
 };
+
+// สีกาลกิณีประจำวันเกิดของบุคคล (Natal Kalakini Protection)
+const NATAL_KALAKINI_RULES = {
+  'อาทิตย์': { names: ['น้ำเงิน', 'ฟ้า', 'คราม'], label: 'น้ำเงิน, ฟ้า, คราม' },
+  'จันทร์': { names: ['แดง', 'แดงสด', 'แดงเพลิง', 'เลือดหมู'], label: 'แดงสด, แดงเพลิง' },
+  'อังคาร': { names: ['เหลือง', 'ขาว', 'ครีม', 'เทาอ่อน'], label: 'เหลือง, ขาว, ครีม' },
+  'พุธ (กลางวัน)': { names: ['ชมพู', 'โอรส', 'บานเย็น'], label: 'ชมพู, โอรส, บานเย็น' },
+  'พุธ (กลางคืน)': { names: ['ส้ม', 'ทอง', 'เหลืองเข้ม', 'แสด'], label: 'ส้ม, ทอง, เหลืองเข้ม' },
+  'พฤหัสบดี': { names: ['ม่วง', 'ดำ', 'น้ำตาลเข้ม'], label: 'ม่วง, ดำ, น้ำตาลเข้ม' },
+  'ศุกร์': { names: ['เทาเข้ม', 'ดำหม่น', 'น้ำตาล'], label: 'เทาเข้ม, ดำหม่น, น้ำตาล' },
+  'เสาร์': { names: ['เขียว', 'เขียวสด', 'เขียวมิ้นต์', 'เขียวใบไม้', 'เขียวทุกเฉด'], label: 'เขียวทุกเฉด' }
+};
+
+// ฟังก์ชันคัดกรองดวงชะตาสองชั้น: วันที่สวมใส่ (Transiting) x วันเกิดบุคคล (Natal)
+function evaluateTransitingColors(targetDay, userBirthDay, goal) {
+  const cleanTarget = (targetDay === 'พุธ (กลางวัน)' || targetDay === 'พุธ (กลางคืน)') ? 'พุธ' : (targetDay || 'จันทร์');
+  const dayRules = DAILY_TRANSITING_RULES[cleanTarget] || DAILY_TRANSITING_RULES['จันทร์'];
+  const natal = NATAL_KALAKINI_RULES[userBirthDay] || NATAL_KALAKINI_RULES['จันทร์'];
+
+  const checkCategory = (catObj) => {
+    const rawNames = catObj.name.split(',').map(s => s.trim());
+    const safeNames = [];
+    const safeHex = [];
+    const conflicts = [];
+
+    rawNames.forEach((name, idx) => {
+      const isConflict = natal.names.some(k => name.includes(k) || k.includes(name));
+      if (isConflict) {
+        conflicts.push(name);
+      } else {
+        safeNames.push(name);
+        if (catObj.hex[idx]) safeHex.push(catObj.hex[idx]);
+      }
+    });
+
+    return {
+      rawName: catObj.name,
+      safeName: safeNames.length > 0 ? safeNames.join(', ') : 'ขาวมุก, ครีมธรรมชาติ (สีเป็นกลาง)',
+      safeHex: safeHex.length > 0 ? safeHex : ['#FFFDD0', '#F5F5DC'],
+      conflicts: conflicts,
+      hasConflict: conflicts.length > 0
+    };
+  };
+
+  const work = checkCategory(dayRules.work);
+  const money = checkCategory(dayRules.money);
+  const love = checkCategory(dayRules.love);
+
+  let activeCat = work;
+  if (goal === 'money') activeCat = money;
+  else if (goal === 'love') activeCat = love;
+
+  const totalConflicts = [...work.conflicts, ...money.conflicts, ...love.conflicts];
+
+  return {
+    targetDay: cleanTarget,
+    dayRules,
+    work,
+    money,
+    love,
+    activeCat,
+    hasAnyConflict: totalConflicts.length > 0,
+    allConflicts: Array.from(new Set(totalConflicts)),
+    natalKalakini: natal.label
+  };
+}
 
 const LOCAL_DEITY_TRIVIA = {
   'อาทิตย์': { name: 'พระอาทิตย์', trait: 'บารมี ความเป็นผู้นำ และเกียรติยศ', story: 'สร้างจากราชสีห์ 6 ตัว ห่อด้วยผ้าสีแดง พรมน้ำอมฤต ผิวกายสีแดง เด็ดขาด ทรงพลัง' },
@@ -79,6 +153,11 @@ const LOCAL_WALLETS = {
   'เสาร์': { walletLucky: 'แดง', walletAvoid: 'เขียว', gem: 'นิลดำ (Onyx)', gemProp: 'ความอดทน มั่งคั่ง บารมีหนักแน่น' }
 };
 
+function getTodayThaiDayName() {
+  const days = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+  return days[new Date().getDay()];
+}
+
 // State การทำงานของแอปพลิเคชัน
 const AppState = {
   currentUser: {
@@ -94,6 +173,8 @@ const AppState = {
   },
   currentGoal: 'work', // 'work', 'money', 'love', 'casual'
   bottomStyle: 'pants', // 'pants', 'skirt'
+  todayDay: getTodayThaiDayName(), // วันนี้ตามปฏิทินจริง (Real-world today)
+  selectedDay: getTodayThaiDayName(), // วันที่ผู้ใช้เลือกดู (Default = วันนี้)
   apiUrl: localStorage.getItem('LUCKY_API_URL') || '',
   activeTab: 'tabHome'
 };
@@ -131,6 +212,24 @@ const DOM = {
   btnSwitchToProfile: document.getElementById('btnSwitchToProfile'),
   btnOpenConfig: document.getElementById('btnOpenConfig'),
   
+  // Weekly Day Selector & Protection Banner
+  dayPillBtns: document.querySelectorAll('.day-pill-btn'),
+  btnQuickToday: document.getElementById('btnQuickToday'),
+  btnOpenWeeklyModal: document.getElementById('btnOpenWeeklyModal'),
+  modalWeeklyOverview: document.getElementById('modalWeeklyOverview'),
+  btnCloseWeeklyModal: document.getElementById('btnCloseWeeklyModal'),
+  btnDoneWeeklyModal: document.getElementById('btnDoneWeeklyModal'),
+  weeklyTableContainer: document.getElementById('weeklyTableContainer'),
+  txtWeeklyModalSubtitle: document.getElementById('txtWeeklyModalSubtitle'),
+  badgeTargetDay: document.getElementById('badgeTargetDay'),
+  txtHeroDayTitle: document.getElementById('txtHeroDayTitle'),
+  txtHeroDayDesc: document.getElementById('txtHeroDayDesc'),
+  boxPersonalizedNotice: document.getElementById('boxPersonalizedNotice'),
+  iconProtectionNotice: document.getElementById('iconProtectionNotice'),
+  titleProtectionNotice: document.getElementById('titleProtectionNotice'),
+  tagProtectionStatus: document.getElementById('tagProtectionStatus'),
+  txtPersonalizedDetail: document.getElementById('txtPersonalizedDetail'),
+
   // Tab Home Elements
   txtWorkColors: document.getElementById('txtWorkColors'),
   txtMoneyColors: document.getElementById('txtMoneyColors'),
@@ -331,6 +430,50 @@ function setupEventListeners() {
   if (DOM.btnGoToRemedy) {
     DOM.btnGoToRemedy.addEventListener('click', () => {
       switchTab('tabRemedies');
+    });
+  }
+
+  // --- Weekly Day Selector Pills (อาทิตย์ - เสาร์) ---
+  if (DOM.dayPillBtns) {
+    DOM.dayPillBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const day = btn.getAttribute('data-day');
+        AppState.selectedDay = day;
+        updateDayPillsUI();
+        updateDailyColorsAndAdvice();
+      });
+    });
+  }
+
+  // --- Quick "วันนี้" Button ---
+  if (DOM.btnQuickToday) {
+    DOM.btnQuickToday.addEventListener('click', () => {
+      AppState.selectedDay = AppState.todayDay;
+      updateDayPillsUI();
+      updateDailyColorsAndAdvice();
+    });
+  }
+
+  // --- Weekly 7-Day Overview Modal ---
+  if (DOM.btnOpenWeeklyModal) {
+    DOM.btnOpenWeeklyModal.addEventListener('click', () => {
+      renderWeeklyMatrix();
+      if (DOM.modalWeeklyOverview) DOM.modalWeeklyOverview.classList.add('active');
+    });
+  }
+  if (DOM.btnCloseWeeklyModal) {
+    DOM.btnCloseWeeklyModal.addEventListener('click', () => {
+      if (DOM.modalWeeklyOverview) DOM.modalWeeklyOverview.classList.remove('active');
+    });
+  }
+  if (DOM.btnDoneWeeklyModal) {
+    DOM.btnDoneWeeklyModal.addEventListener('click', () => {
+      if (DOM.modalWeeklyOverview) DOM.modalWeeklyOverview.classList.remove('active');
+    });
+  }
+  if (DOM.modalWeeklyOverview) {
+    DOM.modalWeeklyOverview.addEventListener('click', (e) => {
+      if (e.target === DOM.modalWeeklyOverview) DOM.modalWeeklyOverview.classList.remove('active');
     });
   }
 
@@ -606,7 +749,40 @@ function renderApp() {
   if (AppState.currentUser && AppState.currentUser.isLoggedIn) {
     updateCurrentDate();
     updateHeaderBadges();
+    updateDayPillsUI();
     updateDailyColorsAndAdvice();
+  }
+}
+
+function updateDayPillsUI() {
+  const currentDay = AppState.todayDay;
+  const selectedDay = AppState.selectedDay;
+
+  // แบดจ์ "วันนี้"
+  const dayBadgeMap = {
+    'อาทิตย์': 'badgeTodaySun',
+    'จันทร์': 'badgeTodayMon',
+    'อังคาร': 'badgeTodayTue',
+    'พุธ': 'badgeTodayWed',
+    'พฤหัสบดี': 'badgeTodayThu',
+    'ศุกร์': 'badgeTodayFri',
+    'เสาร์': 'badgeTodaySat'
+  };
+
+  Object.entries(dayBadgeMap).forEach(([day, badgeId]) => {
+    const el = document.getElementById(badgeId);
+    if (el) el.style.display = (day === currentDay) ? 'inline-block' : 'none';
+  });
+
+  if (DOM.dayPillBtns) {
+    DOM.dayPillBtns.forEach(btn => {
+      const d = btn.getAttribute('data-day');
+      btn.classList.toggle('active', d === selectedDay);
+    });
+  }
+
+  if (DOM.btnQuickToday) {
+    DOM.btnQuickToday.classList.toggle('active', selectedDay === currentDay);
   }
 }
 
@@ -635,7 +811,6 @@ function setBottomStyle(style) {
     if (DOM.itemSkirt) DOM.itemSkirt.style.display = 'none';
   }
   updateFlatlayCaption();
-  // อัปเดตคำแนะนำสไตล์ท่อนล่างในเนื้อหา
   updateDailyColorsAndAdvice();
 }
 
@@ -656,24 +831,74 @@ function updateFlatlayCaption() {
 
 function updateDailyColorsAndAdvice() {
   const user = AppState.currentUser;
-  const dayKey = (user && user.birthDay) ? user.birthDay : 'จันทร์';
-  const rules = LOCAL_COLOR_RULES[dayKey] || LOCAL_COLOR_RULES['จันทร์'];
-  const goal = AppState.currentGoal;
+  const userBirthDay = (user && user.birthDay) ? user.birthDay : 'จันทร์';
+  const targetDay = AppState.selectedDay || AppState.todayDay || 'จันทร์';
+  const goal = AppState.currentGoal || 'work';
   const season = (user && user.personalColor) ? user.personalColor : 'Spring';
 
-  // 1. Swatches Text & Pill Visuals
-  DOM.txtWorkColors.textContent = rules.work.name;
-  DOM.txtMoneyColors.textContent = rules.money.name;
-  DOM.txtLoveColors.textContent = rules.love.name;
-  DOM.txtKalakiniColors.textContent = rules.kalakini.name;
+  // คำนวณแบบ 2 แกน: วันที่สวมใส่ (Target Transiting Day) x วันเกิดบุคคล (Natal Protection)
+  const evalData = evaluateTransitingColors(targetDay, userBirthDay, goal);
+  const dayRules = evalData.dayRules;
 
-  DOM.swatchWork.style.background = `linear-gradient(135deg, ${rules.work.hex[0]}, ${rules.work.hex[1] || rules.work.hex[0]})`;
-  DOM.swatchMoney.style.background = `linear-gradient(135deg, ${rules.money.hex[0]}, ${rules.money.hex[1] || rules.money.hex[0]})`;
-  DOM.swatchLove.style.background = `linear-gradient(135deg, ${rules.love.hex[0]}, ${rules.love.hex[1] || rules.love.hex[0]})`;
+  // 1. อัปเดตข้อความหัวการ์ดและป้ายวันเป้าหมาย
+  if (DOM.txtHeroDayTitle) {
+    const isToday = (targetDay === AppState.todayDay);
+    DOM.txtHeroDayTitle.textContent = isToday ? `สีมงคลวันนี้ (วัน${targetDay})` : `สีมงคลประจำวัน${targetDay}`;
+  }
+  if (DOM.badgeTargetDay) {
+    DOM.badgeTargetDay.textContent = `สำหรับสวมใส่: วัน${targetDay}`;
+  }
+  if (DOM.txtHeroDayDesc) {
+    DOM.txtHeroDayDesc.textContent = `คำนวณตามพลังงานดาวประจำวัน${targetDay} ผสานความปลอดภัยตามวันเกิดของคุณ`;
+  }
 
-  // 2. Dynamic Advice by Goal & Personal Color
-  let activeColors = '';
-  let activeHex = [];
+  // 2. แสดงผล Swatches สีมงคล (ใช้สีที่ผ่านการกรองความปลอดภัยแล้ว)
+  DOM.txtWorkColors.textContent = evalData.work.safeName;
+  DOM.txtMoneyColors.textContent = evalData.money.safeName;
+  DOM.txtLoveColors.textContent = evalData.love.safeName;
+  DOM.txtKalakiniColors.textContent = dayRules.kalakini.name;
+
+  if (evalData.work.safeHex.length > 0) {
+    DOM.swatchWork.style.background = `linear-gradient(135deg, ${evalData.work.safeHex[0]}, ${evalData.work.safeHex[1] || evalData.work.safeHex[0]})`;
+  }
+  if (evalData.money.safeHex.length > 0) {
+    DOM.swatchMoney.style.background = `linear-gradient(135deg, ${evalData.money.safeHex[0]}, ${evalData.money.safeHex[1] || evalData.money.safeHex[0]})`;
+  }
+  if (evalData.love.safeHex.length > 0) {
+    DOM.swatchLove.style.background = `linear-gradient(135deg, ${evalData.love.safeHex[0]}, ${evalData.love.safeHex[1] || evalData.love.safeHex[0]})`;
+  }
+
+  // 3. ปรับแต่งกล่องแจ้งเตือนการกรองความปลอดภัยตามวันเกิด (Natal Protection Banner)
+  if (DOM.boxPersonalizedNotice) {
+    if (DOM.titleProtectionNotice) {
+      DOM.titleProtectionNotice.textContent = `ระบบกรองดวงเฉพาะตัว (เกิดวัน${userBirthDay}):`;
+    }
+    if (evalData.hasAnyConflict) {
+      DOM.boxPersonalizedNotice.classList.add('warning');
+      if (DOM.iconProtectionNotice) DOM.iconProtectionNotice.textContent = '⚡';
+      if (DOM.tagProtectionStatus) {
+        DOM.tagProtectionStatus.className = 'protection-status-tag filtered';
+        DOM.tagProtectionStatus.textContent = 'ปรับสีปลอดภัยแล้ว';
+      }
+      if (DOM.txtPersonalizedDetail) {
+        DOM.txtPersonalizedDetail.textContent = `เนื่องจากคุณเกิดวัน${userBirthDay} (มี ${evalData.natalKalakini} เป็นสีกาลกิณีประจำตัว) ระบบได้คัดกรองสีที่ขัดแย้งออก [${evalData.allConflicts.join(', ')}] และแนะนำเฉดสีที่ปลอดภัยเสริมดวงให้คุณแล้ว 100%!`;
+      }
+    } else {
+      DOM.boxPersonalizedNotice.classList.remove('warning');
+      if (DOM.iconProtectionNotice) DOM.iconProtectionNotice.textContent = '🛡️';
+      if (DOM.tagProtectionStatus) {
+        DOM.tagProtectionStatus.className = 'protection-status-tag safe';
+        DOM.tagProtectionStatus.textContent = 'ปลอดภัย 100%';
+      }
+      if (DOM.txtPersonalizedDetail) {
+        DOM.txtPersonalizedDetail.textContent = `สีมงคลประจำวัน${targetDay}ส่งพลังเกื้อหนุนดีเยี่ยมกับวันเกิดของคุณ ไร้สีกาลกิณีขัดแย้ง สวมใส่ได้อย่างมั่นใจเต็มร้อย`;
+      }
+    }
+  }
+
+  // 4. คำแนะนำการแต่งกายตามเป้าหมาย (Goal)
+  let activeColors = evalData.activeCat.safeName;
+  let activeHex = evalData.activeCat.safeHex;
   let headline = '';
   const userGender = user.gender || 'female';
   let bottomText = '';
@@ -686,26 +911,20 @@ function updateDailyColorsAndAdvice() {
   }
 
   if (goal === 'work') {
-    activeColors = rules.work.name;
-    activeHex = rules.work.hex;
-    headline = 'แนะนำลุคเสริมการงาน &amp; เจรจา (เดช)';
+    headline = `แนะนำลุคเสริมการงาน &amp; เจรจาในวัน${targetDay} (เดช)`;
     outfitDesc = userGender === 'male'
-      ? `เลือกสวมใส่เสื้อเชิ้ตหรือเสื้อโปโลสี ${activeColors} จับคู่กับ${bottomText} ให้บุคลิกดูภูมิฐาน น่าเชื่อถือ และเจรจาราบรื่น`
-      : `เลือกสวมใส่เสื้อเชิ้ตหรือเบลเซอร์สี ${activeColors} จับคู่กับ${bottomText} ให้บุคลิกดูสง่างาม ทรงอำนาจ และเจรจาสำเร็จ`;
+      ? `เลือกสวมใส่เสื้อเชิ้ตหรือเสื้อโปโลสี ${activeColors} จับคู่กับ${bottomText} ให้บุคลิกดูภูมิฐาน ทรงอำนาจ และเจรจาราบรื่น`
+      : `เลือกสวมใส่เสื้อเชิ้ตหรือเบลเซอร์สี ${activeColors} จับคู่กับ${bottomText} ให้บุคลิกดูสง่างาม มีบารมี และเจรจาสำเร็จ`;
   } else if (goal === 'money') {
-    activeColors = rules.money.name;
-    activeHex = rules.money.hex;
-    headline = 'แนะนำลุคเรียกทรัพย์ &amp; โชคลาภ (ศรี)';
+    headline = `แนะนำลุคเรียกทรัพย์ &amp; โชคลาภในวัน${targetDay} (ศรี)`;
     outfitDesc = `ดึงดูดเงินทองด้วยเสื้อผ้ากลุ่มสี ${activeColors} จับคู่กับ${bottomText} เสริมเครื่องประดับเพื่อรวมพลังความมั่งคั่ง`;
   } else if (goal === 'love') {
-    activeColors = rules.love.name;
-    activeHex = rules.love.hex;
-    headline = 'แนะนำลุคเสริมความรัก &amp; เสน่ห์เมตตา';
+    headline = `แนะนำลุคเสริมความรัก &amp; เสน่ห์เมตตาในวัน${targetDay}`;
     outfitDesc = `สวมใส่เสื้อผ้าโทนสีละมุน ${activeColors} ดีไซน์สบายตา จับคู่กับ${bottomText} ช่วยให้ผู้คนรอบข้างรู้สึกเข้าถึงง่ายและเกิดความรักใคร่เอ็นดู`;
   } else {
     activeColors = 'ขาว, ครีม, เทาอ่อน, เขียวธรรมชาติ';
     activeHex = ['#FFFDD0', '#E0E0E0', '#81C784'];
-    headline = 'แนะนำลุควันพักผ่อน &amp; ผ่อนคลายจิตใจ';
+    headline = `แนะนำลุควันพักผ่อน &amp; ผ่อนคลายจิตใจในวัน${targetDay}`;
     outfitDesc = `เน้นเสื้อผ้าเนื้อผ้าคอตตอนหรือลินินสี ${activeColors} สวมคู่กับ${bottomText} เพื่อบำบัดความเหนื่อยล้า คืนพลังงานบริสุทธิ์ให้ร่างกาย`;
   }
 
@@ -724,14 +943,13 @@ function updateDailyColorsAndAdvice() {
   DOM.txtAdviceTitle.innerHTML = headline;
   DOM.txtAdviceDescription.textContent = outfitDesc + seasonNote;
 
-  // Flat-lay visual SVG clothing update
+  // 5. อัปเดตสีเสื้อเวกเตอร์ SVG
   if (activeHex.length > 0 && DOM.pathShirt) {
     DOM.pathShirt.setAttribute('fill', activeHex[0]);
   }
   if (DOM.pathPants) DOM.pathPants.setAttribute('fill', '#E8DFD8');
   if (DOM.pathSkirt) DOM.pathSkirt.setAttribute('fill', '#E8DFD8');
   updateFlatlayCaption();
-
 
   // Render color dots
   DOM.adviceColorBar.innerHTML = '';
@@ -743,21 +961,87 @@ function updateDailyColorsAndAdvice() {
     DOM.adviceColorBar.appendChild(dot);
   });
 
-  // 3. Deity of the Day
-  const deity = LOCAL_DEITY_TRIVIA[dayKey] || LOCAL_DEITY_TRIVIA['จันทร์'];
+  // 6. เทวดานพเคราะห์ประจำวันเป้าหมาย
+  const cleanTarget = (targetDay === 'พุธ (กลางวัน)' || targetDay === 'พุธ (กลางคืน)') ? 'พุธ (กลางวัน)' : targetDay;
+  const deity = LOCAL_DEITY_TRIVIA[cleanTarget] || LOCAL_DEITY_TRIVIA['จันทร์'];
   DOM.txtDeityName.textContent = deity.name;
   DOM.txtDeityTrait.textContent = deity.trait;
   DOM.txtDeityStory.textContent = deity.story;
 
-  // 4. Wallets and Gems
-  const wg = LOCAL_WALLETS[dayKey] || LOCAL_WALLETS['จันทร์'];
+  // 7. กระเป๋าสตางค์และอัญมณี (อิงตามวันเกิดของผู้ใช้เพื่อพลังงานเฉพาะตัว)
+  const wg = LOCAL_WALLETS[userBirthDay] || LOCAL_WALLETS['จันทร์'];
   DOM.txtWalletLucky.textContent = wg.walletLucky;
   DOM.txtWalletAvoid.textContent = `เลี่ยง: ${wg.walletAvoid}`;
   DOM.txtGemstone.textContent = wg.gem;
   DOM.txtGemstoneProp.textContent = wg.gemProp;
 
-  // 5. Render Radar Chart (ดัชนีคะแนนพลังดวง 5 มิติ)
+  // 8. อัปเดตกราฟเรดาร์
   renderRadarChart();
+}
+
+/**
+ * แสดงตารางสรุป 7 วัน (Weekly 7-Day Matrix Modal)
+ */
+function renderWeeklyMatrix() {
+  if (!DOM.weeklyTableContainer) return;
+  const user = AppState.currentUser;
+  const userBirthDay = (user && user.birthDay) ? user.birthDay : 'จันทร์';
+  const days = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+
+  if (DOM.txtWeeklyModalSubtitle) {
+    DOM.txtWeeklyModalSubtitle.textContent = `ตารางสีมงคล 7 วัน คำนวณปรับเข้ากับคนเกิดวัน${userBirthDay} โดยเฉพาะ`;
+  }
+
+  DOM.weeklyTableContainer.innerHTML = '';
+
+  days.forEach(day => {
+    const evalData = evaluateTransitingColors(day, userBirthDay, 'work');
+    const isCurrent = (day === AppState.selectedDay);
+    const isToday = (day === AppState.todayDay);
+
+    const card = document.createElement('div');
+    card.className = `weekly-day-card ${isCurrent ? 'current' : ''}`;
+    card.style.cursor = 'pointer';
+    card.title = `คลิกเพื่อเลือกดูวัน${day}`;
+
+    card.innerHTML = `
+      <div class="weekly-day-card-header">
+        <div>
+          <strong>วัน${day}</strong>
+          ${isToday ? '<span class="weekly-badge-today">วันนี้</span>' : ''}
+          ${evalData.hasAnyConflict ? '<span style="font-size:0.6rem; margin-left:6px; background:#FEF3C7; color:#92400E; padding:1px 5px; border-radius:4px; font-weight:600;">⚡ กรองสีชนแล้ว</span>' : ''}
+        </div>
+        <button type="button" class="btn-text-link" style="font-size:0.7rem;">เลือกดูวันนี้ &rsaquo;</button>
+      </div>
+      <div class="weekly-colors-grid">
+        <div class="weekly-color-field">
+          <span class="label">💼 งาน/เดช:</span>
+          <span class="value">${evalData.work.safeName}</span>
+        </div>
+        <div class="weekly-color-field">
+          <span class="label">💰 เงิน/ศรี:</span>
+          <span class="value">${evalData.money.safeName}</span>
+        </div>
+        <div class="weekly-color-field">
+          <span class="label">💖 รัก/เมตตา:</span>
+          <span class="value">${evalData.love.safeName}</span>
+        </div>
+        <div class="weekly-color-field kalakini">
+          <span class="label">⚠️ เลี่ยง/กาลกิณี:</span>
+          <span class="value">${evalData.dayRules.kalakini.name}</span>
+        </div>
+      </div>
+    `;
+
+    card.addEventListener('click', () => {
+      AppState.selectedDay = day;
+      updateDayPillsUI();
+      updateDailyColorsAndAdvice();
+      if (DOM.modalWeeklyOverview) DOM.modalWeeklyOverview.classList.remove('active');
+    });
+
+    DOM.weeklyTableContainer.appendChild(card);
+  });
 }
 
 /**
@@ -770,14 +1054,16 @@ function renderRadarChart() {
   if (!ctx) return;
 
   const user = AppState.currentUser;
-  const dayKey = (user && user.birthDay) ? user.birthDay : 'จันทร์';
+  const userBirthDay = (user && user.birthDay) ? user.birthDay : 'จันทร์';
+  const targetDay = AppState.selectedDay || AppState.todayDay || 'จันทร์';
   const goal = AppState.currentGoal || 'work';
 
-  // ฐานคะแนนดวงรายวันตามวันเกิด (ดาวครองเรือน)
+  // ฐานคะแนนดวง: ผสมระหว่างพลังงานของวันเป้าหมาย (targetDay 60%) กับวันเกิดผู้ใช้ (userBirthDay 40%)
   const baseScores = {
     'อาทิตย์': { work: 92, money: 84, love: 82, health: 85, wisdom: 88 },
     'จันทร์': { work: 84, money: 90, love: 95, health: 82, wisdom: 86 },
     'อังคาร': { work: 94, money: 86, love: 79, health: 91, wisdom: 83 },
+    'พุธ': { work: 86, money: 88, love: 85, health: 81, wisdom: 96 },
     'พุธ (กลางวัน)': { work: 86, money: 88, love: 85, health: 81, wisdom: 96 },
     'พุธ (กลางคืน)': { work: 88, money: 94, love: 83, health: 79, wisdom: 89 },
     'พฤหัสบดี': { work: 89, money: 85, love: 87, health: 86, wisdom: 97 },
@@ -785,7 +1071,16 @@ function renderRadarChart() {
     'เสาร์': { work: 91, money: 88, love: 80, health: 89, wisdom: 86 }
   };
 
-  const scores = Object.assign({}, baseScores[dayKey] || baseScores['จันทร์']);
+  const natalScore = baseScores[userBirthDay] || baseScores['จันทร์'];
+  const transitingScore = baseScores[targetDay] || baseScores['จันทร์'];
+
+  const scores = {
+    work: Math.round(transitingScore.work * 0.6 + natalScore.work * 0.4),
+    money: Math.round(transitingScore.money * 0.6 + natalScore.money * 0.4),
+    love: Math.round(transitingScore.love * 0.6 + natalScore.love * 0.4),
+    health: Math.round(transitingScore.health * 0.6 + natalScore.health * 0.4),
+    wisdom: Math.round(transitingScore.wisdom * 0.6 + natalScore.wisdom * 0.4)
+  };
 
   // บูสต์คะแนนตามเป้าหมายที่ผู้ใช้เลือกในวันนั้น (Goal Alignment)
   if (goal === 'work') scores.work = Math.min(99, scores.work + 6);

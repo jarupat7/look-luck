@@ -184,12 +184,72 @@
         <!-- TAB 1: หน้าแรก (โชคดีวันนี้) -->
         <section class="tab-page active" id="tabHome">
           
+          <!-- แถบเลือกวันในสัปดาห์ (Weekly Day Selector Pills) -->
+          <div class="week-selector-card">
+            <div class="week-selector-header">
+              <div class="week-selector-title-group">
+                <span class="week-sublabel">TRANSITING DAY SELECTION</span>
+                <span class="week-selector-label">เลือกวันที่จะสวมใส่เสื้อผ้า:</span>
+              </div>
+              <div class="week-actions">
+                <button type="button" class="btn-quick-today active" id="btnQuickToday" title="กลับไปดูสีวันนี้">วันนี้</button>
+                <button type="button" class="btn-weekly-modal" id="btnOpenWeeklyModal" title="ดูสรุป 7 วัน">📅 ตาราง 7 วัน</button>
+              </div>
+            </div>
+            
+            <div class="day-pills-scroll" id="dayPillsRow">
+              <button type="button" class="day-pill-btn" data-day="อาทิตย์">
+                <span class="pill-day-name">อาทิตย์</span>
+                <span class="pill-badge-today" id="badgeTodaySun" style="display:none;">วันนี้</span>
+              </button>
+              <button type="button" class="day-pill-btn" data-day="จันทร์">
+                <span class="pill-day-name">จันทร์</span>
+                <span class="pill-badge-today" id="badgeTodayMon" style="display:none;">วันนี้</span>
+              </button>
+              <button type="button" class="day-pill-btn" data-day="อังคาร">
+                <span class="pill-day-name">อังคาร</span>
+                <span class="pill-badge-today" id="badgeTodayTue" style="display:none;">วันนี้</span>
+              </button>
+              <button type="button" class="day-pill-btn" data-day="พุธ">
+                <span class="pill-day-name">พุธ</span>
+                <span class="pill-badge-today" id="badgeTodayWed" style="display:none;">วันนี้</span>
+              </button>
+              <button type="button" class="day-pill-btn" data-day="พฤหัสบดี">
+                <span class="pill-day-name">พฤหัสบดี</span>
+                <span class="pill-badge-today" id="badgeTodayThu" style="display:none;">วันนี้</span>
+              </button>
+              <button type="button" class="day-pill-btn" data-day="ศุกร์">
+                <span class="pill-day-name">ศุกร์</span>
+                <span class="pill-badge-today" id="badgeTodayFri" style="display:none;">วันนี้</span>
+              </button>
+              <button type="button" class="day-pill-btn" data-day="เสาร์">
+                <span class="pill-day-name">เสาร์</span>
+                <span class="pill-badge-today" id="badgeTodaySat" style="display:none;">วันนี้</span>
+              </button>
+            </div>
+          </div>
+
           <!-- Hero Section: สีมงคลวันนี้ & Visual Outfit -->
           <div class="card fashion-hero-card">
             <div class="card-header-fashion">
-              <span class="section-label">DAILY PALETTE</span>
-              <h2 class="section-title">สีมงคลวันนี้</h2>
-              <p class="section-desc">คำนวณตามหลักมหาทักษา &amp; เทวดานพเคราะห์</p>
+              <div class="header-tag-row">
+                <span class="section-label">DAILY PALETTE 2569</span>
+                <span class="badge-target-day" id="badgeTargetDay">สำหรับ: วันจันทร์</span>
+              </div>
+              <h2 class="section-title" id="txtHeroDayTitle">สีมงคลประจำวันจันทร์</h2>
+              <p class="section-desc" id="txtHeroDayDesc">คำนวณตามพลังงานดาวประจำวัน ผสานความปลอดภัยตามวันเกิดของคุณ</p>
+            </div>
+
+            <!-- กล่องแจ้งเตือนการกรองความปลอดภัยตามวันเกิด (Personalized Natal Protection Alert) -->
+            <div class="natal-protection-banner" id="boxPersonalizedNotice">
+              <div class="protection-icon" id="iconProtectionNotice">🛡️</div>
+              <div class="protection-text">
+                <div class="protection-title-row">
+                  <strong id="titleProtectionNotice">ระบบกรองดวงเฉพาะตัว (เกิดวันจันทร์):</strong>
+                  <span class="protection-status-tag safe" id="tagProtectionStatus">ปลอดภัย 100%</span>
+                </div>
+                <p id="txtPersonalizedDetail">สีมงคลของวันนี้ไม่ขัดแย้งกับสีกาลกิณีประจำวันเกิดของคุณ สวมใส่ได้อย่างมั่นใจเต็มเปี่ยม</p>
+              </div>
             </div>
 
             <!-- Color Swatches & Outfit Graphic -->
@@ -671,6 +731,25 @@
         </button>
       </nav>
 
+    </div>
+
+    <!-- Modal: ตารางสรุปสีเสื้อมงคล 7 วัน (Weekly 7-Day Matrix) -->
+    <div class="modal-overlay" id="modalWeeklyOverview">
+      <div class="modal-sheet weekly-modal-sheet">
+        <div class="modal-drag-bar"></div>
+        <button class="modal-close-btn" id="btnCloseWeeklyModal">&times;</button>
+        <div class="weekly-modal-header">
+          <span class="section-label">WEEKLY MATRIX 2569</span>
+          <h3 class="card-heading">ตารางสีเสื้อมงคล 7 วัน</h3>
+          <p class="card-subtext" id="txtWeeklyModalSubtitle">ปรับสมดุลเฉพาะบุคคลตามวันเกิดของคุณ</p>
+        </div>
+
+        <div class="weekly-table-container" id="weeklyTableContainer">
+          <!-- Dynamic 7 Days Rows will be rendered by JavaScript -->
+        </div>
+
+        <button class="btn-primary" id="btnDoneWeeklyModal" style="margin-top: 16px;">ปิดหน้าต่าง</button>
+      </div>
     </div>
 
     <!-- Modal: Google Apps Script API Connection Settings -->

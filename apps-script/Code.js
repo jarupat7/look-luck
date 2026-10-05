@@ -14,7 +14,8 @@ function doGet(e) {
     const goal = params.goal || 'work';
     const zodiac = params.zodiac || '';
     const personalColor = params.personalColor || 'Spring';
-    const result = getDailyLuckyAdvice(birthDay, goal, zodiac, personalColor);
+    const targetDay = params.targetDay || '';
+    const result = getDailyLuckyAdvice(birthDay, goal, zodiac, personalColor, targetDay);
     return createJsonResponse(result);
   }
 
@@ -22,7 +23,7 @@ function doGet(e) {
     return createJsonResponse({
       status: 'active',
       appName: 'โชคดีทุกวัน (Everyday Lucky)',
-      version: '1.0.0-phase1',
+      version: '1.2.0-phase2-transiting',
       timestamp: new Date().toISOString()
     });
   }
@@ -35,7 +36,7 @@ function doGet(e) {
     'h1{color:#8C6239;margin-bottom:0.5rem;}p{color:#666;line-height:1.6;}' +
     '</style></head><body><div class="card">' +
     '<h1>✨ โชคดีทุกวัน API</h1>' +
-    '<p>ระบบ Google Apps Script Backend พร้อมให้บริการแล้ว</p>' +
+    '<p>ระบบ Google Apps Script Backend พร้อมให้บริการแล้ว (รองรับการคำนวณสีประจำวัน 7 วัน)</p>' +
     '<p>คุณสามารถใช้ URL นี้เป็น Webhook / API Endpoint เชื่อมต่อกับเว็บแอปพลิเคชันได้ทันที</p>' +
     '</div></body></html>'
   ).setTitle('โชคดีทุกวัน API');
@@ -70,7 +71,8 @@ function doPost(e) {
         payload.birthDay,
         payload.goal,
         payload.zodiac,
-        payload.personalColor
+        payload.personalColor,
+        payload.targetDay
       );
     } else {
       responseData = { success: false, message: 'ไม่พบคำสั่ง action: ' + action };

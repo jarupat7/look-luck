@@ -3,7 +3,7 @@
  * คำนวณสีมงคลประจำวันเกิด, ราศี 2569, Personal Color 4 ฤดูกาล และกลยุทธ์แก้เคล็ดสีกาลกิณี
  */
 
-function getDailyLuckyAdvice(birthDay, goal, zodiac, personalColorSeason) {
+function getDailyLuckyAdvice(birthDay, goal, zodiac, personalColorSeason, targetDay) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const colorSheet = ss.getSheetByName('ColorRules');
   const zodiacSheet = ss.getSheetByName('ZodiacColors');
@@ -12,15 +12,16 @@ function getDailyLuckyAdvice(birthDay, goal, zodiac, personalColorSeason) {
 
   // ค่าปริยาย
   const dayKey = (birthDay || 'จันทร์').trim();
+  const currentTargetDay = (targetDay || getTodayThaiDayName()).trim();
   const currentGoal = goal || 'work'; // 'work', 'money', 'love', 'casual'
   const season = personalColorSeason || 'Spring';
 
-  // 1. ค้นหาข้อมูลสีมงคลตามวันเกิด
+  // 1. ค้นหาข้อมูลสีมงคลตามวันที่สวมใส่ (หรือใช้วันเกิดเป็นฐานสำรอง)
   let luckyData = null;
   if (colorSheet) {
     const rows = colorSheet.getDataRange().getValues();
     for (let i = 1; i < rows.length; i++) {
-      if (rows[i][0].toString().trim() === dayKey) {
+      if (rows[i][0].toString().trim() === currentTargetDay || rows[i][0].toString().trim() === dayKey) {
         luckyData = {
           birthDay: rows[i][0],
           workColors: rows[i][1],
@@ -39,13 +40,13 @@ function getDailyLuckyAdvice(birthDay, goal, zodiac, personalColorSeason) {
 
   // หากยังไม่มีชีตหรือหาไม่เจอ ใช้ข้อมูลสำรอง
   if (!luckyData) {
-    luckyData = getFallbackColorRules(dayKey);
+    luckyData = getFallbackColorRules(currentTargetDay);
   }
 
-  // 2. ข้อมูลเทพประจำวันเกิด (เกร็ดความรู้)
-  const deityTrivia = getDeityTrivia(dayKey);
+  // 2. ข้อมูลเทพประจำวันเป้าหมาย (เกร็ดความรู้)
+  const deityTrivia = getDeityTrivia(currentTargetDay);
 
-  // 3. กลยุทธ์แก้เคล็ดสีกาลกิณี
+  // 3. กลยุทธ์แก้เคล็ดสีกาลกิณีประจำวันเกิด
   const remedies = getRemediesForDay(dayKey, luckyData.kalakiniColors);
 
   // 4. คำแนะนำการแต่งกายเฉพาะบุคคล (Personal Color Palette Matching)
@@ -57,6 +58,7 @@ function getDailyLuckyAdvice(birthDay, goal, zodiac, personalColorSeason) {
   return {
     success: true,
     birthDay: dayKey,
+    targetDay: currentTargetDay,
     todayThaiDay: getTodayThaiDayName(),
     todayDateFormatted: formatThaiDate(new Date()),
     luckyData: luckyData,

@@ -1381,4 +1381,280 @@ body {
   margin: 0;
 }
 
+/* Weekly Day Selector Card & Day Pills */
+.week-selector-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.week-selector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.week-selector-title-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.week-sublabel {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--brand-gold-dark);
+}
+
+.week-selector-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.week-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-quick-today,
+.btn-weekly-modal {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-quick-today.active,
+.btn-quick-today:hover,
+.btn-weekly-modal:hover {
+  background: #FDFBF7;
+  border-color: var(--brand-gold);
+  color: var(--brand-gold-dark);
+}
+
+.day-pills-scroll {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.day-pills-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.day-pill-btn {
+  flex: 1;
+  min-width: 44px;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.day-pill-btn:hover {
+  border-color: var(--brand-gold-light);
+  transform: translateY(-1px);
+}
+
+.day-pill-btn.active {
+  background: #332D29;
+  border-color: #332D29;
+  color: #FFFFFF;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.pill-day-name {
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.day-pill-btn.active .pill-day-name {
+  color: #FFFFFF;
+}
+
+.pill-badge-today {
+  font-size: 0.55rem;
+  padding: 1px 4px;
+  border-radius: 6px;
+  background: var(--brand-gold);
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.day-pill-btn.active .pill-badge-today {
+  background: #E8B923;
+  color: #1A1A1A;
+}
+
+/* Header Tag Row */
+.header-tag-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.badge-target-day {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: #F5EBE1;
+  color: var(--brand-gold-dark);
+}
+
+/* Natal Protection Banner */
+.natal-protection-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #FDFCF9;
+  border: 1px solid #EFEAE0;
+  border-left: 3.5px solid #10B981;
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.natal-protection-banner.warning {
+  border-left-color: #F59E0B;
+  background: #FFFDF9;
+}
+
+.protection-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.protection-text {
+  flex: 1;
+}
+
+.protection-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.protection-title-row strong {
+  font-size: 0.76rem;
+  color: var(--text-primary);
+}
+
+.protection-status-tag {
+  font-size: 0.6rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+}
+
+.protection-status-tag.safe {
+  background: #ECFDF5;
+  color: #065F46;
+}
+
+.protection-status-tag.filtered {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.protection-text p {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.35;
+  margin: 0;
+}
+
+/* Weekly Matrix Modal Table */
+.weekly-modal-sheet {
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.weekly-table-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.weekly-day-card {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  transition: all 0.2s;
+}
+
+.weekly-day-card.current {
+  border-color: var(--brand-gold);
+  background: #FFFDF8;
+}
+
+.weekly-day-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.weekly-day-card-header strong {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.weekly-badge-today {
+  font-size: 0.6rem;
+  background: var(--brand-gold);
+  color: white;
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.weekly-colors-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  font-size: 0.72rem;
+}
+
+.weekly-color-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.weekly-color-field .label {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+}
+
+.weekly-color-field .value {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.weekly-color-field.kalakini .value {
+  color: #DC2626;
+}
+
+
 
