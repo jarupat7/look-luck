@@ -199,7 +199,6 @@ const DOM = {
   authRegPersonalColor: document.getElementById('authRegPersonalColor'),
   authRegGender: document.getElementById('authRegGender'),
   authRegPdpaConsent: document.getElementById('authRegPdpaConsent'),
-  btnGuestPreview: document.getElementById('btnGuestPreview'),
   btnOpenConfigFromAuth: document.getElementById('btnOpenConfigFromAuth'),
 
   // Main View Header
@@ -323,7 +322,13 @@ function loadSavedUser() {
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
+      // หากเป็นบัญชี Guest หรือผู้เยี่ยมชมเดิม ให้ยกเลิก เพื่อบังคับให้สมัครสมาชิกหรือเข้าสู่ระบบจริง
+      if (parsed && parsed.token && (parsed.token.startsWith('GUEST_') || parsed.email === 'guest@everydaylucky.app')) {
+        localStorage.removeItem('LUCKY_USER');
+        return;
+      }
       if (parsed && typeof parsed.isLoggedIn === 'boolean') {
+        if (!parsed.plan) parsed.plan = 'free';
         AppState.currentUser = parsed;
       }
     } catch(e) {
@@ -366,24 +371,6 @@ function setupEventListeners() {
     DOM.formMainRegister.addEventListener('submit', (e) => {
       e.preventDefault();
       handleMainRegister();
-    });
-  }
-
-  // --- Guest Mode Link ---
-  if (DOM.btnGuestPreview) {
-    DOM.btnGuestPreview.addEventListener('click', () => {
-      AppState.currentUser = {
-        isLoggedIn: true,
-        displayName: 'คุณผู้เยี่ยมชม',
-        email: 'guest@everydaylucky.app',
-        birthDay: 'จันทร์',
-        zodiac: 'ราศีพฤษภ',
-        personalColor: 'Spring',
-        plan: 'free',
-        token: 'GUEST_' + Date.now()
-      };
-      saveUserToStorage();
-      renderApp();
     });
   }
 
@@ -579,10 +566,11 @@ async function handleMainLogin() {
           isLoggedIn: true,
           displayName: data.user.displayName,
           email: data.user.email,
+          gender: data.user.gender || 'female',
           birthDay: data.user.birthDay,
           zodiac: data.user.zodiac || 'ราศีพฤษภ',
           personalColor: data.user.personalColor || 'Spring',
-          plan: data.user.plan || 'free',
+          plan: 'free',
           token: data.token
         };
         saveUserToStorage();
@@ -594,24 +582,40 @@ async function handleMainLogin() {
         return;
       }
     } catch(err) {
-      console.warn('API connection failed, falling back to local demo login', err);
+      console.warn('API connection failed, falling back to local login check', err);
     }
   }
 
-  // Local Demo Login fallback
-  AppState.currentUser = {
-    isLoggedIn: true,
-    displayName: email.split('@')[0],
-    email: email,
-    birthDay: AppState.currentUser.birthDay || 'จันทร์',
-    zodiac: AppState.currentUser.zodiac || 'ราศีพฤษภ',
-    personalColor: AppState.currentUser.personalColor || 'Spring',
-    plan: 'free',
-    token: 'DEMO_TOKEN_' + Date.now()
-  };
-  saveUserToStorage();
-  renderApp();
-  alert(`เข้าสู่ระบบสำเร็จ ยินดีต้อนรับคุณ ${AppState.currentUser.displayName}`);
+  // Local Accounts verification
+  const localAccounts = JSON.parse(localStorage.getItem('LUCKY_LOCAL_ACCOUNTS') || '[]');
+  const found = localAccounts.find(u => u.email.toLowerCase() === email.toLowerCase());
+
+  if (found) {
+    if (found.password && found.password !== password) {
+      alert('รหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบรหัสผ่านอีกครั้ง');
+      return;
+    }
+    AppState.currentUser = {
+      isLoggedIn: true,
+      displayName: found.displayName,
+      email: found.email,
+      gender: found.gender || 'female',
+      birthDay: found.birthDay || 'จันทร์',
+      zodiac: found.zodiac || 'ราศีพฤษภ',
+      personalColor: found.personalColor || 'Spring',
+      plan: 'free',
+      token: found.token || ('LOCAL_' + Date.now())
+    };
+    saveUserToStorage();
+    renderApp();
+    alert(`เข้าสู่ระบบสำเร็จ ยินดีต้อนรับคุณ ${AppState.currentUser.displayName} (แผน Free)`);
+    return;
+  }
+
+  // หากยังไม่มีบัญชีนี้ในเครื่อง ให้แนะนำสมัครสมาชิกแผน Free
+  alert('ไม่พบบัญชีนี้ในระบบ กรุณากดแท็บ "สมัครสมาชิก" เพื่อลงทะเบียนใช้งานฟรี (Free Plan)');
+  switchMainAuthTab('register');
+  if (DOM.authRegEmail) DOM.authRegEmail.value = email;
 }
 
 async function handleMainRegister() {
@@ -620,6 +624,7 @@ async function handleMainRegister() {
   const password = DOM.authRegPassword.value;
   const birthDay = DOM.authRegBirthDay.value;
   const personalColor = DOM.authRegPersonalColor.value;
+  const gender = (DOM.authRegGender && DOM.authRegGender.value) || 'female';
   const pdpaConsent = DOM.authRegPdpaConsent.checked;
 
   if (!name || !email || !password) {
@@ -642,8 +647,10 @@ async function handleMainRegister() {
           displayName: name,
           email: email,
           password: password,
+          gender: gender,
           birthDay: birthDay,
           personalColor: personalColor,
+          plan: 'free',
           pdpaConsent: true
         })
       });
@@ -669,11 +676,33 @@ async function handleMainRegister() {
         return;
       }
     } catch(err) {
-      console.warn('API connection failed, falling back to local demo register', err);
+      console.warn('API connection failed, falling back to local register', err);
     }
   }
 
-  // Local Demo Register fallback
+  // Local Accounts registration fallback
+  const localAccounts = JSON.parse(localStorage.getItem('LUCKY_LOCAL_ACCOUNTS') || '[]');
+  const existIdx = localAccounts.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
+  const token = 'LOCAL_' + Date.now();
+  const newAccount = {
+    displayName: name,
+    email: email,
+    password: password,
+    gender: gender,
+    birthDay: birthDay,
+    zodiac: 'ราศีพฤษภ',
+    personalColor: personalColor,
+    plan: 'free',
+    token: token
+  };
+
+  if (existIdx >= 0) {
+    localAccounts[existIdx] = newAccount;
+  } else {
+    localAccounts.push(newAccount);
+  }
+  localStorage.setItem('LUCKY_LOCAL_ACCOUNTS', JSON.stringify(localAccounts));
+
   AppState.currentUser = {
     isLoggedIn: true,
     displayName: name,
@@ -683,11 +712,11 @@ async function handleMainRegister() {
     zodiac: 'ราศีพฤษภ',
     personalColor: personalColor,
     plan: 'free',
-    token: 'DEMO_TOKEN_' + Date.now()
+    token: token
   };
   saveUserToStorage();
   renderApp();
-  alert(`สมัครสมาชิกสำเร็จ! ยินดีต้อนรับคุณ ${name} สู่โชคดีทุกวัน`);
+  alert(`สมัครสมาชิกสำเร็จ! ยินดีต้อนรับคุณ ${name} สู่โชคดีทุกวัน (แผน Free)`);
 }
 
 function switchTab(tabId) {
