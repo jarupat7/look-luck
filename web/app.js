@@ -200,6 +200,9 @@ const DOM = {
   authRegGender: document.getElementById('authRegGender'),
   authRegPdpaConsent: document.getElementById('authRegPdpaConsent'),
   btnOpenConfigFromAuth: document.getElementById('btnOpenConfigFromAuth'),
+  authApiStatusBar: document.getElementById('authApiStatusBar'),
+  txtAuthApiStatus: document.getElementById('txtAuthApiStatus'),
+  btnConnectApiFromBar: document.getElementById('btnConnectApiFromBar'),
 
   // Main View Header
   currentDateDisplay: document.getElementById('currentDateDisplay'),
@@ -307,6 +310,7 @@ const DOM = {
   btnCloseConfigModal: document.getElementById('btnCloseConfigModal'),
   inputApiUrl: document.getElementById('inputApiUrl'),
   btnSaveApiConfig: document.getElementById('btnSaveApiConfig'),
+  btnTestApiConfig: document.getElementById('btnTestApiConfig'),
   apiStatusBadge: document.getElementById('apiStatusBadge')
 };
 
@@ -314,6 +318,7 @@ const DOM = {
 document.addEventListener('DOMContentLoaded', () => {
   loadSavedUser();
   setupEventListeners();
+  updateApiStatusBadge();
   renderApp();
 });
 
@@ -506,6 +511,13 @@ function setupEventListeners() {
 
   if (DOM.btnOpenConfig) DOM.btnOpenConfig.addEventListener('click', openConfigModal);
   if (DOM.btnOpenConfigFromAuth) DOM.btnOpenConfigFromAuth.addEventListener('click', openConfigModal);
+  if (DOM.btnConnectApiFromBar) DOM.btnConnectApiFromBar.addEventListener('click', openConfigModal);
+
+  if (DOM.btnTestApiConfig) {
+    DOM.btnTestApiConfig.addEventListener('click', () => {
+      testApiConnection();
+    });
+  }
 
   DOM.btnCloseConfigModal.addEventListener('click', () => {
     DOM.modalConfig.classList.remove('active');
@@ -514,11 +526,24 @@ function setupEventListeners() {
     if (e.target === DOM.modalConfig) DOM.modalConfig.classList.remove('active');
   });
   DOM.btnSaveApiConfig.addEventListener('click', () => {
-    AppState.apiUrl = DOM.inputApiUrl.value.trim();
+    const rawVal = DOM.inputApiUrl.value.trim();
+    if (rawVal && !rawVal.startsWith('https://script.google.com/')) {
+      alert('⚠️ โปรดระบุ URL ที่ขึ้นต้นด้วย https://script.google.com/macros/s/.../exec');
+      return;
+    }
+    if (rawVal.includes('/edit')) {
+      alert('⚠️ URL นี้เป็นหน้าแก้ไขโค้ด (/edit)\nกรุณากด Deploy ใน Apps Script เพื่อนำ Web App URL ที่ลงท้ายด้วย /exec มาใส่ครับ');
+      return;
+    }
+    AppState.apiUrl = rawVal;
     localStorage.setItem('LUCKY_API_URL', AppState.apiUrl);
     updateApiStatusBadge();
     DOM.modalConfig.classList.remove('active');
-    alert('บันทึกการตั้งค่า API แล้ว');
+    if (AppState.apiUrl) {
+      alert('💾 บันทึก URL เรียบร้อยแล้ว! ระบบจะบันทึกข้อมูลและดึงข้อมูลสีมงคลผ่าน Google Sheets');
+    } else {
+      alert('💾 สลับเป็นโหมดออฟไลน์แล้ว (ข้อมูลจะบันทึกในเครื่องนี้เท่านั้น)');
+    }
   });
 
   // --- Resize Listener for Radar Chart ---
@@ -553,7 +578,15 @@ async function handleMainLogin() {
     return;
   }
 
+  const submitBtn = DOM.formMainLogin ? DOM.formMainLogin.querySelector('button[type="submit"]') : null;
+  const originalBtnText = submitBtn ? submitBtn.textContent : '';
+
   if (AppState.apiUrl) {
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = '⏳ กำลังเข้าสู่ระบบผ่าน Google Sheets...';
+    }
+
     try {
       const res = await fetch(AppState.apiUrl, {
         method: 'POST',
@@ -561,6 +594,11 @@ async function handleMainLogin() {
         body: JSON.stringify({ action: 'login', email, password })
       });
       const data = await res.json();
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+      }
+
       if (data.success) {
         AppState.currentUser = {
           isLoggedIn: true,
@@ -575,13 +613,17 @@ async function handleMainLogin() {
         };
         saveUserToStorage();
         renderApp();
-        alert(data.message);
+        alert(data.message || 'เข้าสู่ระบบสำเร็จ');
         return;
       } else {
-        alert(data.message);
+        alert(data.message || 'อีเมลหรือรหัสผ่านไม่ถูกต้อง');
         return;
       }
     } catch(err) {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+      }
       console.warn('API connection failed, falling back to local login check', err);
     }
   }
@@ -608,7 +650,7 @@ async function handleMainLogin() {
     };
     saveUserToStorage();
     renderApp();
-    alert(`เข้าสู่ระบบสำเร็จ ยินดีต้อนรับคุณ ${AppState.currentUser.displayName} (แผน Free)`);
+    alert(`เข้าสู่ระบบสำเร็จ (โหมดเครื่อง) ยินดีต้อนรับคุณ ${AppState.currentUser.displayName}`);
     return;
   }
 
@@ -637,7 +679,34 @@ async function handleMainRegister() {
     return;
   }
 
+  // แจ้งเตือนหากยังไม่ได้เชื่อมต่อ Google Sheets Web App URL
+  if (!AppState.apiUrl) {
+    const proceedOffline = confirm(
+      '⚠️ ยังไม่ได้เชื่อมต่อ Google Sheets (ปัจจุบันระบบอยู่ในโหมดออฟไลน์)\n\n' +
+      'หากสมัครตอนนี้ ข้อมูลจะถูกบันทึกไว้ในเบราว์เซอร์เครื่องนี้เท่านั้น (ไม่เข้า Google Sheets!)\n\n' +
+      '• กด [ตกลง / OK] หากต้องการทดลองใช้งานในโหมดออฟไลน์ต่อ\n' +
+      '• กด [ยกเลิก / Cancel] เพื่อเปิดหน้าต่างเชื่อมต่อ Web App URL ของ Google Sheets'
+    );
+    if (!proceedOffline) {
+      if (DOM.modalConfig) {
+        DOM.inputApiUrl.value = AppState.apiUrl;
+        updateApiStatusBadge();
+        DOM.modalConfig.classList.add('active');
+      }
+      return;
+    }
+  }
+
+  const submitBtn = DOM.formMainRegister ? DOM.formMainRegister.querySelector('button[type="submit"]') : null;
+  const originalBtnText = submitBtn ? submitBtn.textContent : '';
+
+  // หากมี AppState.apiUrl ให้ทำการส่งข้อมูลไปยัง Google Apps Script
   if (AppState.apiUrl) {
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = '⏳ กำลังบันทึกลง Google Sheets...';
+    }
+
     try {
       const res = await fetch(AppState.apiUrl, {
         method: 'POST',
@@ -654,7 +723,13 @@ async function handleMainRegister() {
           pdpaConsent: true
         })
       });
+
       const data = await res.json();
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+      }
+
       if (data.success) {
         AppState.currentUser = {
           isLoggedIn: true,
@@ -669,14 +744,35 @@ async function handleMainRegister() {
         };
         saveUserToStorage();
         renderApp();
-        alert(data.message);
+        alert('🎉 สมัครสมาชิกสำเร็จ!\nข้อมูลของคุณถูกบันทึกลงใน Google Sheets ("Users") เรียบร้อยแล้ว');
         return;
       } else {
-        alert(data.message);
+        alert('❌ ไม่สามารถบันทึกลง Google Sheets ได้:\n' + (data.message || 'เกิดข้อผิดพลาด'));
         return;
       }
     } catch(err) {
-      console.warn('API connection failed, falling back to local register', err);
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+      }
+      console.error('API connection failed during register:', err);
+      const tryLocal = confirm(
+        '❌ ไม่สามารถส่งข้อมูลไปยัง Google Sheets ได้!\n\n' +
+        'สาเหตุหลักที่พบบ่อย:\n' +
+        '1. สิทธิ์การเข้าถึงไม่ได้ตั้งเป็น "ทุกคน (Anyone)" ในหน้า Apps Script Deploy\n' +
+        '2. ยังไม่ได้รัน setupDatabase ใน Apps Script เพื่อสร้างตาราง Users\n' +
+        '3. URL ไม่ถูกต้อง หรือสัญญาณอินเทอร์เน็ตขัดข้อง\n\n' +
+        'รายละเอียด: ' + err.message + '\n\n' +
+        'ต้องการบันทึกข้อมูลแบบจำลองในเครื่องนี้ (Offline Mode) แทนชั่วคราวหรือไม่?'
+      );
+      if (!tryLocal) {
+        if (DOM.modalConfig) {
+          DOM.inputApiUrl.value = AppState.apiUrl;
+          updateApiStatusBadge();
+          DOM.modalConfig.classList.add('active');
+        }
+        return;
+      }
     }
   }
 
@@ -716,7 +812,7 @@ async function handleMainRegister() {
   };
   saveUserToStorage();
   renderApp();
-  alert(`สมัครสมาชิกสำเร็จ! ยินดีต้อนรับคุณ ${name} สู่โชคดีทุกวัน (แผน Free)`);
+  alert(`📱 บันทึกข้อมูลสำเร็จใน "โหมดออฟไลน์" (ข้อมูลยังไม่ได้บันทึกลง Google Sheets จนกว่าจะเชื่อมต่อ Web App URL)`);
 }
 
 function switchTab(tabId) {
@@ -1263,13 +1359,103 @@ function renderRadarChart() {
 
 
 function updateApiStatusBadge() {
-  if (AppState.apiUrl) {
-    DOM.apiStatusBadge.textContent = 'สถานะ: เชื่อมต่อ Google Apps Script Web App แล้ว';
-    DOM.apiStatusBadge.style.background = '#ECFDF5';
-    DOM.apiStatusBadge.style.color = '#065F46';
-  } else {
-    DOM.apiStatusBadge.textContent = 'สถานะ: โหมดสาธิตออฟไลน์ (ทดลองใช้งานได้สมบูรณ์)';
-    DOM.apiStatusBadge.style.background = '#F0FDF4';
-    DOM.apiStatusBadge.style.color = '#166534';
+  const isConnected = !!AppState.apiUrl;
+
+  // ปรับสถานะใน Modal Config
+  if (DOM.apiStatusBadge) {
+    if (isConnected) {
+      DOM.apiStatusBadge.textContent = '🟢 สถานะ: ใส่ URL แล้ว (กดปุ่ม "ทดสอบการเชื่อมต่อ" เพื่อทดสอบการเข้าถึง)';
+      DOM.apiStatusBadge.style.background = '#ECFDF5';
+      DOM.apiStatusBadge.style.color = '#065F46';
+      DOM.apiStatusBadge.style.borderColor = '#A7F3D0';
+    } else {
+      DOM.apiStatusBadge.textContent = '⚪ สถานะ: ยังไม่ได้เชื่อมต่อ Google Sheets (ทำงานในโหมดออฟไลน์)';
+      DOM.apiStatusBadge.style.background = '#FFFBEB';
+      DOM.apiStatusBadge.style.color = '#92400E';
+      DOM.apiStatusBadge.style.borderColor = '#FDE68A';
+    }
+  }
+
+  // ปรับแถบสถานะบนหน้าจอ Login / Register
+  if (DOM.authApiStatusBar) {
+    if (isConnected) {
+      DOM.authApiStatusBar.className = 'auth-api-status-bar connected';
+      if (DOM.txtAuthApiStatus) DOM.txtAuthApiStatus.textContent = 'ออนไลน์: เชื่อมต่อ Google Sheets แล้ว';
+    } else {
+      DOM.authApiStatusBar.className = 'auth-api-status-bar disconnected';
+      if (DOM.txtAuthApiStatus) DOM.txtAuthApiStatus.textContent = 'โหมดออฟไลน์: ยังไม่ได้เชื่อมต่อ Google Sheets';
+    }
+  }
+}
+
+async function testApiConnection(urlToTest) {
+  const url = (urlToTest || (DOM.inputApiUrl && DOM.inputApiUrl.value) || AppState.apiUrl || '').trim();
+  if (!url) {
+    alert('กรุณากรอก Web App URL ก่อนกดทดสอบ');
+    return false;
+  }
+
+  if (!url.startsWith('https://script.google.com/')) {
+    alert('⚠️ รูปแบบ URL ไม่ถูกต้อง ต้องขึ้นต้นด้วย https://script.google.com/macros/s/.../exec');
+    return false;
+  }
+
+  if (url.includes('/edit')) {
+    alert('⚠️ คุณนำ URL หน้าแก้ไขสคริปต์ (/edit) มาวาง!\n\nกรุณากดปุ่ม "ทำให้ใช้งานได้ (Deploy)" > "การทำให้ใช้งานได้ใหม่ (New deployment)" แล้วนำ Web App URL ที่ลงท้ายด้วย /exec มาใส่แทนครับ');
+    return false;
+  }
+
+  if (DOM.apiStatusBadge) {
+    DOM.apiStatusBadge.textContent = '⏳ กำลังทดสอบเชื่อมต่อ Google Apps Script...';
+    DOM.apiStatusBadge.style.background = '#EFF6FF';
+    DOM.apiStatusBadge.style.color = '#1E40AF';
+  }
+
+  if (DOM.btnTestApiConfig) {
+    DOM.btnTestApiConfig.disabled = true;
+    DOM.btnTestApiConfig.textContent = '⏳ กำลังทดสอบ...';
+  }
+
+  try {
+    const testUrl = url.includes('?') ? `${url}&action=checkStatus` : `${url}?action=checkStatus`;
+    const res = await fetch(testUrl, { method: 'GET', mode: 'cors' });
+    const data = await res.json();
+
+    if (DOM.btnTestApiConfig) {
+      DOM.btnTestApiConfig.disabled = false;
+      DOM.btnTestApiConfig.textContent = '🔍 ทดสอบการเชื่อมต่อ';
+    }
+
+    if (data.status === 'active' || data.appName) {
+      if (DOM.apiStatusBadge) {
+        DOM.apiStatusBadge.textContent = `🟢 เชื่อมต่อสำเร็จ! (${data.appName || 'โชคดีทุกวัน API'}) พร้อมบันทึกลงชีต`;
+        DOM.apiStatusBadge.style.background = '#ECFDF5';
+        DOM.apiStatusBadge.style.color = '#065F46';
+      }
+      alert('🎉 เชื่อมต่อ Google Apps Script สำเร็จ!\nระบบพร้อมบันทึกข้อมูลสมาชิกและดึงข้อมูลสีมงคลลง Google Sheets ("DATA โชคดีทุกวัน") ได้ทันที');
+      return true;
+    } else {
+      throw new Error(data.message || 'โครงสร้างข้อมูลไม่ตรงกับสคริปต์โชคดีทุกวัน');
+    }
+  } catch (err) {
+    if (DOM.btnTestApiConfig) {
+      DOM.btnTestApiConfig.disabled = false;
+      DOM.btnTestApiConfig.textContent = '🔍 ทดสอบการเชื่อมต่อ';
+    }
+    console.error('Test connection error:', err);
+    if (DOM.apiStatusBadge) {
+      DOM.apiStatusBadge.textContent = '🔴 เชื่อมต่อไม่สำเร็จ: ' + err.message;
+      DOM.apiStatusBadge.style.background = '#FEF2F2';
+      DOM.apiStatusBadge.style.color = '#991B1B';
+    }
+    alert(
+      '❌ เชื่อมต่อ Google Apps Script ไม่สำเร็จ!\n\n' +
+      'สาเหตุหลักที่พบบ่อย:\n' +
+      '1. สิทธิ์การเข้าถึงไม่ได้ตั้งเป็น "ทุกคน (Anyone)": ใน Apps Script ตอน Deploy ต้องเลือก Who has access: Anyone\n' +
+      '2. ยังไม่ได้รันฟังก์ชัน setupDatabase ในชีต เพื่อสร้างตาราง Users และ Reference\n' +
+      '3. นำ URL หน้าแก้ไขสคริปต์ (/edit) มาใส่ แทนที่จะเป็น Web App URL (/exec)\n\n' +
+      'ข้อความระบบ: ' + err.message
+    );
+    return false;
   }
 }

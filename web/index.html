@@ -43,6 +43,13 @@
       <!-- Auth Form Card -->
       <div class="card auth-main-card">
         
+        <!-- แถบแสดงสถานะการเชื่อมต่อ Google Sheets บนหน้า Auth -->
+        <div class="auth-api-status-bar disconnected" id="authApiStatusBar">
+          <div class="status-indicator-dot" id="dotApiStatus"></div>
+          <span class="status-text" id="txtAuthApiStatus">โหมดออฟไลน์: ยังไม่ได้เชื่อมต่อ Google Sheets</span>
+          <button type="button" class="btn-connect-api" id="btnConnectApiFromBar">เชื่อมต่อชีต ⚙️</button>
+        </div>
+
         <!-- Toggle Tabs: เข้าสู่ระบบ / สมัครสมาชิก -->
         <div class="auth-switch-tabs">
           <button class="auth-tab-btn active" id="btnTabLogin">เข้าสู่ระบบ</button>
@@ -754,19 +761,41 @@
         <div class="modal-drag-bar"></div>
         <button class="modal-close-btn" id="btnCloseConfigModal">&times;</button>
         <h3 class="card-heading">การเชื่อมต่อ Google Sheets</h3>
-        <p class="card-subtext">คุณสามารถใช้งานในโหมดทดลองทันที หรือเชื่อมต่อ Web App URL จาก Google Apps Script ได้</p>
+        <p class="card-subtext">เชื่อมต่อกับ Google Spreadsheet "DATA โชคดีทุกวัน" เพื่อบันทึกข้อมูลสมาชิกและดึงสถิติแบบ Real-time</p>
 
         <div class="form-group">
           <label class="form-label">Google Apps Script Web App URL</label>
           <input type="url" class="form-input" id="inputApiUrl" placeholder="https://script.google.com/macros/s/.../exec">
-          <small class="helper-text">หากเว้นว่างไว้ ระบบจะทำงานในโหมด "สาธิตออฟไลน์ (Local Demo Mode)" ให้ทดสอบฟีเจอร์ได้ทันที</small>
+          <small class="helper-text">นำ URL ที่ได้จากการ Deploy Web App มาวางที่นี่ (ต้องลงท้ายด้วย <code>/exec</code>)</small>
         </div>
 
         <div class="api-status-badge" id="apiStatusBadge">
-          สถานะ: โหมดสาธิตออฟไลน์ (ทำงานได้ครบทุกฟังก์ชัน)
+          สถานะ: กำลังตรวจสอบ...
         </div>
 
-        <button class="btn-primary" id="btnSaveApiConfig">บันทึกการตั้งค่า</button>
+        <div class="config-actions-row">
+          <button type="button" class="btn-secondary" id="btnTestApiConfig">🔍 ทดสอบการเชื่อมต่อ</button>
+          <button type="button" class="btn-primary" id="btnSaveApiConfig">💾 บันทึกการตั้งค่า</button>
+        </div>
+
+        <!-- กล่องคำแนะนำขั้นตอนการเชื่อมต่อแบบเข้าใจง่าย -->
+        <div class="config-guide-box">
+          <h4 class="guide-title">📋 3 ขั้นตอนเชื่อมต่อชีต "DATA โชคดีทุกวัน":</h4>
+          <ol class="guide-steps">
+            <li>เปิดไฟล์ <strong>DATA โชคดีทุกวัน.gsheet</strong> ใน Google Drive ของคุณ</li>
+            <li>ไปที่เมนู <strong>ส่วนขยาย (Extensions)</strong> &gt; <strong>Apps Script</strong>
+              <div class="guide-subnote">💡 <em>สำคัญครั้งแรก:</em> เลือกฟังก์ชัน <code>setupDatabase</code> แล้วกด <strong>เรียกใช้ (Run)</strong> เพื่อสร้างตาราง Users และ Reference</div>
+            </li>
+            <li>กดปุ่มสีน้ำเงิน <strong>ทำให้ใช้งานได้ (Deploy)</strong> &gt; <strong>การทำให้ใช้งานได้ใหม่ (New deployment)</strong>:
+              <ul class="guide-sublist">
+                <li>เลือกประเภท: <strong>เว็บแอป (Web app)</strong></li>
+                <li>ผู้บริหารจัดการการทำงาน: <strong>ฉัน (Me)</strong></li>
+                <li>ผู้ที่มีสิทธิ์เข้าถึง: <strong>ทุกคน (Anyone)</strong> <span class="badge-alert-mini">สำคัญมาก</span></li>
+              </ul>
+            </li>
+            <li>คัดลอก <strong>URL เว็บแอป</strong> ที่ได้ มาวางในช่องด้านบน แล้วกด <strong>ทดสอบการเชื่อมต่อ</strong></li>
+          </ol>
+        </div>
       </div>
     </div>
 
