@@ -638,7 +638,7 @@ async function handleMainRegister() {
       };
       saveUserToStorage();
       renderApp();
-      alert('🎉 สมัครสมาชิกสำเร็จ!\nข้อมูลของคุณถูกบันทึกลงใน Google Sheets เรียบร้อยแล้ว');
+      alert('🎉 สมัครสมาชิกสำเร็จ!\nยินดีต้อนรับสู่ Look&Luck (ข้อมูลบันทึกลง Google Sheets เรียบร้อยแล้ว)');
       return;
     } else {
       alert('❌ ไม่สามารถลงทะเบียนได้:\n' + (data.message || 'โปรดลองใหม่อีกครั้ง'));
