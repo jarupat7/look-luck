@@ -158,6 +158,9 @@ function getTodayThaiDayName() {
   return days[new Date().getDay()];
 }
 
+// URL หลักของ Google Apps Script Web App (เชื่อมต่อชีต DATA โชคดีทุกวัน อัตโนมัติ)
+const DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbzq5M_wOok95sOW0LKqtUAmMFC719IqHBzF8jH5O85rrilutOheaZJBxtoEr9SYK1k20w/exec';
+
 // State การทำงานของแอปพลิเคชัน
 const AppState = {
   currentUser: {
@@ -175,7 +178,9 @@ const AppState = {
   bottomStyle: 'pants', // 'pants', 'skirt'
   todayDay: getTodayThaiDayName(), // วันนี้ตามปฏิทินจริง (Real-world today)
   selectedDay: getTodayThaiDayName(), // วันที่ผู้ใช้เลือกดู (Default = วันนี้)
-  apiUrl: localStorage.getItem('LUCKY_API_URL') || '',
+  apiUrl: (localStorage.getItem('LUCKY_API_URL') && localStorage.getItem('LUCKY_API_URL').trim() !== '') 
+    ? localStorage.getItem('LUCKY_API_URL').trim() 
+    : DEFAULT_API_URL,
   activeTab: 'tabHome'
 };
 
@@ -504,7 +509,7 @@ function setupEventListeners() {
 
   // --- Config Modal Events ---
   const openConfigModal = () => {
-    DOM.inputApiUrl.value = AppState.apiUrl;
+    DOM.inputApiUrl.value = AppState.apiUrl || DEFAULT_API_URL;
     updateApiStatusBadge();
     DOM.modalConfig.classList.add('active');
   };
