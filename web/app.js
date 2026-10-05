@@ -158,8 +158,8 @@ function getTodayThaiDayName() {
   return days[new Date().getDay()];
 }
 
-// URL หลักของ Google Apps Script Web App (เชื่อมต่อชีต DATA โชคดีทุกวัน อัตโนมัติ)
-const DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbzq5M_wOok95sOW0LKqtUAmMFC719IqHBzF8jH5O85rrilutOheaZJBxtoEr9SYK1k20w/exec';
+// Google Apps Script Web App URL ถาวร (เชื่อมต่อชีต DATA โชคดีทุกวัน)
+const API_URL = 'https://script.google.com/macros/s/AKfycbzq5M_wOok95sOW0LKqtUAmMFC719IqHBzF8jH5O85rrilutOheaZJBxtoEr9SYK1k20w/exec';
 
 // State การทำงานของแอปพลิเคชัน
 const AppState = {
@@ -178,9 +178,7 @@ const AppState = {
   bottomStyle: 'pants', // 'pants', 'skirt'
   todayDay: getTodayThaiDayName(), // วันนี้ตามปฏิทินจริง (Real-world today)
   selectedDay: getTodayThaiDayName(), // วันที่ผู้ใช้เลือกดู (Default = วันนี้)
-  apiUrl: (localStorage.getItem('LUCKY_API_URL') && localStorage.getItem('LUCKY_API_URL').trim() !== '') 
-    ? localStorage.getItem('LUCKY_API_URL').trim() 
-    : DEFAULT_API_URL,
+  apiUrl: API_URL,
   activeTab: 'tabHome'
 };
 
@@ -204,10 +202,6 @@ const DOM = {
   authRegPersonalColor: document.getElementById('authRegPersonalColor'),
   authRegGender: document.getElementById('authRegGender'),
   authRegPdpaConsent: document.getElementById('authRegPdpaConsent'),
-  btnOpenConfigFromAuth: document.getElementById('btnOpenConfigFromAuth'),
-  authApiStatusBar: document.getElementById('authApiStatusBar'),
-  txtAuthApiStatus: document.getElementById('txtAuthApiStatus'),
-  btnConnectApiFromBar: document.getElementById('btnConnectApiFromBar'),
 
   // Main View Header
   currentDateDisplay: document.getElementById('currentDateDisplay'),
@@ -217,7 +211,6 @@ const DOM = {
   badgeGender: document.getElementById('badgeGender'),
   badgePlan: document.getElementById('badgePlan'),
   btnSwitchToProfile: document.getElementById('btnSwitchToProfile'),
-  btnOpenConfig: document.getElementById('btnOpenConfig'),
   
   // Weekly Day Selector & Protection Banner
   dayPillBtns: document.querySelectorAll('.day-pill-btn'),
@@ -310,20 +303,12 @@ const DOM = {
   tabPages: document.querySelectorAll('.tab-page'),
   chipBtns: document.querySelectorAll('.chip-btn'),
 
-  // Config Modal
-  modalConfig: document.getElementById('modalConfig'),
-  btnCloseConfigModal: document.getElementById('btnCloseConfigModal'),
-  inputApiUrl: document.getElementById('inputApiUrl'),
-  btnSaveApiConfig: document.getElementById('btnSaveApiConfig'),
-  btnTestApiConfig: document.getElementById('btnTestApiConfig'),
-  apiStatusBadge: document.getElementById('apiStatusBadge')
 };
 
 // Initial Setup
 document.addEventListener('DOMContentLoaded', () => {
   loadSavedUser();
   setupEventListeners();
-  updateApiStatusBadge();
   renderApp();
 });
 
@@ -507,50 +492,6 @@ function setupEventListeners() {
     });
   }
 
-  // --- Config Modal Events ---
-  const openConfigModal = () => {
-    DOM.inputApiUrl.value = AppState.apiUrl || DEFAULT_API_URL;
-    updateApiStatusBadge();
-    DOM.modalConfig.classList.add('active');
-  };
-
-  if (DOM.btnOpenConfig) DOM.btnOpenConfig.addEventListener('click', openConfigModal);
-  if (DOM.btnOpenConfigFromAuth) DOM.btnOpenConfigFromAuth.addEventListener('click', openConfigModal);
-  if (DOM.btnConnectApiFromBar) DOM.btnConnectApiFromBar.addEventListener('click', openConfigModal);
-
-  if (DOM.btnTestApiConfig) {
-    DOM.btnTestApiConfig.addEventListener('click', () => {
-      testApiConnection();
-    });
-  }
-
-  DOM.btnCloseConfigModal.addEventListener('click', () => {
-    DOM.modalConfig.classList.remove('active');
-  });
-  DOM.modalConfig.addEventListener('click', (e) => {
-    if (e.target === DOM.modalConfig) DOM.modalConfig.classList.remove('active');
-  });
-  DOM.btnSaveApiConfig.addEventListener('click', () => {
-    const rawVal = DOM.inputApiUrl.value.trim();
-    if (rawVal && !rawVal.startsWith('https://script.google.com/')) {
-      alert('⚠️ โปรดระบุ URL ที่ขึ้นต้นด้วย https://script.google.com/macros/s/.../exec');
-      return;
-    }
-    if (rawVal.includes('/edit')) {
-      alert('⚠️ URL นี้เป็นหน้าแก้ไขโค้ด (/edit)\nกรุณากด Deploy ใน Apps Script เพื่อนำ Web App URL ที่ลงท้ายด้วย /exec มาใส่ครับ');
-      return;
-    }
-    AppState.apiUrl = rawVal;
-    localStorage.setItem('LUCKY_API_URL', AppState.apiUrl);
-    updateApiStatusBadge();
-    DOM.modalConfig.classList.remove('active');
-    if (AppState.apiUrl) {
-      alert('💾 บันทึก URL เรียบร้อยแล้ว! ระบบจะบันทึกข้อมูลและดึงข้อมูลสีมงคลผ่าน Google Sheets');
-    } else {
-      alert('💾 สลับเป็นโหมดออฟไลน์แล้ว (ข้อมูลจะบันทึกในเครื่องนี้เท่านั้น)');
-    }
-  });
-
   // --- Resize Listener for Radar Chart ---
   window.addEventListener('resize', () => {
     if (AppState.currentUser && AppState.currentUser.isLoggedIn && AppState.activeTab === 'tabHome') {
@@ -586,83 +527,51 @@ async function handleMainLogin() {
   const submitBtn = DOM.formMainLogin ? DOM.formMainLogin.querySelector('button[type="submit"]') : null;
   const originalBtnText = submitBtn ? submitBtn.textContent : '';
 
-  if (AppState.apiUrl) {
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.textContent = '⏳ กำลังเข้าสู่ระบบผ่าน Google Sheets...';
-    }
-
-    try {
-      const res = await fetch(AppState.apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'login', email, password })
-      });
-      const data = await res.json();
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalBtnText;
-      }
-
-      if (data.success) {
-        AppState.currentUser = {
-          isLoggedIn: true,
-          displayName: data.user.displayName,
-          email: data.user.email,
-          gender: data.user.gender || 'female',
-          birthDay: data.user.birthDay,
-          zodiac: data.user.zodiac || 'ราศีพฤษภ',
-          personalColor: data.user.personalColor || 'Spring',
-          plan: 'free',
-          token: data.token
-        };
-        saveUserToStorage();
-        renderApp();
-        alert(data.message || 'เข้าสู่ระบบสำเร็จ');
-        return;
-      } else {
-        alert(data.message || 'อีเมลหรือรหัสผ่านไม่ถูกต้อง');
-        return;
-      }
-    } catch(err) {
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalBtnText;
-      }
-      console.warn('API connection failed, falling back to local login check', err);
-    }
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = '⏳ กำลังเข้าสู่ระบบ...';
   }
 
-  // Local Accounts verification
-  const localAccounts = JSON.parse(localStorage.getItem('LUCKY_LOCAL_ACCOUNTS') || '[]');
-  const found = localAccounts.find(u => u.email.toLowerCase() === email.toLowerCase());
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'login', email, password })
+    });
+    const data = await res.json();
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+    }
 
-  if (found) {
-    if (found.password && found.password !== password) {
-      alert('รหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบรหัสผ่านอีกครั้ง');
+    if (data.success) {
+      AppState.currentUser = {
+        isLoggedIn: true,
+        displayName: data.user.displayName,
+        email: data.user.email,
+        gender: data.user.gender || 'female',
+        birthDay: data.user.birthDay,
+        zodiac: data.user.zodiac || 'ราศีพฤษภ',
+        personalColor: data.user.personalColor || 'Spring',
+        plan: 'free',
+        token: data.token
+      };
+      saveUserToStorage();
+      renderApp();
+      alert(data.message || 'เข้าสู่ระบบสำเร็จ');
+      return;
+    } else {
+      alert(data.message || 'อีเมลหรือรหัสผ่านไม่ถูกต้อง');
       return;
     }
-    AppState.currentUser = {
-      isLoggedIn: true,
-      displayName: found.displayName,
-      email: found.email,
-      gender: found.gender || 'female',
-      birthDay: found.birthDay || 'จันทร์',
-      zodiac: found.zodiac || 'ราศีพฤษภ',
-      personalColor: found.personalColor || 'Spring',
-      plan: 'free',
-      token: found.token || ('LOCAL_' + Date.now())
-    };
-    saveUserToStorage();
-    renderApp();
-    alert(`เข้าสู่ระบบสำเร็จ (โหมดเครื่อง) ยินดีต้อนรับคุณ ${AppState.currentUser.displayName}`);
-    return;
+  } catch(err) {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+    }
+    console.error('Login error:', err);
+    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ Google Sheets กรุณาลองใหม่อีกครั้ง');
   }
-
-  // หากยังไม่มีบัญชีนี้ในเครื่อง ให้แนะนำสมัครสมาชิกแผน Free
-  alert('ไม่พบบัญชีนี้ในระบบ กรุณากดแท็บ "สมัครสมาชิก" เพื่อลงทะเบียนใช้งานฟรี (Free Plan)');
-  switchMainAuthTab('register');
-  if (DOM.authRegEmail) DOM.authRegEmail.value = email;
 }
 
 async function handleMainRegister() {
@@ -684,140 +593,65 @@ async function handleMainRegister() {
     return;
   }
 
-  // แจ้งเตือนหากยังไม่ได้เชื่อมต่อ Google Sheets Web App URL
-  if (!AppState.apiUrl) {
-    const proceedOffline = confirm(
-      '⚠️ ยังไม่ได้เชื่อมต่อ Google Sheets (ปัจจุบันระบบอยู่ในโหมดออฟไลน์)\n\n' +
-      'หากสมัครตอนนี้ ข้อมูลจะถูกบันทึกไว้ในเบราว์เซอร์เครื่องนี้เท่านั้น (ไม่เข้า Google Sheets!)\n\n' +
-      '• กด [ตกลง / OK] หากต้องการทดลองใช้งานในโหมดออฟไลน์ต่อ\n' +
-      '• กด [ยกเลิก / Cancel] เพื่อเปิดหน้าต่างเชื่อมต่อ Web App URL ของ Google Sheets'
-    );
-    if (!proceedOffline) {
-      if (DOM.modalConfig) {
-        DOM.inputApiUrl.value = AppState.apiUrl;
-        updateApiStatusBadge();
-        DOM.modalConfig.classList.add('active');
-      }
-      return;
-    }
-  }
-
   const submitBtn = DOM.formMainRegister ? DOM.formMainRegister.querySelector('button[type="submit"]') : null;
   const originalBtnText = submitBtn ? submitBtn.textContent : '';
 
-  // หากมี AppState.apiUrl ให้ทำการส่งข้อมูลไปยัง Google Apps Script
-  if (AppState.apiUrl) {
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = '⏳ กำลังบันทึกข้อมูลสมาชิกลงชีต...';
+  }
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'register',
+        displayName: name,
+        email: email,
+        password: password,
+        gender: gender,
+        birthDay: birthDay,
+        personalColor: personalColor,
+        plan: 'free',
+        pdpaConsent: true
+      })
+    });
+
+    const data = await res.json();
     if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.textContent = '⏳ กำลังบันทึกลง Google Sheets...';
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
     }
 
-    try {
-      const res = await fetch(AppState.apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: 'register',
-          displayName: name,
-          email: email,
-          password: password,
-          gender: gender,
-          birthDay: birthDay,
-          personalColor: personalColor,
-          plan: 'free',
-          pdpaConsent: true
-        })
-      });
-
-      const data = await res.json();
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalBtnText;
-      }
-
-      if (data.success) {
-        AppState.currentUser = {
-          isLoggedIn: true,
-          displayName: data.user.displayName,
-          email: data.user.email,
-          gender: gender,
-          birthDay: data.user.birthDay,
-          zodiac: data.user.zodiac || 'ราศีพฤษภ',
-          personalColor: data.user.personalColor || personalColor,
-          plan: 'free',
-          token: data.token
-        };
-        saveUserToStorage();
-        renderApp();
-        alert('🎉 สมัครสมาชิกสำเร็จ!\nข้อมูลของคุณถูกบันทึกลงใน Google Sheets ("Users") เรียบร้อยแล้ว');
-        return;
-      } else {
-        alert('❌ ไม่สามารถบันทึกลง Google Sheets ได้:\n' + (data.message || 'เกิดข้อผิดพลาด'));
-        return;
-      }
-    } catch(err) {
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalBtnText;
-      }
-      console.error('API connection failed during register:', err);
-      const tryLocal = confirm(
-        '❌ ไม่สามารถส่งข้อมูลไปยัง Google Sheets ได้!\n\n' +
-        'สาเหตุหลักที่พบบ่อย:\n' +
-        '1. สิทธิ์การเข้าถึงไม่ได้ตั้งเป็น "ทุกคน (Anyone)" ในหน้า Apps Script Deploy\n' +
-        '2. ยังไม่ได้รัน setupDatabase ใน Apps Script เพื่อสร้างตาราง Users\n' +
-        '3. URL ไม่ถูกต้อง หรือสัญญาณอินเทอร์เน็ตขัดข้อง\n\n' +
-        'รายละเอียด: ' + err.message + '\n\n' +
-        'ต้องการบันทึกข้อมูลแบบจำลองในเครื่องนี้ (Offline Mode) แทนชั่วคราวหรือไม่?'
-      );
-      if (!tryLocal) {
-        if (DOM.modalConfig) {
-          DOM.inputApiUrl.value = AppState.apiUrl;
-          updateApiStatusBadge();
-          DOM.modalConfig.classList.add('active');
-        }
-        return;
-      }
+    if (data.success) {
+      AppState.currentUser = {
+        isLoggedIn: true,
+        displayName: data.user.displayName,
+        email: data.user.email,
+        gender: gender,
+        birthDay: data.user.birthDay,
+        zodiac: data.user.zodiac || 'ราศีพฤษภ',
+        personalColor: data.user.personalColor || personalColor,
+        plan: 'free',
+        token: data.token
+      };
+      saveUserToStorage();
+      renderApp();
+      alert('🎉 สมัครสมาชิกสำเร็จ!\nข้อมูลของคุณถูกบันทึกลงใน Google Sheets เรียบร้อยแล้ว');
+      return;
+    } else {
+      alert('❌ ไม่สามารถลงทะเบียนได้:\n' + (data.message || 'โปรดลองใหม่อีกครั้ง'));
+      return;
     }
+  } catch(err) {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+    }
+    console.error('Register error:', err);
+    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ Google Sheets กรุณาลองใหม่อีกครั้ง');
   }
-
-  // Local Accounts registration fallback
-  const localAccounts = JSON.parse(localStorage.getItem('LUCKY_LOCAL_ACCOUNTS') || '[]');
-  const existIdx = localAccounts.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
-  const token = 'LOCAL_' + Date.now();
-  const newAccount = {
-    displayName: name,
-    email: email,
-    password: password,
-    gender: gender,
-    birthDay: birthDay,
-    zodiac: 'ราศีพฤษภ',
-    personalColor: personalColor,
-    plan: 'free',
-    token: token
-  };
-
-  if (existIdx >= 0) {
-    localAccounts[existIdx] = newAccount;
-  } else {
-    localAccounts.push(newAccount);
-  }
-  localStorage.setItem('LUCKY_LOCAL_ACCOUNTS', JSON.stringify(localAccounts));
-
-  AppState.currentUser = {
-    isLoggedIn: true,
-    displayName: name,
-    email: email,
-    gender: gender,
-    birthDay: birthDay,
-    zodiac: 'ราศีพฤษภ',
-    personalColor: personalColor,
-    plan: 'free',
-    token: token
-  };
-  saveUserToStorage();
-  renderApp();
-  alert(`📱 บันทึกข้อมูลสำเร็จใน "โหมดออฟไลน์" (ข้อมูลยังไม่ได้บันทึกลง Google Sheets จนกว่าจะเชื่อมต่อ Web App URL)`);
 }
 
 function switchTab(tabId) {
@@ -1362,105 +1196,3 @@ function renderRadarChart() {
   });
 }
 
-
-function updateApiStatusBadge() {
-  const isConnected = !!AppState.apiUrl;
-
-  // ปรับสถานะใน Modal Config
-  if (DOM.apiStatusBadge) {
-    if (isConnected) {
-      DOM.apiStatusBadge.textContent = '🟢 สถานะ: ใส่ URL แล้ว (กดปุ่ม "ทดสอบการเชื่อมต่อ" เพื่อทดสอบการเข้าถึง)';
-      DOM.apiStatusBadge.style.background = '#ECFDF5';
-      DOM.apiStatusBadge.style.color = '#065F46';
-      DOM.apiStatusBadge.style.borderColor = '#A7F3D0';
-    } else {
-      DOM.apiStatusBadge.textContent = '⚪ สถานะ: ยังไม่ได้เชื่อมต่อ Google Sheets (ทำงานในโหมดออฟไลน์)';
-      DOM.apiStatusBadge.style.background = '#FFFBEB';
-      DOM.apiStatusBadge.style.color = '#92400E';
-      DOM.apiStatusBadge.style.borderColor = '#FDE68A';
-    }
-  }
-
-  // ปรับแถบสถานะบนหน้าจอ Login / Register
-  if (DOM.authApiStatusBar) {
-    if (isConnected) {
-      DOM.authApiStatusBar.className = 'auth-api-status-bar connected';
-      if (DOM.txtAuthApiStatus) DOM.txtAuthApiStatus.textContent = 'ออนไลน์: เชื่อมต่อ Google Sheets แล้ว';
-    } else {
-      DOM.authApiStatusBar.className = 'auth-api-status-bar disconnected';
-      if (DOM.txtAuthApiStatus) DOM.txtAuthApiStatus.textContent = 'โหมดออฟไลน์: ยังไม่ได้เชื่อมต่อ Google Sheets';
-    }
-  }
-}
-
-async function testApiConnection(urlToTest) {
-  const url = (urlToTest || (DOM.inputApiUrl && DOM.inputApiUrl.value) || AppState.apiUrl || '').trim();
-  if (!url) {
-    alert('กรุณากรอก Web App URL ก่อนกดทดสอบ');
-    return false;
-  }
-
-  if (!url.startsWith('https://script.google.com/')) {
-    alert('⚠️ รูปแบบ URL ไม่ถูกต้อง ต้องขึ้นต้นด้วย https://script.google.com/macros/s/.../exec');
-    return false;
-  }
-
-  if (url.includes('/edit')) {
-    alert('⚠️ คุณนำ URL หน้าแก้ไขสคริปต์ (/edit) มาวาง!\n\nกรุณากดปุ่ม "ทำให้ใช้งานได้ (Deploy)" > "การทำให้ใช้งานได้ใหม่ (New deployment)" แล้วนำ Web App URL ที่ลงท้ายด้วย /exec มาใส่แทนครับ');
-    return false;
-  }
-
-  if (DOM.apiStatusBadge) {
-    DOM.apiStatusBadge.textContent = '⏳ กำลังทดสอบเชื่อมต่อ Google Apps Script...';
-    DOM.apiStatusBadge.style.background = '#EFF6FF';
-    DOM.apiStatusBadge.style.color = '#1E40AF';
-  }
-
-  if (DOM.btnTestApiConfig) {
-    DOM.btnTestApiConfig.disabled = true;
-    DOM.btnTestApiConfig.textContent = '⏳ กำลังทดสอบ...';
-  }
-
-  try {
-    const testUrl = url.includes('?') ? `${url}&action=checkStatus` : `${url}?action=checkStatus`;
-    const res = await fetch(testUrl, { method: 'GET', mode: 'cors' });
-    const data = await res.json();
-
-    if (DOM.btnTestApiConfig) {
-      DOM.btnTestApiConfig.disabled = false;
-      DOM.btnTestApiConfig.textContent = '🔍 ทดสอบการเชื่อมต่อ';
-    }
-
-    if (data.status === 'active' || data.appName) {
-      if (DOM.apiStatusBadge) {
-        DOM.apiStatusBadge.textContent = `🟢 เชื่อมต่อสำเร็จ! (${data.appName || 'โชคดีทุกวัน API'}) พร้อมบันทึกลงชีต`;
-        DOM.apiStatusBadge.style.background = '#ECFDF5';
-        DOM.apiStatusBadge.style.color = '#065F46';
-      }
-      alert('🎉 เชื่อมต่อ Google Apps Script สำเร็จ!\nระบบพร้อมบันทึกข้อมูลสมาชิกและดึงข้อมูลสีมงคลลง Google Sheets ("DATA โชคดีทุกวัน") ได้ทันที');
-      return true;
-    } else {
-      throw new Error(data.message || 'โครงสร้างข้อมูลไม่ตรงกับสคริปต์โชคดีทุกวัน');
-    }
-  } catch (err) {
-    if (DOM.btnTestApiConfig) {
-      DOM.btnTestApiConfig.disabled = false;
-      DOM.btnTestApiConfig.textContent = '🔍 ทดสอบการเชื่อมต่อ';
-    }
-    console.error('Test connection error:', err);
-    if (DOM.apiStatusBadge) {
-      DOM.apiStatusBadge.textContent = '🔴 เชื่อมต่อไม่สำเร็จ: ' + err.message;
-      DOM.apiStatusBadge.style.background = '#FEF2F2';
-      DOM.apiStatusBadge.style.color = '#991B1B';
-    }
-    alert(
-      '❌ เชื่อมต่อ Google Apps Script ไม่สำเร็จ!\n\n' +
-      'สาเหตุหลักที่พบบ่อย:\n' +
-      '1. สิทธิ์การเข้าถึงไม่ได้ตั้งเป็น "ทุกคน (Anyone)": ใน Apps Script ตอน Deploy ต้องเลือก Who has access: Anyone\n' +
-      '2. ยังไม่ได้รันฟังก์ชัน setupDatabase ในชีต เพื่อสร้างตาราง Users และ Reference\n' +
-      '3. นำ URL หน้าแก้ไขสคริปต์ (/edit) มาใส่ แทนที่จะเป็น Web App URL (/exec)\n\n' +
-      'ข้อความระบบ: ' + err.message
-    );
-    return false;
-  }
-}
