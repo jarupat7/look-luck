@@ -298,6 +298,31 @@ const DOM = {
 
   btnLogout: document.getElementById('btnLogout'),
 
+  // Tab Tarot & Teaser
+  btnHomeOpenTarot: document.getElementById('btnHomeOpenTarot'),
+  tarotCardScene: document.getElementById('tarotCardScene'),
+  tarotCardObject: document.getElementById('tarotCardObject'),
+  tarotImg: document.getElementById('tarotImg'),
+  tarotOrientationBadge: document.getElementById('tarotOrientationBadge'),
+  tarotInstruction: document.getElementById('tarotInstruction'),
+  btnDrawTarot: document.getElementById('btnDrawTarot'),
+  btnRedrawTarot: document.getElementById('btnRedrawTarot'),
+  tarotResultSection: document.getElementById('tarotResultSection'),
+  resTarotNumber: document.getElementById('resTarotNumber'),
+  resTarotName: document.getElementById('resTarotName'),
+  resTarotOrientTag: document.getElementById('resTarotOrientTag'),
+  resTarotElement: document.getElementById('resTarotElement'),
+  resTarotKeywords: document.getElementById('resTarotKeywords'),
+  resTarotCore: document.getElementById('resTarotCore'),
+  resTarotYesNo: document.getElementById('resTarotYesNo'),
+  resTarotCareer: document.getElementById('resTarotCareer'),
+  resTarotFinance: document.getElementById('resTarotFinance'),
+  resTarotLove: document.getElementById('resTarotLove'),
+  resTarotMind: document.getElementById('resTarotMind'),
+  resTarotAdvice: document.getElementById('resTarotAdvice'),
+  resTarotColorTip: document.getElementById('resTarotColorTip'),
+  btnShareTarot: document.getElementById('btnShareTarot'),
+
   // Navigation
   navItems: document.querySelectorAll('.nav-item'),
   tabPages: document.querySelectorAll('.tab-page'),
@@ -310,6 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadSavedUser();
   setupEventListeners();
   renderApp();
+  initTarot();
 });
 
 function loadSavedUser() {
@@ -490,6 +516,29 @@ function setupEventListeners() {
       renderApp();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+  }
+
+  // --- Tarot Listeners ---
+  if (DOM.btnHomeOpenTarot) {
+    DOM.btnHomeOpenTarot.addEventListener('click', () => {
+      switchTab('tabTarot');
+    });
+  }
+  if (DOM.btnDrawTarot) {
+    DOM.btnDrawTarot.addEventListener('click', handleDrawTarot);
+  }
+  if (DOM.tarotCardScene) {
+    DOM.tarotCardScene.addEventListener('click', () => {
+      if (DOM.tarotCardObject && !DOM.tarotCardObject.classList.contains('flipped')) {
+        handleDrawTarot();
+      }
+    });
+  }
+  if (DOM.btnRedrawTarot) {
+    DOM.btnRedrawTarot.addEventListener('click', handleResetTarot);
+  }
+  if (DOM.btnShareTarot) {
+    DOM.btnShareTarot.addEventListener('click', handleShareTarot);
   }
 
   // --- Resize Listener for Radar Chart ---
@@ -1195,4 +1244,158 @@ function renderRadarChart() {
     ctx.fillText(`${pt.label} ${pt.score}%`, lx, ly);
   });
 }
+
+// ===================================================
+// TAROT ORACLE MODULE (ระบบไพ่ทาโรต์ดวงวันนี้)
+// ===================================================
+
+function initTarot() {
+  const todayKey = 'LOOKLUCK_TAROT_' + new Date().toISOString().slice(0, 10);
+  const saved = localStorage.getItem(todayKey);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      if (parsed && parsed.card) {
+        displayTarotResult(parsed, false);
+      }
+    } catch(e) {
+      console.warn('Tarot storage parse error', e);
+    }
+  }
+}
+
+function handleDrawTarot() {
+  if (typeof TarotEngine === 'undefined') {
+    alert('ระบบฐานข้อมูลไพ่ทาโรต์กำลังโหลด กรุณาลองใหม่อีกครั้ง');
+    return;
+  }
+
+  if (DOM.btnDrawTarot) {
+    DOM.btnDrawTarot.disabled = true;
+    DOM.btnDrawTarot.textContent = '⏳ กำลังเปิดไพ่พยากรณ์...';
+  }
+
+  // Draw card using TarotEngine
+  const result = TarotEngine.drawCard();
+  
+  // Save today's draw in localStorage
+  const todayKey = 'LOOKLUCK_TAROT_' + new Date().toISOString().slice(0, 10);
+  try {
+    localStorage.setItem(todayKey, JSON.stringify(result));
+  } catch(e) {}
+
+  displayTarotResult(result, true);
+}
+
+function displayTarotResult(result, animate = true) {
+  const card = result.card;
+  const isReversed = result.isReversed;
+  const data = result.data;
+
+  // Set Front Image
+  if (DOM.tarotImg) {
+    DOM.tarotImg.src = card.image;
+    DOM.tarotImg.alt = card.nameEn;
+    // Error fallback image if connection issue
+    DOM.tarotImg.onerror = function() {
+      this.src = 'https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg';
+    };
+  }
+
+  if (DOM.tarotOrientationBadge) {
+    DOM.tarotOrientationBadge.textContent = result.orientationText;
+  }
+
+  // Animate Flip
+  if (DOM.tarotCardObject) {
+    DOM.tarotCardObject.classList.remove('is-reversed');
+    if (isReversed) {
+      DOM.tarotCardObject.classList.add('is-reversed');
+    }
+    DOM.tarotCardObject.classList.add('flipped');
+  }
+
+  // Fill in content
+  if (DOM.resTarotNumber) DOM.resTarotNumber.textContent = `${card.arcana} • ${card.number}`;
+  if (DOM.resTarotName) DOM.resTarotName.textContent = `${card.nameEn} (${card.nameTh})`;
+  if (DOM.resTarotOrientTag) {
+    DOM.resTarotOrientTag.textContent = result.orientationText;
+    DOM.resTarotOrientTag.className = 'res-badge-orient ' + (isReversed ? 'reversed' : 'upright');
+  }
+  if (DOM.resTarotElement) DOM.resTarotElement.textContent = card.element;
+  if (DOM.resTarotKeywords) DOM.resTarotKeywords.textContent = 'คำสำคัญ: ' + data.keywords.join(', ');
+  if (DOM.resTarotCore) DOM.resTarotCore.textContent = data.general;
+  if (DOM.resTarotYesNo) DOM.resTarotYesNo.textContent = data.yesNo;
+  if (DOM.resTarotCareer) DOM.resTarotCareer.textContent = data.career;
+  if (DOM.resTarotFinance) DOM.resTarotFinance.textContent = data.finance;
+  if (DOM.resTarotLove) DOM.resTarotLove.textContent = data.love;
+  if (DOM.resTarotMind) DOM.resTarotMind.textContent = data.mind;
+  if (DOM.resTarotAdvice) DOM.resTarotAdvice.textContent = data.advice;
+  if (DOM.resTarotColorTip) {
+    DOM.resTarotColorTip.innerHTML = `🎨 <strong>ทริกเสริมสีมงคล Look&amp;Luck:</strong> ${data.colorTip}`;
+  }
+
+  // Update instruction & controls
+  if (DOM.tarotInstruction) {
+    DOM.tarotInstruction.textContent = '✨ สารจากไพ่ทาโรต์ได้เปิดเผยแล้ว นำข้อคิดไปปรับใช้ในการดำเนินชีวิตวันนี้';
+  }
+  if (DOM.btnDrawTarot) {
+    DOM.btnDrawTarot.style.display = 'none';
+    DOM.btnDrawTarot.disabled = false;
+    DOM.btnDrawTarot.textContent = '✨ แตะเพื่อเปิดไพ่ทาโรต์ดวงวันนี้';
+  }
+  if (DOM.btnRedrawTarot) {
+    DOM.btnRedrawTarot.style.display = 'block';
+  }
+
+  // Reveal result section
+  setTimeout(() => {
+    if (DOM.tarotResultSection) {
+      DOM.tarotResultSection.style.display = 'flex';
+      if (animate) {
+        DOM.tarotResultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  }, animate ? 600 : 0);
+}
+
+function handleResetTarot() {
+  if (DOM.tarotCardObject) {
+    DOM.tarotCardObject.classList.remove('flipped');
+    DOM.tarotCardObject.classList.remove('is-reversed');
+  }
+  if (DOM.tarotResultSection) {
+    DOM.tarotResultSection.style.display = 'none';
+  }
+  if (DOM.btnRedrawTarot) {
+    DOM.btnRedrawTarot.style.display = 'none';
+  }
+  if (DOM.btnDrawTarot) {
+    DOM.btnDrawTarot.style.display = 'block';
+  }
+  if (DOM.tarotInstruction) {
+    DOM.tarotInstruction.textContent = '🧘 หลับตา หายใจเข้าลึกๆ ตั้งจิตระลึกถึงสิ่งที่ท่านอยากได้คำแนะนำในวันนี้ แล้วกดปุ่มเพื่อเปิดไพ่';
+  }
+}
+
+function handleShareTarot() {
+  const cardName = DOM.resTarotName ? DOM.resTarotName.textContent : 'ไพ่ทาโรต์';
+  const orient = DOM.resTarotOrientTag ? DOM.resTarotOrientTag.textContent : '';
+  const core = DOM.resTarotCore ? DOM.resTarotCore.textContent : '';
+  const shareText = `🔮 ไพ่ทาโรต์ดวงวันนี้ของฉันบน Look&Luck:\n【${cardName}】(${orient})\n\n🌟 คำทำนาย: ${core}\n\nเช็กสีเสื้อมงคลและเปิดไพ่ทาโรต์ได้ที่ Look&Luck!`;
+
+  if (navigator.share) {
+    navigator.share({
+      title: 'Look&Luck - ไพ่ทาโรต์ดวงวันนี้',
+      text: shareText
+    }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(shareText).then(() => {
+      alert('คัดลอกคำทำนายไพ่ทาโรต์เรียบร้อยแล้ว! สามารถนำไปแชร์ให้เพื่อนได้เลย');
+    }).catch(() => {
+      alert(shareText);
+    });
+  }
+}
+
 

@@ -448,6 +448,145 @@
             <p class="deity-story" id="txtDeityStory">สร้างจากเทพธิดา 15 นาง ห่อด้วยผ้าสีขาวนวล จึงมีสีกายขาวนวล อ่อนโยน มีเสน่ห์ เมตตามหานิยม</p>
           </div>
 
+          <!-- Tarot Teaser Card (เชื่อมโยงไพ่ทาโรต์ประจำวัน) -->
+          <div class="card tarot-teaser-card" id="cardTarotTeaser">
+            <div class="tarot-teaser-badge">DAILY TAROT • เสี่ยงทายประจำวัน</div>
+            <div class="tarot-teaser-content">
+              <div class="tarot-teaser-icon">🔮</div>
+              <div class="tarot-teaser-text">
+                <h4 class="tarot-teaser-title">เปิดไพ่ทาโรต์ดวงวันนี้ของคุณ</h4>
+                <p class="tarot-teaser-desc">ตั้งจิตอธิษฐานแล้วเปิดไพ่ 1 ใบ เพื่อรับสารเตือนใจและคำแนะนำการใช้ชีวิตประจำวัน</p>
+              </div>
+            </div>
+            <button type="button" class="btn-primary btn-open-tarot" id="btnHomeOpenTarot">
+              ✨ แตะเพื่อเปิดไพ่ทาโรต์วันนี้
+            </button>
+          </div>
+
+        </section>
+
+        <!-- TAB TAROT: สุ่มไพ่ทาโรต์ดวงวันนี้ (Daily Tarot Oracle) -->
+        <section class="tab-page" id="tabTarot">
+          <div class="card-header-fashion">
+            <span class="section-label">MYSTIC TAROT 78</span>
+            <h2 class="section-title">ไพ่ทาโรต์ดวงวันนี้</h2>
+            <p class="section-desc">ถอดรหัสพลังงานและข้อคิดประจำวันผ่านภูมิปัญญาไพ่ทาโรต์สากล</p>
+          </div>
+
+          <!-- Daily Card Draw Deck Area -->
+          <div class="card tarot-deck-container">
+            <!-- 3D Flippable Tarot Card -->
+            <div class="tarot-card-scene" id="tarotCardScene" title="แตะที่ไพ่เพื่อเปิดดวง">
+              <div class="tarot-card-object" id="tarotCardObject">
+                <!-- Back Face -->
+                <div class="tarot-card-face tarot-card-back">
+                  <div class="tarot-back-pattern">
+                    <div class="tarot-back-border">
+                      <span class="tarot-back-symbol">🔮</span>
+                      <span class="tarot-back-hint">แตะเพื่อเปิดไพ่</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- Front Face -->
+                <div class="tarot-card-face tarot-card-front" id="tarotCardFront">
+                  <img src="" id="tarotImg" class="tarot-card-img" alt="Tarot Card" />
+                  <div class="tarot-card-overlay-badge" id="tarotOrientationBadge">ไพ่หัวตั้ง</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Prompt -->
+            <div class="tarot-control-box">
+              <p class="tarot-instruction" id="tarotInstruction">
+                🧘 หลับตา หายใจเข้าลึกๆ ตั้งจิตระลึกถึงสิ่งที่ท่านอยากได้คำแนะนำในวันนี้ แล้วกดปุ่มเพื่อเปิดไพ่
+              </p>
+              <button type="button" class="btn-primary btn-draw-card" id="btnDrawTarot">
+                ✨ แตะเพื่อเปิดไพ่ทาโรต์ดวงวันนี้
+              </button>
+              <button type="button" class="btn-secondary btn-redraw-card" id="btnRedrawTarot" style="display: none; margin-top: 10px;">
+                🔄 สุ่มไพ่อีกครั้ง (ถามเรื่องใหม่)
+              </button>
+            </div>
+          </div>
+
+          <!-- Prediction Results Section (แสดงเมื่อเปิดไพ่แล้ว) -->
+          <div class="tarot-result-section" id="tarotResultSection" style="display: none;">
+            
+            <!-- Card Header Information -->
+            <div class="card tarot-detail-header-card">
+              <div class="tarot-num-tag" id="resTarotNumber">Major Arcana 0</div>
+              <h3 class="res-tarot-name" id="resTarotName">The Fool (เดอะ ฟูล)</h3>
+              <div class="res-orientation-row">
+                <span class="res-badge-orient upright" id="resTarotOrientTag">ไพ่หัวตั้ง (Upright)</span>
+                <span class="res-badge-element" id="resTarotElement">ธาตุลม • ลมหายใจแห่งการเริ่มต้น</span>
+              </div>
+              <p class="res-tarot-keyword" id="resTarotKeywords">คำสำคัญ: การเริ่มต้นใหม่, อิสรภาพ, การผจญภัย</p>
+            </div>
+
+            <!-- Core Overview & Yes/No Oracle -->
+            <div class="card tarot-core-meaning-card">
+              <div class="tarot-sec-title">🌟 ภาพรวมดวงชะตาวันนี้</div>
+              <p class="tarot-sec-body" id="resTarotCore"></p>
+              
+              <div class="tarot-yesno-box" id="resTarotYesNoBox">
+                <span class="yesno-label">🔮 Yes / No Oracle (แนวโน้มทิศทาง):</span>
+                <strong class="yesno-val" id="resTarotYesNo">ใช่ (Yes) — ลุยเลย อย่าลังเล!</strong>
+              </div>
+            </div>
+
+            <!-- 4 Pillars: Career, Finance, Love, Mind -->
+            <div class="tarot-pillars-grid">
+              <div class="pillar-box pillar-work">
+                <div class="pillar-icon">💼</div>
+                <div class="pillar-content">
+                  <h5 class="pillar-title">การงาน &amp; โอกาส</h5>
+                  <p class="pillar-desc" id="resTarotCareer"></p>
+                </div>
+              </div>
+
+              <div class="pillar-box pillar-money">
+                <div class="pillar-icon">🪙</div>
+                <div class="pillar-content">
+                  <h5 class="pillar-title">การเงิน &amp; โชคลาภ</h5>
+                  <p class="pillar-desc" id="resTarotFinance"></p>
+                </div>
+              </div>
+
+              <div class="pillar-box pillar-love">
+                <div class="pillar-icon">💖</div>
+                <div class="pillar-content">
+                  <h5 class="pillar-title">ความรัก &amp; ความสัมพันธ์</h5>
+                  <p class="pillar-desc" id="resTarotLove"></p>
+                </div>
+              </div>
+
+              <div class="pillar-box pillar-mind">
+                <div class="pillar-icon">🧠</div>
+                <div class="pillar-content">
+                  <h5 class="pillar-title">สภาวะจิตใจ &amp; อารมณ์</h5>
+                  <p class="pillar-desc" id="resTarotMind"></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Synergy with Look&Luck: Advice & Lucky Color Alignment -->
+            <div class="card tarot-synergy-card">
+              <div class="tarot-synergy-header">
+                <span class="synergy-icon">✨</span>
+                <h4 class="synergy-title">คำแนะนำพิเศษ &amp; การเสริมดวงวันนี้</h4>
+              </div>
+              <p class="synergy-advice" id="resTarotAdvice"></p>
+              <div class="synergy-color-tip" id="resTarotColorTip">
+                🎨 <strong>ทริกเสริมสีมงคล Look&amp;Luck:</strong> วันนี้แนะนำแมตช์เสื้อผ้าสีนำโชคของคุณเพื่อเสริมพลังงานด้านบวกตามคำแนะนำของไพ่
+              </div>
+            </div>
+
+            <!-- Share & Save Actions -->
+            <div class="tarot-share-actions">
+              <button type="button" class="btn-secondary" id="btnShareTarot">📤 แชร์ผลคำทำนาย</button>
+            </div>
+
+          </div>
         </section>
 
         <!-- TAB 2: ตู้เสื้อผ้า & Personal Color -->
@@ -698,11 +837,21 @@
 
       </main>
 
-      <!-- Bottom Navigation Bar (4 Menus as Mockup B) -->
+      <!-- Bottom Navigation Bar (5 Menus: Home, Tarot, Wardrobe, Remedies, Profile) -->
       <nav class="app-bottom-nav">
         <button class="nav-item active" data-tab="tabHome">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
           <span class="nav-label">หน้าแรก</span>
+        </button>
+
+        <button class="nav-item" data-tab="tabTarot">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="5" y="2" width="14" height="20" rx="3" ry="3"></rect>
+            <circle cx="12" cy="12" r="3"></circle>
+            <line x1="12" y1="5" x2="12" y2="7"></line>
+            <line x1="12" y1="17" x2="12" y2="19"></line>
+          </svg>
+          <span class="nav-label">ไพ่ทาโรต์</span>
         </button>
 
         <button class="nav-item" data-tab="tabWardrobe">
@@ -744,6 +893,7 @@
 
   </div>
 
-  <script src="app.js?v=2.0.1"></script>
+  <script src="tarot-data.js?v=2.0.2"></script>
+  <script src="app.js?v=2.0.2"></script>
 </body>
 </html>
