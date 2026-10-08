@@ -358,6 +358,47 @@ const DOM = {
   resTarotColorTip: document.getElementById('resTarotColorTip'),
   btnShareTarot: document.getElementById('btnShareTarot'),
 
+  // Oracle Subtabs & Siam Si Elements
+  btnOracleTarot: document.getElementById('btnOracleTarot'),
+  btnOracleSiamsi: document.getElementById('btnOracleSiamsi'),
+  subviewTarot: document.getElementById('subviewTarot'),
+  subviewSiamsi: document.getElementById('subviewSiamsi'),
+  btnShakeSiamsi: document.getElementById('btnShakeSiamsi'),
+  siamsiCylinder: document.getElementById('siamsiCylinder'),
+  drawnStick: document.getElementById('drawnStick'),
+  stickNumTh: document.getElementById('stickNumTh'),
+  stickNumAr: document.getElementById('stickNumAr'),
+  siamsiStepHint: document.getElementById('siamsiStepHint'),
+  sengPuaiBox: document.getElementById('sengPuaiBox'),
+  txtDrawnStickNumber: document.getElementById('txtDrawnStickNumber'),
+  btnTossPuai: document.getElementById('btnTossPuai'),
+  puaiPiece1: document.getElementById('puaiPiece1'),
+  puaiPiece2: document.getElementById('puaiPiece2'),
+  puaiFace1: document.getElementById('puaiFace1'),
+  puaiFace2: document.getElementById('puaiFace2'),
+  puaiResultBanner: document.getElementById('puaiResultBanner'),
+  puaiResultTitle: document.getElementById('puaiResultTitle'),
+  puaiResultText: document.getElementById('puaiResultText'),
+  btnReshakeSiamsi: document.getElementById('btnReshakeSiamsi'),
+  btnOpenSlip: document.getElementById('btnOpenSlip'),
+  siamsiSlipContainer: document.getElementById('siamsiSlipContainer'),
+  slipMainTitle: document.getElementById('slipMainTitle'),
+  slipRankBadge: document.getElementById('slipRankBadge'),
+  slipPoemText: document.getElementById('slipPoemText'),
+  slipMeaningDesc: document.getElementById('slipMeaningDesc'),
+  slipCareer: document.getElementById('slipCareer'),
+  slipFinance: document.getElementById('slipFinance'),
+  slipLove: document.getElementById('slipLove'),
+  slipHealth: document.getElementById('slipHealth'),
+  slipRemedyBox: document.getElementById('slipRemedyBox'),
+  slipRemedyText: document.getElementById('slipRemedyText'),
+  btnSaveSlip: document.getElementById('btnSaveSlip'),
+  btnOfferOilLamp: document.getElementById('btnOfferOilLamp'),
+  btnLeaveSlip: document.getElementById('btnLeaveSlip'),
+  btnRestartSiamsi: document.getElementById('btnRestartSiamsi'),
+  modalOilLamp: document.getElementById('modalOilLamp'),
+  btnCloseOilLamp: document.getElementById('btnCloseOilLamp'),
+
   // Navigation
   navItems: document.querySelectorAll('.nav-item'),
   tabPages: document.querySelectorAll('.tab-page'),
@@ -371,6 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupEventListeners();
   renderApp();
   initTarot();
+  initSiamsi();
 });
 
 function loadSavedUser() {
@@ -599,10 +641,17 @@ function setupEventListeners() {
     });
   }
 
+  // --- Oracle Subtab Toggling (Tarot vs Siamsi) ---
+  if (DOM.btnOracleTarot && DOM.btnOracleSiamsi) {
+    DOM.btnOracleTarot.addEventListener('click', () => switchOracleSubtab('tarot'));
+    DOM.btnOracleSiamsi.addEventListener('click', () => switchOracleSubtab('siamsi'));
+  }
+
   // --- Tarot Listeners ---
   if (DOM.btnHomeOpenTarot) {
     DOM.btnHomeOpenTarot.addEventListener('click', () => {
       switchTab('tabTarot');
+      switchOracleSubtab('tarot');
     });
   }
   if (DOM.btnDrawTarot) {
@@ -622,9 +671,43 @@ function setupEventListeners() {
     DOM.btnShareTarot.addEventListener('click', handleShareTarot);
   }
 
+  // --- Wat Mangkon Siam Si Listeners ---
+  if (DOM.btnShakeSiamsi) {
+    DOM.btnShakeSiamsi.addEventListener('click', handleShakeSiamsi);
+  }
+  if (DOM.btnTossPuai) {
+    DOM.btnTossPuai.addEventListener('click', handleTossPuai);
+  }
+  if (DOM.btnReshakeSiamsi) {
+    DOM.btnReshakeSiamsi.addEventListener('click', handleReshakeSiamsi);
+  }
+  if (DOM.btnOpenSlip) {
+    DOM.btnOpenSlip.addEventListener('click', handleOpenSlip);
+  }
+  if (DOM.btnSaveSlip) {
+    DOM.btnSaveSlip.addEventListener('click', handleSaveSlip);
+  }
+  if (DOM.btnOfferOilLamp) {
+    DOM.btnOfferOilLamp.addEventListener('click', handleOpenOilLampModal);
+  }
+  if (DOM.btnCloseOilLamp) {
+    DOM.btnCloseOilLamp.addEventListener('click', handleCloseOilLampModal);
+  }
+  if (DOM.modalOilLamp) {
+    DOM.modalOilLamp.addEventListener('click', (e) => {
+      if (e.target === DOM.modalOilLamp) handleCloseOilLampModal();
+    });
+  }
+  if (DOM.btnLeaveSlip) {
+    DOM.btnLeaveSlip.addEventListener('click', handleLeaveSlipAtTemple);
+  }
+  if (DOM.btnRestartSiamsi) {
+    DOM.btnRestartSiamsi.addEventListener('click', handleRestartSiamsi);
+  }
+
   // --- Resize Listener for Radar Chart ---
   window.addEventListener('resize', () => {
-    if (AppState.currentUser && AppState.currentUser.isLoggedIn && AppState.activeTab === 'tabHome') {
+    if (AppState.currentUser && AppState.currentUser.isLoggedIn && (AppState.activeTab === 'tabWardrobe' || AppState.activeTab === 'tabHome')) {
       renderRadarChart();
     }
   });
@@ -854,7 +937,7 @@ function switchTab(tabId) {
   DOM.tabPages.forEach(p => {
     p.classList.toggle('active', p.id === tabId);
   });
-  if (tabId === 'tabHome') {
+  if (tabId === 'tabWardrobe' || tabId === 'tabHome') {
     setTimeout(renderRadarChart, 60);
   }
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1716,3 +1799,290 @@ function handleShareTarot() {
 }
 
 
+
+// ===================================================
+// ORACLE HUB & WAT MANGKON SIAM SI MODULE
+// ===================================================
+
+let siamsiState = {
+  currentStick: null,
+  puaiCount: 0,
+  maxPuai: 3,
+  isShaking: false,
+  isTossing: false
+};
+
+function switchOracleSubtab(type) {
+  if (type === 'tarot') {
+    if (DOM.btnOracleTarot) DOM.btnOracleTarot.classList.add('active');
+    if (DOM.btnOracleSiamsi) DOM.btnOracleSiamsi.classList.remove('active');
+    if (DOM.subviewTarot) DOM.subviewTarot.style.display = 'block';
+    if (DOM.subviewSiamsi) DOM.subviewSiamsi.style.display = 'none';
+  } else {
+    if (DOM.btnOracleSiamsi) DOM.btnOracleSiamsi.classList.add('active');
+    if (DOM.btnOracleTarot) DOM.btnOracleTarot.classList.remove('active');
+    if (DOM.subviewSiamsi) DOM.subviewSiamsi.style.display = 'block';
+    if (DOM.subviewTarot) DOM.subviewTarot.style.display = 'none';
+  }
+}
+
+function initSiamsi() {
+  const todayKey = 'LOOKLUCK_SIAMSI_' + new Date().toISOString().slice(0, 10);
+  const saved = localStorage.getItem(todayKey);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      if (parsed && parsed.title) {
+        siamsiState.currentStick = parsed;
+        // หากผู้ใช้เคยเสี่ยงทายวันนี้แล้ว แสดงให้เห็นผลได้
+        if (DOM.btnRestartSiamsi) {
+          DOM.btnRestartSiamsi.textContent = '🔄 สุ่มใบใหม่สำหรับคำถามอื่น';
+        }
+      }
+    } catch(e) {
+      console.warn('Siam Si storage parse error', e);
+    }
+  }
+}
+
+function handleShakeSiamsi() {
+  if (typeof SiamsiEngine === 'undefined') {
+    alert('ระบบฐานข้อมูลเซียมซีกำลังโหลด กรุณาลองใหม่อีกครั้ง');
+    return;
+  }
+  if (siamsiState.isShaking) return;
+  siamsiState.isShaking = true;
+
+  if (DOM.btnShakeSiamsi) {
+    DOM.btnShakeSiamsi.disabled = true;
+    DOM.btnShakeSiamsi.textContent = '🎋 กำลังเขย่ากระบอกเซียมซี...';
+  }
+  if (DOM.siamsiStepHint) {
+    DOM.siamsiStepHint.textContent = '✨ สมาธิจดจ่อระลึกถึงสิ่งศักดิ์สิทธิ์... กำลังคัดเลือกไม้ติ้วประจำดวงชะตา';
+  }
+
+  // Animation shaking
+  if (DOM.siamsiCylinder) {
+    DOM.siamsiCylinder.classList.add('shaking');
+  }
+
+  setTimeout(() => {
+    if (DOM.siamsiCylinder) {
+      DOM.siamsiCylinder.classList.remove('shaking');
+    }
+
+    const stick = SiamsiEngine.drawStick();
+    siamsiState.currentStick = stick;
+    siamsiState.puaiCount = 0;
+
+    // Show drawn stick
+    if (DOM.stickNumTh) DOM.stickNumTh.textContent = stick.numTh;
+    if (DOM.stickNumAr) DOM.stickNumAr.textContent = 'No. ' + stick.id;
+    if (DOM.drawnStick) DOM.drawnStick.style.display = 'flex';
+
+    // Show Seng Puai validation box
+    if (DOM.txtDrawnStickNumber) DOM.txtDrawnStickNumber.textContent = stick.numTh + ' (หมายเลข ' + stick.id + ')';
+    if (DOM.sengPuaiBox) DOM.sengPuaiBox.style.display = 'block';
+    if (DOM.puaiResultBanner) DOM.puaiResultBanner.style.display = 'none';
+
+    // Button states
+    if (DOM.btnTossPuai) {
+      DOM.btnTossPuai.disabled = false;
+      DOM.btnTossPuai.style.display = 'block';
+      DOM.btnTossPuai.textContent = '🌙 เสี่ยงทายโยนไม้ปวย';
+    }
+    if (DOM.btnReshakeSiamsi) DOM.btnReshakeSiamsi.style.display = 'none';
+    if (DOM.btnOpenSlip) DOM.btnOpenSlip.style.display = 'none';
+
+    if (DOM.btnShakeSiamsi) {
+      DOM.btnShakeSiamsi.disabled = false;
+      DOM.btnShakeSiamsi.textContent = '🎋 เขย่ากระบอกติ้วอีกครั้ง';
+    }
+
+    siamsiState.isShaking = false;
+  }, 1100);
+}
+
+function handleTossPuai() {
+  if (typeof SiamsiEngine === 'undefined' || !siamsiState.currentStick) return;
+  if (siamsiState.isTossing) return;
+  siamsiState.isTossing = true;
+
+  if (DOM.btnTossPuai) {
+    DOM.btnTossPuai.disabled = true;
+    DOM.btnTossPuai.textContent = '🌙 กำลังโยนไม้ปวยถามสวรรค์...';
+  }
+
+  // Animate puai pieces
+  if (DOM.puaiPiece1) DOM.puaiPiece1.classList.add('tossing');
+  if (DOM.puaiPiece2) DOM.puaiPiece2.classList.add('tossing');
+
+  setTimeout(() => {
+    if (DOM.puaiPiece1) DOM.puaiPiece1.classList.remove('tossing');
+    if (DOM.puaiPiece2) DOM.puaiPiece2.classList.remove('tossing');
+
+    const puai = SiamsiEngine.tossPuai();
+
+    // Update physical faces (Yang / Yin)
+    if (DOM.puaiFace1) {
+      if (puai.p1 === 'yang') {
+        DOM.puaiFace1.className = 'puai-face puai-yang';
+        DOM.puaiFace1.textContent = 'หงาย (เอี๊ยง)';
+      } else {
+        DOM.puaiFace1.className = 'puai-face puai-yin';
+        DOM.puaiFace1.textContent = 'คว่ำ (อิม)';
+      }
+    }
+
+    if (DOM.puaiFace2) {
+      if (puai.p2 === 'yang') {
+        DOM.puaiFace2.className = 'puai-face puai-yang';
+        DOM.puaiFace2.textContent = 'หงาย (เอี๊ยง)';
+      } else {
+        DOM.puaiFace2.className = 'puai-face puai-yin';
+        DOM.puaiFace2.textContent = 'คว่ำ (อิม)';
+      }
+    }
+
+    // Update Result Banner
+    if (DOM.puaiResultBanner) {
+      DOM.puaiResultBanner.className = 'puai-result-banner ' + puai.result;
+      DOM.puaiResultBanner.style.display = 'block';
+    }
+    if (DOM.puaiResultTitle) DOM.puaiResultTitle.textContent = puai.title;
+    if (DOM.puaiResultText) DOM.puaiResultText.textContent = puai.desc;
+
+    if (puai.approved) {
+      // เซ้งปวย (อนุมัติ) -> ปลดล็อกอ่านคำทำนาย
+      if (DOM.btnTossPuai) DOM.btnTossPuai.style.display = 'none';
+      if (DOM.btnReshakeSiamsi) DOM.btnReshakeSiamsi.style.display = 'none';
+      if (DOM.btnOpenSlip) {
+        DOM.btnOpenSlip.style.display = 'block';
+        DOM.btnOpenSlip.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    } else {
+      siamsiState.puaiCount++;
+      if (siamsiState.puaiCount >= siamsiState.maxPuai) {
+        // ครบ 3 ครั้งไม่ผ่าน (ฝืนลิขิตสวรรค์)
+        if (DOM.puaiResultText) {
+          DOM.puaiResultText.textContent = '⚠️ โยนไม้ปวยครบ 3 ครั้งแล้ว สวรรค์ส่งสัญญาณว่าไม่ควรฝืนลิขิตสวรรค์ในเวลานี้ พักใจให้สงบแล้วกลับมาเสี่ยงทายใหม่ในภายหลัง';
+        }
+        if (DOM.btnTossPuai) DOM.btnTossPuai.style.display = 'none';
+        if (DOM.btnReshakeSiamsi) {
+          DOM.btnReshakeSiamsi.style.display = 'block';
+          DOM.btnReshakeSiamsi.textContent = '🔄 สิ้นสุดรอบนี้ (เริ่มใหม่)';
+        }
+      } else if (puai.result === 'yin') {
+        // อิมปวย (คว่ำทั้งคู่) -> บังคับเขย่ากระบอกใหม่
+        if (DOM.btnTossPuai) DOM.btnTossPuai.style.display = 'none';
+        if (DOM.btnReshakeSiamsi) {
+          DOM.btnReshakeSiamsi.style.display = 'block';
+          DOM.btnReshakeSiamsi.textContent = '🔄 เขย่ากระบอกติ้วใหม่';
+        }
+      } else {
+        // เอี๊ยงปวย (หงายทั้งคู่ - แย้มสรวล) -> ให้โยนใหม่ได้
+        if (DOM.btnTossPuai) {
+          DOM.btnTossPuai.disabled = false;
+          DOM.btnTossPuai.style.display = 'block';
+          DOM.btnTossPuai.textContent = `🌙 ตั้งจิตใหม่แล้วโยนไม้ปวยอีกครั้ง (${siamsiState.puaiCount + 1}/${siamsiState.maxPuai})`;
+        }
+      }
+    }
+
+    siamsiState.isTossing = false;
+  }, 950);
+}
+
+function handleReshakeSiamsi() {
+  if (DOM.sengPuaiBox) DOM.sengPuaiBox.style.display = 'none';
+  if (DOM.drawnStick) DOM.drawnStick.style.display = 'none';
+  handleShakeSiamsi();
+}
+
+function handleOpenSlip() {
+  if (!siamsiState.currentStick) return;
+  if (DOM.siamsiStageBox) DOM.siamsiStageBox.style.display = 'none';
+  displaySiamsiSlip(siamsiState.currentStick);
+}
+
+function displaySiamsiSlip(stick) {
+  if (!stick) return;
+
+  if (DOM.slipMainTitle) DOM.slipMainTitle.textContent = stick.title;
+  if (DOM.slipRankBadge) {
+    DOM.slipRankBadge.textContent = stick.level;
+    DOM.slipRankBadge.className = 'slip-rank-badge ' + (stick.levelType || 'neutral');
+  }
+  if (DOM.slipPoemText) DOM.slipPoemText.textContent = stick.poem;
+  if (DOM.slipMeaningDesc) DOM.slipMeaningDesc.textContent = stick.interpretation;
+  if (DOM.slipCareer) DOM.slipCareer.textContent = stick.career;
+  if (DOM.slipFinance) DOM.slipFinance.textContent = stick.finance;
+  if (DOM.slipLove) DOM.slipLove.textContent = stick.love;
+  if (DOM.slipHealth) DOM.slipHealth.textContent = stick.health;
+  if (DOM.slipRemedyText) DOM.slipRemedyText.textContent = stick.remedy;
+
+  if (DOM.siamsiSlipContainer) {
+    DOM.siamsiSlipContainer.style.display = 'block';
+    DOM.siamsiSlipContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // บันทึกลง Storage ประจำวัน
+  const todayKey = 'LOOKLUCK_SIAMSI_' + new Date().toISOString().slice(0, 10);
+  try {
+    localStorage.setItem(todayKey, JSON.stringify(stick));
+  } catch(e) {}
+}
+
+function handleSaveSlip() {
+  alert('🔖 บันทึกใบเซียมซีมงคลวัดมังกรกมลาวาสเรียบร้อยแล้ว!\nสามารถเข้ามาอ่านทบทวนข้อคิดเตือนใจได้ตลอดเวลา');
+}
+
+function handleOpenOilLampModal() {
+  if (DOM.modalOilLamp) {
+    DOM.modalOilLamp.style.display = 'flex';
+  }
+}
+
+function handleCloseOilLampModal() {
+  if (DOM.modalOilLamp) {
+    DOM.modalOilLamp.style.display = 'none';
+  }
+  alert('🙏 จุดประทีปเติมน้ำมันตะเกียงสะเดาะเคราะห์เรียบร้อยแล้ว!\nขออำนาจบารมีสิ่งศักดิ์สิทธิ์ดลบันดาลให้ชีวิตสว่างไสว ร่มเย็นเป็นสุข ปัดเป่าโพยภัย');
+}
+
+function handleLeaveSlipAtTemple() {
+  const confirmLeave = confirm('ท่านต้องการฝากใบเซียมซีนี้ไว้ที่วัดมังกรกมลาวาส (ไม่นำเคราะห์กลับบ้าน) ใช่หรือไม่?');
+  if (confirmLeave) {
+    alert('🍃 ฝากใบเซียมซีไว้ที่วัดมังกรกมลาวาสเรียบร้อยแล้ว!\nตามคติโบราณ สิ่งใดที่เป็นเคราะห์หรือความขุ่นมัวได้ถูกปลดเปลื้องทิ้งไว้ ณ ศาสนสถานแล้ว ขอให้ท่านดำเนินชีวิตด้วยสติและความเบิกบาน');
+    handleRestartSiamsi();
+  }
+}
+
+function handleRestartSiamsi() {
+  siamsiState.currentStick = null;
+  siamsiState.puaiCount = 0;
+
+  if (DOM.siamsiSlipContainer) DOM.siamsiSlipContainer.style.display = 'none';
+  if (DOM.sengPuaiBox) DOM.sengPuaiBox.style.display = 'none';
+  if (DOM.drawnStick) DOM.drawnStick.style.display = 'none';
+  if (DOM.siamsiStageBox) {
+    DOM.siamsiStageBox.style.display = 'block';
+    DOM.siamsiStageBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  if (DOM.btnShakeSiamsi) {
+    DOM.btnShakeSiamsi.disabled = false;
+    DOM.btnShakeSiamsi.textContent = '🎋 แตะเพื่อเขย่าเซียมซี';
+  }
+  if (DOM.btnTossPuai) {
+    DOM.btnTossPuai.disabled = false;
+    DOM.btnTossPuai.style.display = 'block';
+    DOM.btnTossPuai.textContent = '🌙 เสี่ยงทายโยนไม้ปวย';
+  }
+  if (DOM.btnOpenSlip) DOM.btnOpenSlip.style.display = 'none';
+  if (DOM.btnReshakeSiamsi) DOM.btnReshakeSiamsi.style.display = 'none';
+  if (DOM.puaiResultBanner) DOM.puaiResultBanner.style.display = 'none';
+  if (DOM.siamsiStepHint) {
+    DOM.siamsiStepHint.textContent = '🙏 ยกกระบอกติ้วขึ้นเสมอระดับอก ตั้งจิตอธิษฐานแจ้งชื่อ-นามสกุล และคำถามเจาะจง 1 เรื่อง';
+  }
+}

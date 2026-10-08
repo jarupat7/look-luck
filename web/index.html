@@ -351,55 +351,6 @@
             </div>
           </div>
 
-          <!-- Radar Chart Section: ดัชนีคะแนนพลังดวง 5 มิติ -->
-          <div class="card radar-card">
-            <div class="radar-card-header">
-              <div>
-                <span class="section-label">ENERGY SPECTRUM</span>
-                <h3 class="section-title">ดัชนีพลังดวงวันนี้</h3>
-                <p class="section-desc">วิเคราะห์คลื่นพลังงาน 5 มิติตามดาวเสวยอายุ</p>
-              </div>
-              <div class="total-score-badge">
-                <span class="score-num" id="radarTotalScore">88%</span>
-                <small id="radarScoreLevel">เกณฑ์ดีเยี่ยม</small>
-              </div>
-            </div>
-
-            <!-- Canvas Container -->
-            <div class="radar-canvas-container">
-              <canvas id="radarChartCanvas" width="340" height="280"></canvas>
-            </div>
-
-            <!-- Radar Score Badges Grid -->
-            <div class="radar-scores-grid" id="radarScoresGrid">
-              <div class="radar-score-item" id="itemScoreWork">
-                <span class="score-tag">การงาน</span>
-                <strong class="score-val" id="valScoreWork">85%</strong>
-              </div>
-              <div class="radar-score-item" id="itemScoreMoney">
-                <span class="score-tag">การเงิน</span>
-                <strong class="score-val" id="valScoreMoney">92%</strong>
-              </div>
-              <div class="radar-score-item" id="itemScoreLove">
-                <span class="score-tag">ความรัก</span>
-                <strong class="score-val" id="valScoreLove">88%</strong>
-              </div>
-              <div class="radar-score-item" id="itemScoreHealth">
-                <span class="score-tag">สุขภาพ</span>
-                <strong class="score-val" id="valScoreHealth">78%</strong>
-              </div>
-              <div class="radar-score-item" id="itemScoreWisdom">
-                <span class="score-tag">สติปัญญา</span>
-                <strong class="score-val" id="valScoreWisdom">90%</strong>
-              </div>
-            </div>
-
-            <div class="radar-insight-box">
-              <span class="insight-icon">✨</span>
-              <p id="radarInsightText">วันนี้พลังงานด้านการเงินและสติปัญญาสูงเด่น เหมาะแก่การเจรจาธุรกิจและคว้าโอกาสใหม่</p>
-            </div>
-          </div>
-
           <!-- Goal Selection Chips (สิ่งที่อยากเสริมวันนี้) -->
           <div class="section-container">
             <div class="section-title-wrap">
@@ -427,35 +378,6 @@
             </div>
           </div>
 
-          <!-- Dynamic Recommendation Card for Today (หัวข้อกระชับ) -->
-          <div class="card outfit-advice-card compact-topic">
-            <div class="card-tag" id="tagPersonalColorMatch">PERSONAL COLOR COMPATIBLE</div>
-            <h4 class="advice-headline" id="txtAdviceTitle">แนะนำการแต่งกายเจรจางาน</h4>
-            
-            <div class="advice-topic-grid" id="adviceTopicGrid">
-              <div class="advice-topic-item">
-                <span class="topic-label">🎨 โทนสีแนะนำ:</span>
-                <strong class="topic-value" id="topicValColor">ส้ม, ครีม</strong>
-              </div>
-              <div class="advice-topic-item">
-                <span class="topic-label">👔 ชิ้นบน:</span>
-                <strong class="topic-value" id="topicValTop">เสื้อเชิ้ต / เบลเซอร์</strong>
-              </div>
-              <div class="advice-topic-item">
-                <span class="topic-label">👖 ชิ้นล่าง:</span>
-                <strong class="topic-value" id="topicValBottom">กางเกงสแล็คสีเบจ</strong>
-              </div>
-              <div class="advice-topic-item">
-                <span class="topic-label">✨ ทริกเสริม:</span>
-                <strong class="topic-value" id="topicValAcc">เครื่องประดับโทนทองนวล</strong>
-              </div>
-            </div>
-            
-            <div class="advice-color-bar" id="adviceColorBar">
-              <!-- Dynamic color chips -->
-            </div>
-          </div>
-
           <!-- Deity of the Day Card (เกร็ดความรู้เทวดานพเคราะห์ - หัวข้อกระชับ) -->
           <div class="card deity-card compact-topic">
             <div class="deity-badge">เทวดานพเคราะห์ประจำวัน</div>
@@ -465,142 +387,344 @@
             </div>
           </div>
 
-          <!-- Tarot Teaser Card (เชื่อมโยงไพ่ทาโรต์ประจำวัน) -->
-          <div class="card tarot-teaser-card" id="cardTarotTeaser">
-            <div class="tarot-teaser-badge">DAILY TAROT • เสี่ยงทายประจำวัน</div>
-            <div class="tarot-teaser-content">
-              <div class="tarot-teaser-icon">🔮</div>
-              <div class="tarot-teaser-text">
-                <h4 class="tarot-teaser-title">เปิดไพ่ทาโรต์ดวงวันนี้ของคุณ</h4>
-                <p class="tarot-teaser-desc">ตั้งจิตอธิษฐานแล้วเปิดไพ่ 1 ใบ เพื่อรับสารเตือนใจและคำแนะนำการใช้ชีวิตประจำวัน</p>
-              </div>
-            </div>
-            <button type="button" class="btn-primary btn-open-tarot" id="btnHomeOpenTarot">
-              ✨ แตะเพื่อเปิดไพ่ทาโรต์วันนี้
+        </section>
+
+        <!-- TAB 2 (ORACLE): ทำนายดวงชะตา (ไพ่ทาโรต์ & เซียมซีวัดมังกร) -->
+        <section class="tab-page" id="tabTarot">
+          <div class="card-header-fashion">
+            <span class="section-label">MYSTIC &amp; SACRED ORACLES</span>
+            <h2 class="section-title">ทำนายดวงชะตา</h2>
+            <p class="section-desc">รวมศาสตร์พยากรณ์: ไพ่ทาโรต์สากล 78 ใบ &amp; เซียมซีวัดมังกรกมลาวาส (ไม้ปวย)</p>
+          </div>
+
+          <!-- Oracle Sub-tab Navigation (ไพ่ทาโรต์ vs เซียมซี) -->
+          <div class="oracle-subtab-bar">
+            <button type="button" class="btn-oracle-tab active" id="btnOracleTarot" data-sub="tarot">
+              <span class="tab-icon">🔮</span>
+              <span>ไพ่ทาโรต์สากล</span>
+            </button>
+            <button type="button" class="btn-oracle-tab" id="btnOracleSiamsi" data-sub="siamsi">
+              <span class="tab-icon">🎋</span>
+              <span>เซียมซีวัดมังกร (ไม้ปวย)</span>
             </button>
           </div>
 
-        </section>
-
-        <!-- TAB TAROT: สุ่มไพ่ทาโรต์ดวงวันนี้ (Daily Tarot Oracle) -->
-        <section class="tab-page" id="tabTarot">
-          <div class="card-header-fashion">
-            <span class="section-label">MYSTIC TAROT 78</span>
-            <h2 class="section-title">ไพ่ทาโรต์ดวงวันนี้</h2>
-            <p class="section-desc">ถอดรหัสพลังงานและข้อคิดประจำวันผ่านภูมิปัญญาไพ่ทาโรต์สากล</p>
-          </div>
-
-          <!-- Daily Card Draw Deck Area -->
-          <div class="card tarot-deck-container">
-            <!-- 3D Flippable Tarot Card -->
-            <div class="tarot-card-scene" id="tarotCardScene" title="แตะที่ไพ่เพื่อเปิดดวง">
-              <div class="tarot-card-object" id="tarotCardObject">
-                <!-- Back Face -->
-                <div class="tarot-card-face tarot-card-back">
-                  <div class="tarot-back-pattern">
-                    <div class="tarot-back-border">
-                      <span class="tarot-back-symbol">🔮</span>
-                      <span class="tarot-back-hint">แตะเพื่อเปิดไพ่</span>
+          <!-- SUB-VIEW 1: TAROT (ไพ่ทาโรต์) -->
+          <div class="oracle-subview active" id="subviewTarot">
+            <!-- Daily Card Draw Deck Area -->
+            <div class="card tarot-deck-container">
+              <!-- 3D Flippable Tarot Card -->
+              <div class="tarot-card-scene" id="tarotCardScene" title="แตะที่ไพ่เพื่อเปิดดวง">
+                <div class="tarot-card-object" id="tarotCardObject">
+                  <!-- Back Face -->
+                  <div class="tarot-card-face tarot-card-back">
+                    <div class="tarot-back-pattern">
+                      <div class="tarot-back-border">
+                        <span class="tarot-back-symbol">🔮</span>
+                        <span class="tarot-back-hint">แตะเพื่อเปิดไพ่</span>
+                      </div>
                     </div>
                   </div>
+                  <!-- Front Face -->
+                  <div class="tarot-card-face tarot-card-front" id="tarotCardFront">
+                    <img src="" id="tarotImg" class="tarot-card-img" alt="Tarot Card" />
+                    <div class="tarot-card-overlay-badge" id="tarotOrientationBadge">ไพ่หัวตั้ง</div>
+                  </div>
                 </div>
-                <!-- Front Face -->
-                <div class="tarot-card-face tarot-card-front" id="tarotCardFront">
-                  <img src="" id="tarotImg" class="tarot-card-img" alt="Tarot Card" />
-                  <div class="tarot-card-overlay-badge" id="tarotOrientationBadge">ไพ่หัวตั้ง</div>
-                </div>
+              </div>
+
+              <!-- Action Prompt -->
+              <div class="tarot-control-box">
+                <p class="tarot-instruction" id="tarotInstruction">
+                  🧘 หลับตา หายใจเข้าลึกๆ ตั้งจิตระลึกถึงสิ่งที่ท่านอยากได้คำแนะนำในวันนี้ แล้วกดปุ่มเพื่อเปิดไพ่
+                </p>
+                <button type="button" class="btn-primary btn-draw-card" id="btnDrawTarot">
+                  ✨ แตะเพื่อเปิดไพ่ทาโรต์ดวงวันนี้
+                </button>
+                <button type="button" class="btn-secondary btn-redraw-card" id="btnRedrawTarot" style="display: none; margin-top: 10px;">
+                  🔄 สุ่มไพ่อีกครั้ง (ถามเรื่องใหม่)
+                </button>
               </div>
             </div>
 
-            <!-- Action Prompt -->
-            <div class="tarot-control-box">
-              <p class="tarot-instruction" id="tarotInstruction">
-                🧘 หลับตา หายใจเข้าลึกๆ ตั้งจิตระลึกถึงสิ่งที่ท่านอยากได้คำแนะนำในวันนี้ แล้วกดปุ่มเพื่อเปิดไพ่
-              </p>
-              <button type="button" class="btn-primary btn-draw-card" id="btnDrawTarot">
-                ✨ แตะเพื่อเปิดไพ่ทาโรต์ดวงวันนี้
-              </button>
-              <button type="button" class="btn-secondary btn-redraw-card" id="btnRedrawTarot" style="display: none; margin-top: 10px;">
-                🔄 สุ่มไพ่อีกครั้ง (ถามเรื่องใหม่)
-              </button>
+            <!-- Prediction Results Section (แสดงเมื่อเปิดไพ่แล้ว) -->
+            <div class="tarot-result-section" id="tarotResultSection" style="display: none;">
+              
+              <!-- Card Header Information -->
+              <div class="card tarot-detail-header-card">
+                <div class="tarot-num-tag" id="resTarotNumber">Major Arcana 0</div>
+                <h3 class="res-tarot-name" id="resTarotName">The Fool (เดอะ ฟูล)</h3>
+                <div class="res-orientation-row">
+                  <span class="res-badge-orient upright" id="resTarotOrientTag">ไพ่หัวตั้ง (Upright)</span>
+                  <span class="res-badge-element" id="resTarotElement">ธาตุลม • ลมหายใจแห่งการเริ่มต้น</span>
+                </div>
+                <p class="res-tarot-keyword" id="resTarotKeywords">คำสำคัญ: การเริ่มต้นใหม่, อิสรภาพ, การผจญภัย</p>
+              </div>
+
+              <!-- Core Overview & Yes/No Oracle -->
+              <div class="card tarot-core-meaning-card">
+                <div class="tarot-sec-title">🌟 ภาพรวมดวงชะตาวันนี้</div>
+                <p class="tarot-sec-body" id="resTarotCore"></p>
+                
+                <div class="tarot-yesno-box" id="resTarotYesNoBox">
+                  <span class="yesno-label">🔮 Yes / No Oracle (แนวโน้มทิศทาง):</span>
+                  <strong class="yesno-val" id="resTarotYesNo">ใช่ (Yes) — ลุยเลย อย่าลังเล!</strong>
+                </div>
+              </div>
+
+              <!-- 4 Pillars: Career, Finance, Love, Mind -->
+              <div class="tarot-pillars-grid">
+                <div class="pillar-box pillar-work">
+                  <div class="pillar-icon">💼</div>
+                  <div class="pillar-content">
+                    <h5 class="pillar-title">การงาน &amp; โอกาส</h5>
+                    <p class="pillar-desc" id="resTarotCareer"></p>
+                  </div>
+                </div>
+
+                <div class="pillar-box pillar-money">
+                  <div class="pillar-icon">🪙</div>
+                  <div class="pillar-content">
+                    <h5 class="pillar-title">การเงิน &amp; โชคลาภ</h5>
+                    <p class="pillar-desc" id="resTarotFinance"></p>
+                  </div>
+                </div>
+
+                <div class="pillar-box pillar-love">
+                  <div class="pillar-icon">💖</div>
+                  <div class="pillar-content">
+                    <h5 class="pillar-title">ความรัก &amp; ความสัมพันธ์</h5>
+                    <p class="pillar-desc" id="resTarotLove"></p>
+                  </div>
+                </div>
+
+                <div class="pillar-box pillar-mind">
+                  <div class="pillar-icon">🧠</div>
+                  <div class="pillar-content">
+                    <h5 class="pillar-title">สภาวะจิตใจ &amp; อารมณ์</h5>
+                    <p class="pillar-desc" id="resTarotMind"></p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Synergy with Look&Luck: Advice & Lucky Color Alignment -->
+              <div class="card tarot-synergy-card">
+                <div class="tarot-synergy-header">
+                  <span class="synergy-icon">✨</span>
+                  <h4 class="synergy-title">คำแนะนำพิเศษ &amp; การเสริมดวงวันนี้</h4>
+                </div>
+                <p class="synergy-advice" id="resTarotAdvice"></p>
+                <div class="synergy-color-tip" id="resTarotColorTip">
+                  🎨 <strong>ทริกเสริมสีมงคล Look&amp;Luck:</strong> วันนี้แนะนำแมตช์เสื้อผ้าสีนำโชคของคุณเพื่อเสริมพลังงานด้านบวกตามคำแนะนำของไพ่
+                </div>
+              </div>
+
+              <!-- Share & Save Actions -->
+              <div class="tarot-share-actions">
+                <button type="button" class="btn-secondary" id="btnShareTarot">📤 แชร์ผลคำทำนาย</button>
+              </div>
+
             </div>
           </div>
 
-          <!-- Prediction Results Section (แสดงเมื่อเปิดไพ่แล้ว) -->
-          <div class="tarot-result-section" id="tarotResultSection" style="display: none;">
+          <!-- SUB-VIEW 2: SIAMSI (เซียมซีวัดมังกรกมลาวาส) -->
+          <div class="oracle-subview" id="subviewSiamsi" style="display: none;">
             
-            <!-- Card Header Information -->
-            <div class="card tarot-detail-header-card">
-              <div class="tarot-num-tag" id="resTarotNumber">Major Arcana 0</div>
-              <h3 class="res-tarot-name" id="resTarotName">The Fool (เดอะ ฟูล)</h3>
-              <div class="res-orientation-row">
-                <span class="res-badge-orient upright" id="resTarotOrientTag">ไพ่หัวตั้ง (Upright)</span>
-                <span class="res-badge-element" id="resTarotElement">ธาตุลม • ลมหายใจแห่งการเริ่มต้น</span>
-              </div>
-              <p class="res-tarot-keyword" id="resTarotKeywords">คำสำคัญ: การเริ่มต้นใหม่, อิสรภาพ, การผจญภัย</p>
+            <!-- Intro Card -->
+            <div class="card siamsi-hero-card">
+              <div class="siamsi-badge">วัดมังกรกมลาวาส (เล่งเน่ยยี่) • ๒๘ ใบศักดิ์สิทธิ์</div>
+              <h3 class="siamsi-hero-title">เซียมซีเสี่ยงทาย &amp; ไม้ปวยถามสวรรค์</h3>
+              <p class="siamsi-hero-desc">
+                ตามขนบจีนโบราณ ตั้งจิตอธิษฐานถามเรื่องที่ต้องการคำตอบ 1 ข้อ (การงาน, การเงิน, ความรัก, สุขภาพ) 
+                เขย่ากระบอกติ้ว และโยนไม้ปวย (หยิน-หยาง) เพื่อขอการอนุมัติจากสิ่งศักดิ์สิทธิ์
+              </p>
             </div>
 
-            <!-- Core Overview & Yes/No Oracle -->
-            <div class="card tarot-core-meaning-card">
-              <div class="tarot-sec-title">🌟 ภาพรวมดวงชะตาวันนี้</div>
-              <p class="tarot-sec-body" id="resTarotCore"></p>
+            <!-- Stage 1: กระบอกเซียมซี & เขย่าติ้ว -->
+            <div class="card siamsi-stage-card" id="siamsiStageBox">
               
-              <div class="tarot-yesno-box" id="resTarotYesNoBox">
-                <span class="yesno-label">🔮 Yes / No Oracle (แนวโน้มทิศทาง):</span>
-                <strong class="yesno-val" id="resTarotYesNo">ใช่ (Yes) — ลุยเลย อย่าลังเล!</strong>
+              <!-- Bamboo Cylinder Visual -->
+              <div class="siamsi-cylinder-wrap" id="siamsiCylinderWrap">
+                <div class="siamsi-cylinder" id="siamsiCylinder">
+                  <div class="bamboo-sticks" id="bambooSticksGroup">
+                    <span class="stick s1"></span>
+                    <span class="stick s2"></span>
+                    <span class="stick s3"></span>
+                    <span class="stick s4"></span>
+                    <span class="stick s5"></span>
+                  </div>
+                  <div class="cylinder-body">
+                    <div class="cylinder-rim"></div>
+                    <div class="cylinder-emblem">龍</div>
+                    <span class="cylinder-label">เล่งเน่ยยี่</span>
+                  </div>
+                </div>
+
+                <!-- Drawn Stick Pop-out (เมื่อเขย่าได้) -->
+                <div class="drawn-stick" id="drawnStick" style="display: none;">
+                  <div class="stick-head">
+                    <span class="stick-num-th" id="stickNumTh">๑๘</span>
+                    <span class="stick-num-ar" id="stickNumAr">No. 18</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Control & Instruction -->
+              <div class="siamsi-control-wrap">
+                <p class="siamsi-step-hint" id="siamsiStepHint">
+                  🙏 ยกกระบอกติ้วขึ้นเสมอระดับอก ตั้งจิตอธิษฐานแจ้งชื่อ-นามสกุล และคำถามเจาะจง 1 เรื่อง
+                </p>
+
+                <!-- Shake Button -->
+                <button type="button" class="btn-primary btn-shake-siamsi" id="btnShakeSiamsi">
+                  🎋 แตะเพื่อเขย่าเซียมซี
+                </button>
+              </div>
+
+              <!-- Stage 2: กล่องโยนไม้ปวย (Seng Puai Validation) -->
+              <div class="seng-puai-box" id="sengPuaiBox" style="display: none;">
+                <div class="puai-divider"></div>
+                <h4 class="puai-heading">🌙 ขั้นตอนโยน "ไม้ปวย" ยืนยันลิขิตสวรรค์</h4>
+                <p class="puai-desc">
+                  ได้ติ้วหมายเลข <strong id="txtDrawnStickNumber">๑๘</strong> แล้ว โยนไม้ปวย 2 ชิ้น (หยิน-หยาง) 
+                  เพื่อตรวจดูว่าเทพเจ้าอนุมัติให้เป็นคำทำนายของท่านหรือไม่
+                </p>
+
+                <!-- Puai Visuals (2 Pieces) -->
+                <div class="puai-visual-row" id="puaiVisualRow">
+                  <div class="puai-piece" id="puaiPiece1">
+                    <div class="puai-face puai-yang" id="puaiFace1">หงาย (เอี๊ยง)</div>
+                  </div>
+                  <div class="puai-piece" id="puaiPiece2">
+                    <div class="puai-face puai-yin" id="puaiFace2">คว่ำ (อิม)</div>
+                  </div>
+                </div>
+
+                <!-- Puai Result Status Banner -->
+                <div class="puai-result-banner" id="puaiResultBanner" style="display: none;">
+                  <strong class="puai-result-title" id="puaiResultTitle">✨ เซ้งปวย (อนุมัติ!)</strong>
+                  <p class="puai-result-text" id="puaiResultText">สิ่งศักดิ์สิทธิ์เห็นชอบ ประทานคำทำนายนี้ให้แก่ท่าน</p>
+                </div>
+
+                <!-- Toss Button & Re-shake Buttons -->
+                <div class="puai-actions-wrap">
+                  <button type="button" class="btn-primary btn-toss-puai" id="btnTossPuai">
+                    🌙 เสี่ยงทายโยนไม้ปวย
+                  </button>
+                  <button type="button" class="btn-secondary btn-reshake" id="btnReshakeSiamsi" style="display: none;">
+                    🔄 เขย่ากระบอกติ้วใหม่
+                  </button>
+                  <button type="button" class="btn-gold btn-open-slip" id="btnOpenSlip" style="display: none;">
+                    📜 เปิดอ่านใบเซียมซี
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Stage 3: ผลใบเซียมซี (Siamsi Slip Result Display) -->
+            <div class="siamsi-slip-container" id="siamsiSlipContainer" style="display: none;">
+              <div class="chinese-fortune-slip">
+                <div class="slip-border">
+                  
+                  <div class="slip-header">
+                    <div class="slip-seal">龍蓮寺</div>
+                    <div class="slip-titles">
+                      <span class="slip-sub">เซียมซีวัดมังกรกมลาวาส (เล่งเน่ยยี่)</span>
+                      <h3 class="slip-main-title" id="slipMainTitle">ใบที่ ๑๘: ศักยภาพเป็นเลิศ ครอบครัวผาสุก</h3>
+                    </div>
+                    <div class="slip-rank-badge" id="slipRankBadge">ยอดเยี่ยม (大吉)</div>
+                  </div>
+
+                  <!-- Poem Box -->
+                  <div class="slip-poem-card">
+                    <span class="quote-mark">“</span>
+                    <p class="slip-poem-text" id="slipPoemText">
+                      มีความสามารถ ทำการใดช่วงนี้สำเร็จ งานรุ่งเรือง ความรักสมหวัง ครอบครัวประสบสุข สรรพสิ่งสมประสงค์
+                    </p>
+                    <span class="quote-mark right">”</span>
+                  </div>
+
+                  <!-- In-depth Deciphering -->
+                  <div class="slip-meaning-box">
+                    <h5 class="meaning-heading">📖 ความหมายและบทวิเคราะห์เชิงลึก</h5>
+                    <p class="meaning-desc" id="slipMeaningDesc">
+                      ชัยชนะที่มาจากศักยภาพส่วนบุคคล ผสานกับบารมีที่สะสมมา ความรู้ความสามารถนำมาซึ่งความผาสุกของวงศ์ตระกูล
+                    </p>
+                  </div>
+
+                  <!-- 4 Dimensions Grid -->
+                  <div class="slip-pillars-grid">
+                    <div class="slip-pillar">
+                      <span class="pillar-label">💼 การงาน:</span>
+                      <strong class="pillar-text" id="slipCareer">ก้าวหน้า ได้รับความไว้วางใจสูงสุด</strong>
+                    </div>
+                    <div class="slip-pillar">
+                      <span class="pillar-label">💰 การเงิน:</span>
+                      <strong class="pillar-text" id="slipFinance">ฐานะมั่นคง โชคลาภพอกพูน</strong>
+                    </div>
+                    <div class="slip-pillar">
+                      <span class="pillar-label">💖 ความรัก:</span>
+                      <strong class="pillar-text" id="slipLove">ครอบครัวอบอุ่น เป็นคู่สร้างคู่สม</strong>
+                    </div>
+                    <div class="slip-pillar">
+                      <span class="pillar-label">🌿 สุขภาพ:</span>
+                      <strong class="pillar-text" id="slipHealth">แข็งแรง สมบูรณ์ทั้งกายและใจ</strong>
+                    </div>
+                  </div>
+
+                  <!-- Actionable Remedy / Blessing -->
+                  <div class="slip-remedy-box" id="slipRemedyBox">
+                    <div class="remedy-icon">🪔</div>
+                    <div class="remedy-content">
+                      <span class="remedy-label">คำแนะนำเสริมดวง / สะเดาะเคราะห์:</span>
+                      <p class="remedy-text" id="slipRemedyText">ทำบุญแบ่งปันเพื่อต่อยอดผลบุญให้ยั่งยืน</p>
+                    </div>
+                  </div>
+
+                  <!-- Slip Actions -->
+                  <div class="slip-actions-row">
+                    <button type="button" class="btn-primary btn-save-slip" id="btnSaveSlip">
+                      🔖 บันทึกใบเซียมซี
+                    </button>
+                    <button type="button" class="btn-gold btn-oil-lamp" id="btnOfferOilLamp">
+                      🪔 เติมน้ำมันตะเกียงออนไลน์
+                    </button>
+                    <button type="button" class="btn-text-link btn-leave-slip" id="btnLeaveSlip">
+                      🍃 ฝากใบเซียมซีไว้ที่วัด
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Draw Again Button -->
+              <div style="text-align:center; margin-top:16px;">
+                <button type="button" class="btn-secondary" id="btnRestartSiamsi">
+                  🔄 ถามคำถามเรื่องใหม่ / เสี่ยงเซียมซีอีกครั้ง
+                </button>
               </div>
             </div>
 
-            <!-- 4 Pillars: Career, Finance, Love, Mind -->
-            <div class="tarot-pillars-grid">
-              <div class="pillar-box pillar-work">
-                <div class="pillar-icon">💼</div>
-                <div class="pillar-content">
-                  <h5 class="pillar-title">การงาน &amp; โอกาส</h5>
-                  <p class="pillar-desc" id="resTarotCareer"></p>
+            <!-- Oil Lamp Modal (โมดอลเติมน้ำมันตะเกียงสะเดาะเคราะห์ออนไลน์) -->
+            <div class="modal-backdrop" id="modalOilLamp" style="display: none;">
+              <div class="modal-card oil-lamp-modal-card">
+                <div class="lamp-flame-container">
+                  <div class="lamp-flame"></div>
+                  <div class="lamp-glow"></div>
+                  <div class="lamp-base">🪔</div>
                 </div>
-              </div>
-
-              <div class="pillar-box pillar-money">
-                <div class="pillar-icon">🪙</div>
-                <div class="pillar-content">
-                  <h5 class="pillar-title">การเงิน &amp; โชคลาภ</h5>
-                  <p class="pillar-desc" id="resTarotFinance"></p>
+                <h3 class="modal-title">จุดประทีปเติมน้ำมันตะเกียง</h3>
+                <p class="modal-sub">
+                  อธิษฐานจิตเติมน้ำมันตะเกียง ณ วัดมังกรกมลาวาส (เล่งเน่ยยี่) เพื่อเติมความสว่างไสวให้ปัญญา ต่อชะตาชีวิต ปัดเป่าอุปสรรค และนำพาความเจริญรุ่งเรือง
+                </p>
+                <div class="lamp-blessing-card">
+                  <span>✨ ขอให้ชีวิตของข้าพเจ้าสว่างไสวดุจแสงประทีป ปราศจากความมืดมน ไร้โพยภัยเบียดเบียนเทอญ ✨</span>
                 </div>
+                <button type="button" class="btn-primary" id="btnCloseOilLamp">
+                  🙏 รับพรมงคล (เสร็จสิ้น)
+                </button>
               </div>
-
-              <div class="pillar-box pillar-love">
-                <div class="pillar-icon">💖</div>
-                <div class="pillar-content">
-                  <h5 class="pillar-title">ความรัก &amp; ความสัมพันธ์</h5>
-                  <p class="pillar-desc" id="resTarotLove"></p>
-                </div>
-              </div>
-
-              <div class="pillar-box pillar-mind">
-                <div class="pillar-icon">🧠</div>
-                <div class="pillar-content">
-                  <h5 class="pillar-title">สภาวะจิตใจ &amp; อารมณ์</h5>
-                  <p class="pillar-desc" id="resTarotMind"></p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Synergy with Look&Luck: Advice & Lucky Color Alignment -->
-            <div class="card tarot-synergy-card">
-              <div class="tarot-synergy-header">
-                <span class="synergy-icon">✨</span>
-                <h4 class="synergy-title">คำแนะนำพิเศษ &amp; การเสริมดวงวันนี้</h4>
-              </div>
-              <p class="synergy-advice" id="resTarotAdvice"></p>
-              <div class="synergy-color-tip" id="resTarotColorTip">
-                🎨 <strong>ทริกเสริมสีมงคล Look&amp;Luck:</strong> วันนี้แนะนำแมตช์เสื้อผ้าสีนำโชคของคุณเพื่อเสริมพลังงานด้านบวกตามคำแนะนำของไพ่
-              </div>
-            </div>
-
-            <!-- Share & Save Actions -->
-            <div class="tarot-share-actions">
-              <button type="button" class="btn-secondary" id="btnShareTarot">📤 แชร์ผลคำทำนาย</button>
             </div>
 
           </div>
@@ -659,6 +783,84 @@
                 <strong class="season-title">Winter (ฤดูหนาว)</strong>
                 <small>Cool Tone เข้ม คมชัด</small>
               </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Recommendation Card (PERSONAL COLOR COMPATIBLE) -->
+          <div class="card outfit-advice-card compact-topic">
+            <div class="card-tag" id="tagPersonalColorMatch">PERSONAL COLOR COMPATIBLE</div>
+            <h4 class="advice-headline" id="txtAdviceTitle">แนะนำการแต่งกายเจรจางาน</h4>
+            
+            <div class="advice-topic-grid" id="adviceTopicGrid">
+              <div class="advice-topic-item">
+                <span class="topic-label">🎨 โทนสีแนะนำ:</span>
+                <strong class="topic-value" id="topicValColor">ส้ม, ครีม</strong>
+              </div>
+              <div class="advice-topic-item">
+                <span class="topic-label">👔 ชิ้นบน:</span>
+                <strong class="topic-value" id="topicValTop">เสื้อเชิ้ต / เบลเซอร์</strong>
+              </div>
+              <div class="advice-topic-item">
+                <span class="topic-label">👖 ชิ้นล่าง:</span>
+                <strong class="topic-value" id="topicValBottom">กางเกงสแล็คสีเบจ</strong>
+              </div>
+              <div class="advice-topic-item">
+                <span class="topic-label">✨ ทริกเสริม:</span>
+                <strong class="topic-value" id="topicValAcc">เครื่องประดับโทนทองนวล</strong>
+              </div>
+            </div>
+            
+            <div class="advice-color-bar" id="adviceColorBar">
+              <!-- Dynamic color chips -->
+            </div>
+          </div>
+
+          <!-- Radar Chart Section: ดัชนีคะแนนพลังดวง 5 มิติ (ENERGY SPECTRUM) -->
+          <div class="card radar-card">
+            <div class="radar-card-header">
+              <div>
+                <span class="section-label">ENERGY SPECTRUM</span>
+                <h3 class="section-title">ดัชนีพลังดวงวันนี้</h3>
+                <p class="section-desc">วิเคราะห์คลื่นพลังงาน 5 มิติตามดาวเสวยอายุและโทนสี</p>
+              </div>
+              <div class="total-score-badge">
+                <span class="score-num" id="radarTotalScore">88%</span>
+                <small id="radarScoreLevel">เกณฑ์ดีเยี่ยม</small>
+              </div>
+            </div>
+
+            <!-- Canvas Container -->
+            <div class="radar-canvas-container">
+              <canvas id="radarChartCanvas" width="340" height="280"></canvas>
+            </div>
+
+            <!-- Radar Score Badges Grid -->
+            <div class="radar-scores-grid" id="radarScoresGrid">
+              <div class="radar-score-item" id="itemScoreWork">
+                <span class="score-tag">การงาน</span>
+                <strong class="score-val" id="valScoreWork">85%</strong>
+              </div>
+              <div class="radar-score-item" id="itemScoreMoney">
+                <span class="score-tag">การเงิน</span>
+                <strong class="score-val" id="valScoreMoney">92%</strong>
+              </div>
+              <div class="radar-score-item" id="itemScoreLove">
+                <span class="score-tag">ความรัก</span>
+                <strong class="score-val" id="valScoreLove">88%</strong>
+              </div>
+              <div class="radar-score-item" id="itemScoreHealth">
+                <span class="score-tag">สุขภาพ</span>
+                <strong class="score-val" id="valScoreHealth">78%</strong>
+              </div>
+              <div class="radar-score-item" id="itemScoreWisdom">
+                <span class="score-tag">สติปัญญา</span>
+                <strong class="score-val" id="valScoreWisdom">90%</strong>
+              </div>
+            </div>
+
+            <div class="radar-insight-box">
+              <span class="insight-icon">✨</span>
+              <p id="radarInsightText">วันนี้พลังงานด้านการเงินและสติปัญญาสูงเด่น เหมาะแก่การเจรจาธุรกิจและคว้าโอกาสใหม่</p>
             </div>
           </div>
 
@@ -863,12 +1065,11 @@
 
         <button class="nav-item" data-tab="tabTarot">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="5" y="2" width="14" height="20" rx="3" ry="3"></rect>
-            <circle cx="12" cy="12" r="3"></circle>
-            <line x1="12" y1="5" x2="12" y2="7"></line>
-            <line x1="12" y1="17" x2="12" y2="19"></line>
+            <circle cx="12" cy="11" r="6"></circle>
+            <path d="M12 2v3M5 11H2M22 11h-3M6.34 5.34l2.12 2.12M17.66 5.34l-2.12 2.12"></path>
+            <path d="M7 21h10M9 17h6M8 17l-1 4M16 17l1 4"></path>
           </svg>
-          <span class="nav-label">ไพ่ทาโรต์</span>
+          <span class="nav-label">ทำนายดวง</span>
         </button>
 
         <button class="nav-item" data-tab="tabWardrobe">
@@ -1004,7 +1205,8 @@
     </div>
   </div>
 
-  <script src="tarot-data.js?v=2.1.0"></script>
-  <script src="app.js?v=2.1.0"></script>
+  <script src="tarot-data.js?v=2.2.0"></script>
+  <script src="siamsi-data.js?v=2.2.0"></script>
+  <script src="app.js?v=2.2.0"></script>
 </body>
 </html>

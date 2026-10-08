@@ -2740,3 +2740,723 @@ body {
 
 
 
+
+/* ========================================================
+   ORACLE HUB: SUB-TABS (ไพ่ทาโรต์ vs เซียมซี)
+   ======================================================== */
+.oracle-subtab-bar {
+  display: flex;
+  background: #F1EDE4;
+  border-radius: var(--radius-full);
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-subtle);
+}
+
+.btn-oracle-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-oracle-tab:hover {
+  color: var(--text-primary);
+}
+
+.btn-oracle-tab.active {
+  background: #FFFFFF;
+  color: var(--brand-gold-dark);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.btn-oracle-tab .tab-icon {
+  font-size: 1.05rem;
+}
+
+.oracle-subview {
+  animation: fadeInSubtab 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInSubtab {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================================
+   SIAM SI (เซียมซีวัดมังกรกมลาวาส)
+   ======================================================== */
+.siamsi-hero-card {
+  background: linear-gradient(135deg, #FFFDF8 0%, #FAF3E6 100%);
+  border: 1px solid #EAD8B8;
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin-bottom: 18px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.siamsi-hero-card::before {
+  content: "龍";
+  position: absolute;
+  right: -10px;
+  bottom: -20px;
+  font-size: 6rem;
+  font-family: serif;
+  color: rgba(184, 51, 42, 0.05);
+  pointer-events: none;
+  user-select: none;
+}
+
+.siamsi-badge {
+  display: inline-block;
+  background: #B8332A;
+  color: #FFF;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 3px 12px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 6px rgba(184, 51, 42, 0.25);
+}
+
+.siamsi-hero-title {
+  font-family: var(--font-display);
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: #5C1E18;
+  margin-bottom: 6px;
+}
+
+.siamsi-hero-desc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Stage Box */
+.siamsi-stage-card {
+  background: #FFFFFF;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 24px 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+}
+
+/* Cylinder Visual */
+.siamsi-cylinder-wrap {
+  position: relative;
+  width: 140px;
+  height: 200px;
+  margin: 0 auto 20px;
+  perspective: 600px;
+}
+
+.siamsi-cylinder {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 160px;
+  transition: transform 0.2s ease;
+}
+
+.siamsi-cylinder.shaking {
+  animation: shakeCylinder 0.8s infinite ease-in-out;
+}
+
+@keyframes shakeCylinder {
+  0% { transform: translateX(-50%) rotate(0deg); }
+  20% { transform: translateX(-54%) rotate(-8deg); }
+  40% { transform: translateX(-46%) rotate(8deg); }
+  60% { transform: translateX(-52%) rotate(-6deg); }
+  80% { transform: translateX(-48%) rotate(6deg); }
+  100% { transform: translateX(-50%) rotate(0deg); }
+}
+
+.bamboo-sticks {
+  position: absolute;
+  top: -24px;
+  left: 12px;
+  width: 66px;
+  height: 40px;
+}
+
+.stick {
+  position: absolute;
+  bottom: 0;
+  width: 6px;
+  height: 48px;
+  background: linear-gradient(180deg, #E6C280 0%, #C4974E 100%);
+  border-radius: 3px 3px 0 0;
+  box-shadow: 1px 0 2px rgba(0, 0, 0, 0.2);
+}
+
+.stick.s1 { left: 8px; transform: rotate(-8deg); height: 42px; }
+.stick.s2 { left: 20px; transform: rotate(-3deg); height: 50px; }
+.stick.s3 { left: 32px; transform: rotate(2deg); height: 54px; }
+.stick.s4 { left: 44px; transform: rotate(7deg); height: 46px; }
+.stick.s5 { left: 54px; transform: rotate(12deg); height: 40px; }
+
+.cylinder-body {
+  position: absolute;
+  bottom: 0;
+  width: 90px;
+  height: 130px;
+  background: linear-gradient(135deg, #8B1E17 0%, #5E140F 100%);
+  border-radius: 8px 8px 14px 14px;
+  border: 3px solid #D4AF37;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 24px rgba(94, 20, 15, 0.35);
+  overflow: hidden;
+}
+
+.cylinder-rim {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: linear-gradient(180deg, #F3E5AB 0%, #D4AF37 100%);
+  border-bottom: 1.5px solid #8C6A1E;
+}
+
+.cylinder-emblem {
+  font-size: 2.2rem;
+  color: #D4AF37;
+  font-family: serif;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.cylinder-label {
+  font-size: 0.65rem;
+  color: #F8E7C0;
+  letter-spacing: 1.5px;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+/* Drawn Stick Pop-out */
+.drawn-stick {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 90px;
+  background: linear-gradient(180deg, #FFF6D6 0%, #E6C280 100%);
+  border: 1.5px solid #B8860B;
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: popStick 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 10;
+}
+
+@keyframes popStick {
+  0% { transform: translateX(-50%) translateY(40px) scale(0.6); opacity: 0; }
+  60% { transform: translateX(-50%) translateY(-15px) scale(1.08); opacity: 1; }
+  100% { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; }
+}
+
+.drawn-stick .stick-num-th {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #8B1E17;
+  line-height: 1.1;
+}
+
+.drawn-stick .stick-num-ar {
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: #665022;
+}
+
+.siamsi-step-hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+
+.btn-shake-siamsi {
+  width: 100%;
+  padding: 13px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+}
+
+/* ========================================================
+   SENG PUAI VALIDATION (ไม้ปวย เสี่ยงทาย)
+   ======================================================== */
+.seng-puai-box {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--border-subtle);
+  animation: fadeInSubtab 0.4s ease;
+}
+
+.puai-divider {
+  width: 40px;
+  height: 3px;
+  background: #D4AF37;
+  margin: 0 auto 12px;
+  border-radius: 2px;
+}
+
+.puai-heading {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #5C1E18;
+  margin-bottom: 6px;
+}
+
+.puai-desc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  line-height: 1.45;
+}
+
+.puai-visual-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 16px;
+  min-height: 70px;
+}
+
+.puai-piece {
+  width: 72px;
+  height: 48px;
+  perspective: 500px;
+  transition: transform 0.3s ease;
+}
+
+.puai-piece.tossing {
+  animation: tossPuai 0.9s cubic-bezier(0.2, 0.85, 0.4, 1.2);
+}
+
+@keyframes tossPuai {
+  0% { transform: translateY(0) rotate(0deg) scale(1); }
+  50% { transform: translateY(-38px) rotate(360deg) scale(1.15); }
+  100% { transform: translateY(0) rotate(720deg) scale(1); }
+}
+
+.puai-face {
+  width: 100%;
+  height: 100%;
+  border-radius: 40px 40px 10px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+  transition: all 0.3s ease;
+}
+
+.puai-face.puai-yang {
+  background: linear-gradient(135deg, #FDF8EE 0%, #ECCF9A 100%);
+  color: #5C3806;
+  border: 2px solid #C4974E;
+}
+
+.puai-face.puai-yin {
+  background: linear-gradient(135deg, #962820 0%, #5E140F 100%);
+  color: #FFF;
+  border: 2px solid #D4AF37;
+  border-radius: 10px 10px 40px 40px;
+}
+
+.puai-result-banner {
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  margin-bottom: 14px;
+  animation: fadeInSubtab 0.3s ease;
+}
+
+.puai-result-banner.sheng {
+  background: #ECFDF5;
+  border: 1px solid #6EE7B7;
+}
+
+.puai-result-banner.sheng .puai-result-title {
+  color: #065F46;
+}
+
+.puai-result-banner.yin {
+  background: #FEF2F2;
+  border: 1px solid #FCA5A5;
+}
+
+.puai-result-banner.yin .puai-result-title {
+  color: #991B1B;
+}
+
+.puai-result-banner.xiao {
+  background: #FFFBEB;
+  border: 1px solid #FCD34D;
+}
+
+.puai-result-banner.xiao .puai-result-title {
+  color: #92400E;
+}
+
+.puai-result-title {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+
+.puai-result-text {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.puai-actions-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-toss-puai, .btn-open-slip {
+  width: 100%;
+  padding: 12px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+}
+
+.btn-reshake {
+  width: 100%;
+  padding: 11px;
+  font-size: 0.84rem;
+  border-radius: var(--radius-full);
+}
+
+/* ========================================================
+   CHINESE FORTUNE SLIP (ใบเซียมซีมงคล)
+   ======================================================== */
+.siamsi-slip-container {
+  animation: fadeInSubtab 0.4s ease;
+  margin-bottom: 24px;
+}
+
+.chinese-fortune-slip {
+  background: #FFFDF9;
+  border: 2px solid #B8332A;
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow: 0 8px 24px rgba(184, 51, 42, 0.12);
+}
+
+.slip-border {
+  border: 1px dashed #C4974E;
+  border-radius: 8px;
+  padding: 20px 18px;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FCF9F2 100%);
+  position: relative;
+}
+
+.slip-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #F0E4D0;
+  padding-bottom: 14px;
+}
+
+.slip-seal {
+  width: 44px;
+  height: 44px;
+  border: 2px solid #B8332A;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #B8332A;
+  font-family: serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  background: rgba(184, 51, 42, 0.04);
+}
+
+.slip-titles {
+  flex: 1;
+}
+
+.slip-sub {
+  display: block;
+  font-size: 0.68rem;
+  color: #8C6A1E;
+  font-weight: 600;
+}
+
+.slip-main-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #5C1E18;
+  margin: 2px 0 0;
+}
+
+.slip-rank-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 8px;
+  background: #FEF3C7;
+  color: #92400E;
+  border: 1px solid #FCD34D;
+  white-space: nowrap;
+}
+
+.slip-rank-badge.best {
+  background: #DCFCE7;
+  color: #15803D;
+  border-color: #86EFAC;
+}
+
+.slip-rank-badge.warning {
+  background: #FEE2E2;
+  color: #991B1B;
+  border-color: #FCA5A5;
+}
+
+/* Poem Box */
+.slip-poem-card {
+  background: #FAF5EB;
+  border-left: 3px solid #B8332A;
+  padding: 12px 14px;
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.slip-poem-text {
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  color: #3D2916;
+  line-height: 1.6;
+  margin: 0;
+  font-weight: 600;
+  text-align: center;
+}
+
+.quote-mark {
+  color: #D4AF37;
+  font-size: 1.4rem;
+  font-family: serif;
+  line-height: 0;
+  vertical-align: middle;
+}
+
+/* Meaning */
+.slip-meaning-box {
+  margin-bottom: 16px;
+}
+
+.meaning-heading {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.meaning-desc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* 4 Pillars */
+.slip-pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.slip-pillar {
+  background: #FFFFFF;
+  border: 1px solid #EFEAE0;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.pillar-label {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.pillar-text {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+
+/* Remedy Box */
+.slip-remedy-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #FFF9E6;
+  border: 1px solid #F3E5AB;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 18px;
+}
+
+.slip-remedy-box .remedy-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.remedy-label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #78350F;
+  margin-bottom: 2px;
+}
+
+.remedy-text {
+  font-size: 0.76rem;
+  color: #92400E;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Slip Actions */
+.slip-actions-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-oil-lamp {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  color: #FFF;
+  border: none;
+  padding: 11px;
+  border-radius: var(--radius-full);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-oil-lamp:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+}
+
+.btn-save-slip {
+  width: 100%;
+  padding: 11px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+}
+
+.btn-leave-slip {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-decoration: underline;
+  padding: 4px;
+}
+
+/* ========================================================
+   OIL LAMP OFFERING MODAL (จุดประทีปเติมน้ำมันตะเกียง)
+   ======================================================== */
+.oil-lamp-modal-card {
+  max-width: 360px;
+  text-align: center;
+  padding: 26px 20px;
+}
+
+.lamp-flame-container {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lamp-base {
+  font-size: 3rem;
+  position: relative;
+  z-index: 2;
+}
+
+.lamp-glow {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.6) 0%, rgba(245, 158, 11, 0) 70%);
+  animation: flickerGlow 1.4s infinite alternate ease-in-out;
+  z-index: 1;
+}
+
+@keyframes flickerGlow {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  100% { transform: scale(1.25); opacity: 1; }
+}
+
+.lamp-blessing-card {
+  background: #FFFDF5;
+  border: 1px dashed #D4AF37;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 0.78rem;
+  color: #78350F;
+  line-height: 1.5;
+  margin: 14px 0 18px;
+}
