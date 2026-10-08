@@ -399,6 +399,89 @@ const DOM = {
   modalOilLamp: document.getElementById('modalOilLamp'),
   btnCloseOilLamp: document.getElementById('btnCloseOilLamp'),
 
+  // Oracle Subtabs - Rune Casting & Library
+  btnOracleRune: document.getElementById('btnOracleRune'),
+  subviewRune: document.getElementById('subviewRune'),
+  btnOpenRuneLibrary: document.getElementById('btnOpenRuneLibrary'),
+  runeTopicChips: document.querySelectorAll('.rune-topic-chip'),
+  runeSacredClothSection: document.getElementById('runeSacredClothSection'),
+  runePouchArea: document.getElementById('runePouchArea'),
+  runePouchVisual: document.getElementById('runePouchVisual'),
+  txtRunePickedCount: document.getElementById('txtRunePickedCount'),
+  runePouchInstruction: document.getElementById('runePouchInstruction'),
+  dotRune1: document.getElementById('dotRune1'),
+  dotRune2: document.getElementById('dotRune2'),
+  dotRune3: document.getElementById('dotRune3'),
+  btnCastRunes: document.getElementById('btnCastRunes'),
+  threeNornsSpreadGrid: document.getElementById('threeNornsSpreadGrid'),
+  stonePiece1: document.getElementById('stonePiece1'),
+  stoneGlyph1: document.getElementById('stoneGlyph1'),
+  stoneName1: document.getElementById('stoneName1'),
+  stoneStatusTag1: document.getElementById('stoneStatusTag1'),
+  stonePiece2: document.getElementById('stonePiece2'),
+  stoneGlyph2: document.getElementById('stoneGlyph2'),
+  stoneName2: document.getElementById('stoneName2'),
+  stoneStatusTag2: document.getElementById('stoneStatusTag2'),
+  stonePiece3: document.getElementById('stonePiece3'),
+  stoneGlyph3: document.getElementById('stoneGlyph3'),
+  stoneName3: document.getElementById('stoneName3'),
+  stoneStatusTag3: document.getElementById('stoneStatusTag3'),
+  runeResultContainer: document.getElementById('runeResultContainer'),
+  resGlyph1: document.getElementById('resGlyph1'),
+  resName1: document.getElementById('resName1'),
+  resStatus1: document.getElementById('resStatus1'),
+  resAett1: document.getElementById('resAett1'),
+  resElement1: document.getElementById('resElement1'),
+  resLiteral1: document.getElementById('resLiteral1'),
+  resKeywords1: document.getElementById('resKeywords1'),
+  resReading1: document.getElementById('resReading1'),
+  resAdvice1: document.getElementById('resAdvice1'),
+  resGlyph2: document.getElementById('resGlyph2'),
+  resName2: document.getElementById('resName2'),
+  resStatus2: document.getElementById('resStatus2'),
+  resAett2: document.getElementById('resAett2'),
+  resElement2: document.getElementById('resElement2'),
+  resLiteral2: document.getElementById('resLiteral2'),
+  resKeywords2: document.getElementById('resKeywords2'),
+  resReading2: document.getElementById('resReading2'),
+  resAdvice2: document.getElementById('resAdvice2'),
+  resGlyph3: document.getElementById('resGlyph3'),
+  resName3: document.getElementById('resName3'),
+  resStatus3: document.getElementById('resStatus3'),
+  resAett3: document.getElementById('resAett3'),
+  resElement3: document.getElementById('resElement3'),
+  resLiteral3: document.getElementById('resLiteral3'),
+  resKeywords3: document.getElementById('resKeywords3'),
+  resReading3: document.getElementById('resReading3'),
+  resAdvice3: document.getElementById('resAdvice3'),
+  cardWyrdSynthesis: document.getElementById('cardWyrdSynthesis'),
+  txtDominantAett: document.getElementById('txtDominantAett'),
+  txtEnergyTone: document.getElementById('txtEnergyTone'),
+  txtWyrdSynthesisCore: document.getElementById('txtWyrdSynthesisCore'),
+  btnRestartRune: document.getElementById('btnRestartRune'),
+  btnShareRune: document.getElementById('btnShareRune'),
+  modalRuneLibrary: document.getElementById('modalRuneLibrary'),
+  btnCloseRuneLibrary: document.getElementById('btnCloseRuneLibrary'),
+  aettTabs: document.querySelectorAll('.btn-aett-tab'),
+  runeLibraryGrid: document.getElementById('runeLibraryGrid'),
+  modalRuneDetail: document.getElementById('modalRuneDetail'),
+  btnCloseRuneDetail: document.getElementById('btnCloseRuneDetail'),
+  dtlGlyph: document.getElementById('dtlGlyph'),
+  dtlName: document.getElementById('dtlName'),
+  dtlAett: document.getElementById('dtlAett'),
+  dtlLiteral: document.getElementById('dtlLiteral'),
+  dtlElement: document.getElementById('dtlElement'),
+  dtlDeity: document.getElementById('dtlDeity'),
+  dtlReversible: document.getElementById('dtlReversible'),
+  dtlLore: document.getElementById('dtlLore'),
+  dtlUprightKeywords: document.getElementById('dtlUprightKeywords'),
+  dtlUprightSummary: document.getElementById('dtlUprightSummary'),
+  dtlUprightAdvice: document.getElementById('dtlUprightAdvice'),
+  dtlReversedBlock: document.getElementById('dtlReversedBlock'),
+  dtlReversedKeywords: document.getElementById('dtlReversedKeywords'),
+  dtlReversedSummary: document.getElementById('dtlReversedSummary'),
+  dtlReversedAdvice: document.getElementById('dtlReversedAdvice'),
+
   // Navigation
   navItems: document.querySelectorAll('.nav-item'),
   tabPages: document.querySelectorAll('.tab-page'),
@@ -413,6 +496,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderApp();
   initTarot();
   initSiamsi();
+  initRuneModule();
 });
 
 function loadSavedUser() {
@@ -641,11 +725,10 @@ function setupEventListeners() {
     });
   }
 
-  // --- Oracle Subtab Toggling (Tarot vs Siamsi) ---
-  if (DOM.btnOracleTarot && DOM.btnOracleSiamsi) {
-    DOM.btnOracleTarot.addEventListener('click', () => switchOracleSubtab('tarot'));
-    DOM.btnOracleSiamsi.addEventListener('click', () => switchOracleSubtab('siamsi'));
-  }
+  // --- Oracle Subtab Toggling (Tarot vs Siamsi vs Rune) ---
+  if (DOM.btnOracleTarot) DOM.btnOracleTarot.addEventListener('click', () => switchOracleSubtab('tarot'));
+  if (DOM.btnOracleSiamsi) DOM.btnOracleSiamsi.addEventListener('click', () => switchOracleSubtab('siamsi'));
+  if (DOM.btnOracleRune) DOM.btnOracleRune.addEventListener('click', () => switchOracleSubtab('rune'));
 
   // --- Tarot Listeners ---
   if (DOM.btnHomeOpenTarot) {
@@ -703,6 +786,58 @@ function setupEventListeners() {
   }
   if (DOM.btnRestartSiamsi) {
     DOM.btnRestartSiamsi.addEventListener('click', handleRestartSiamsi);
+  }
+
+  // --- Norse Rune Casting & Library Listeners ---
+  if (DOM.btnOpenRuneLibrary) {
+    DOM.btnOpenRuneLibrary.addEventListener('click', () => openRuneLibraryModal());
+  }
+  if (DOM.btnCloseRuneLibrary) {
+    DOM.btnCloseRuneLibrary.addEventListener('click', () => closeRuneLibraryModal());
+  }
+  if (DOM.modalRuneLibrary) {
+    DOM.modalRuneLibrary.addEventListener('click', (e) => {
+      if (e.target === DOM.modalRuneLibrary) closeRuneLibraryModal();
+    });
+  }
+  if (DOM.btnCloseRuneDetail) {
+    DOM.btnCloseRuneDetail.addEventListener('click', () => closeRuneDetailModal());
+  }
+  if (DOM.modalRuneDetail) {
+    DOM.modalRuneDetail.addEventListener('click', (e) => {
+      if (e.target === DOM.modalRuneDetail) closeRuneDetailModal();
+    });
+  }
+  if (DOM.runeTopicChips) {
+    DOM.runeTopicChips.forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        DOM.runeTopicChips.forEach(c => c.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        runeState.selectedTopic = e.currentTarget.getAttribute('data-topic') || 'general';
+      });
+    });
+  }
+  if (DOM.runePouchVisual) {
+    DOM.runePouchVisual.addEventListener('click', handlePickRuneFromPouch);
+  }
+  if (DOM.btnCastRunes) {
+    DOM.btnCastRunes.addEventListener('click', handleCastRunes);
+  }
+  if (DOM.btnRestartRune) {
+    DOM.btnRestartRune.addEventListener('click', handleRestartRune);
+  }
+  if (DOM.btnShareRune) {
+    DOM.btnShareRune.addEventListener('click', handleShareRune);
+  }
+  if (DOM.aettTabs) {
+    DOM.aettTabs.forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        DOM.aettTabs.forEach(t => t.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        const aett = e.currentTarget.getAttribute('data-aett') || 'all';
+        renderRuneLibrary(aett);
+      });
+    });
   }
 
   // --- Resize Listener for Radar Chart ---
@@ -1813,17 +1948,17 @@ let siamsiState = {
 };
 
 function switchOracleSubtab(type) {
-  if (type === 'tarot') {
-    if (DOM.btnOracleTarot) DOM.btnOracleTarot.classList.add('active');
-    if (DOM.btnOracleSiamsi) DOM.btnOracleSiamsi.classList.remove('active');
-    if (DOM.subviewTarot) DOM.subviewTarot.style.display = 'block';
-    if (DOM.subviewSiamsi) DOM.subviewSiamsi.style.display = 'none';
-  } else {
-    if (DOM.btnOracleSiamsi) DOM.btnOracleSiamsi.classList.add('active');
-    if (DOM.btnOracleTarot) DOM.btnOracleTarot.classList.remove('active');
-    if (DOM.subviewSiamsi) DOM.subviewSiamsi.style.display = 'block';
-    if (DOM.subviewTarot) DOM.subviewTarot.style.display = 'none';
-  }
+  const tabs = [
+    { key: 'tarot', btn: DOM.btnOracleTarot, view: DOM.subviewTarot },
+    { key: 'siamsi', btn: DOM.btnOracleSiamsi, view: DOM.subviewSiamsi },
+    { key: 'rune', btn: DOM.btnOracleRune, view: DOM.subviewRune }
+  ];
+
+  tabs.forEach(t => {
+    const isActive = (t.key === type);
+    if (t.btn) t.btn.classList.toggle('active', isActive);
+    if (t.view) t.view.style.display = isActive ? 'block' : 'none';
+  });
 }
 
 function initSiamsi() {
@@ -2086,3 +2221,359 @@ function handleRestartSiamsi() {
     DOM.siamsiStepHint.textContent = '🙏 ยกกระบอกติ้วขึ้นเสมอระดับอก ตั้งจิตอธิษฐานแจ้งชื่อ-นามสกุล และคำถามเจาะจง 1 เรื่อง';
   }
 }
+
+// ===================================================
+// NORSE RUNE CASTING & THE THREE NORNS MODULE
+// ===================================================
+
+let runeState = {
+  selectedTopic: 'general',
+  pickedCount: 0,
+  isCasting: false,
+  currentSpread: null,
+  activeAettFilter: 'all'
+};
+
+function initRuneModule() {
+  const todayKey = 'LOOKLUCK_RUNE_' + new Date().toISOString().slice(0, 10);
+  const saved = localStorage.getItem(todayKey);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      if (parsed && parsed.positions && parsed.positions.length === 3) {
+        runeState.currentSpread = parsed;
+        displayRuneSpread(parsed, false);
+        if (DOM.btnRestartRune) {
+          DOM.btnRestartRune.textContent = '🔄 สุ่มผังใหม่สำหรับคำถามอื่น';
+        }
+      }
+    } catch (e) {
+      console.warn('Rune storage parse error', e);
+    }
+  }
+
+  // Pre-render library items
+  renderRuneLibrary('all');
+}
+
+function handlePickRuneFromPouch() {
+  if (runeState.isCasting) return;
+
+  // Animate pouch bounce
+  if (DOM.runePouchVisual) {
+    DOM.runePouchVisual.classList.add('bounce');
+    setTimeout(() => {
+      if (DOM.runePouchVisual) DOM.runePouchVisual.classList.remove('bounce');
+    }, 450);
+  }
+
+  if (runeState.pickedCount < 3) {
+    runeState.pickedCount++;
+    if (DOM.txtRunePickedCount) {
+      DOM.txtRunePickedCount.textContent = runeState.pickedCount;
+    }
+
+    const dotMap = [DOM.dotRune1, DOM.dotRune2, DOM.dotRune3];
+    if (dotMap[runeState.pickedCount - 1]) {
+      dotMap[runeState.pickedCount - 1].classList.add('active');
+    }
+
+    if (runeState.pickedCount === 3) {
+      if (DOM.runePouchInstruction) {
+        DOM.runePouchInstruction.textContent = '✨ หยิบหินศักดิ์สิทธิ์ครบ 3 ก้อนแล้ว! กดปุ่ม "ทอยหินรูนลงบนผืนผ้า" เพื่อเปิดเผยลิขิตชะตา';
+      }
+    } else {
+      if (DOM.runePouchInstruction) {
+        DOM.runePouchInstruction.textContent = `แตะอีก ${3 - runeState.pickedCount} ครั้งเพื่อหยิบหินให้ครบ 3 ก้อน (หยิบแล้ว ${runeState.pickedCount}/3)`;
+      }
+    }
+  } else {
+    // If already 3, guide user to cast
+    handleCastRunes();
+  }
+}
+
+function handleCastRunes() {
+  if (typeof RuneEngine === 'undefined') {
+    alert('ระบบฐานข้อมูลอักษรรูนกำลังโหลด กรุณาลองใหม่อีกครั้ง');
+    return;
+  }
+  if (runeState.isCasting) return;
+
+  // Auto-fill picks if user directly clicks cast
+  if (runeState.pickedCount < 3) {
+    runeState.pickedCount = 3;
+    if (DOM.txtRunePickedCount) DOM.txtRunePickedCount.textContent = '3';
+    [DOM.dotRune1, DOM.dotRune2, DOM.dotRune3].forEach(dot => {
+      if (dot) dot.classList.add('active');
+    });
+  }
+
+  runeState.isCasting = true;
+
+  if (DOM.btnCastRunes) {
+    DOM.btnCastRunes.disabled = true;
+    DOM.btnCastRunes.textContent = 'ᚱ กำลังทอยหินรูนลงบนผืนผ้า...';
+  }
+
+  // Generate spread
+  const spread = RuneEngine.castThreeNorns(runeState.selectedTopic);
+  runeState.currentSpread = spread;
+
+  displayRuneSpread(spread, true);
+}
+
+function displayRuneSpread(spread, animate = true) {
+  const p1 = spread.positions[0].drawn;
+  const p2 = spread.positions[1].drawn;
+  const p3 = spread.positions[2].drawn;
+
+  if (DOM.threeNornsSpreadGrid) {
+    DOM.threeNornsSpreadGrid.style.display = 'grid';
+  }
+
+  // Populate Stones
+  const setupStone = (pieceEl, glyphEl, nameEl, tagEl, drawn) => {
+    if (glyphEl) glyphEl.textContent = drawn.rune.runeChar;
+    if (nameEl) nameEl.textContent = drawn.rune.name;
+    if (tagEl) tagEl.textContent = drawn.isReversed ? 'กลับหัว' : 'ตรง';
+
+    if (pieceEl) {
+      if (drawn.isReversed) {
+        pieceEl.classList.add('reversed');
+      } else {
+        pieceEl.classList.remove('reversed');
+      }
+    }
+  };
+
+  setupStone(DOM.stonePiece1, DOM.stoneGlyph1, DOM.stoneName1, DOM.stoneStatusTag1, p1);
+  setupStone(DOM.stonePiece2, DOM.stoneGlyph2, DOM.stoneName2, DOM.stoneStatusTag2, p2);
+  setupStone(DOM.stonePiece3, DOM.stoneGlyph3, DOM.stoneName3, DOM.stoneStatusTag3, p3);
+
+  // Populate Detailed Cards
+  const populateDetailCard = (idx, drawn, aett, element, literal) => {
+    const glyphEl = DOM[`resGlyph${idx}`];
+    const nameEl = DOM[`resName${idx}`];
+    const statusEl = DOM[`resStatus${idx}`];
+    const aettEl = DOM[`resAett${idx}`];
+    const elementEl = DOM[`resElement${idx}`];
+    const literalEl = DOM[`resLiteral${idx}`];
+    const kwEl = DOM[`resKeywords${idx}`];
+    const readingEl = DOM[`resReading${idx}`];
+    const adviceEl = DOM[`resAdvice${idx}`];
+
+    if (glyphEl) glyphEl.textContent = drawn.rune.runeChar;
+    if (nameEl) nameEl.textContent = drawn.rune.name;
+    if (statusEl) statusEl.textContent = drawn.statusText;
+    if (aettEl) aettEl.textContent = aett;
+    if (elementEl) elementEl.textContent = 'ธาตุ: ' + element;
+    if (literalEl) literalEl.textContent = literal;
+
+    if (kwEl) {
+      kwEl.innerHTML = '';
+      (drawn.keywords || []).forEach(kw => {
+        const span = document.createElement('span');
+        span.className = 'norn-kw-chip';
+        span.textContent = kw;
+        kwEl.appendChild(span);
+      });
+    }
+
+    if (readingEl) readingEl.textContent = drawn.positionReading;
+    if (adviceEl) adviceEl.textContent = drawn.advice;
+  };
+
+  populateDetailCard(1, p1, p1.rune.aettTh, p1.rune.element, p1.rune.literalMeaning);
+  populateDetailCard(2, p2, p2.rune.aettTh, p2.rune.element, p2.rune.literalMeaning);
+  populateDetailCard(3, p3, p3.rune.aettTh, p3.rune.element, p3.rune.literalMeaning);
+
+  // Populate Wyrd Synthesis
+  if (DOM.txtDominantAett) DOM.txtDominantAett.textContent = spread.synthesis.dominantAett;
+  if (DOM.txtEnergyTone) DOM.txtEnergyTone.textContent = spread.synthesis.energyTone;
+  if (DOM.txtWyrdSynthesisCore) DOM.txtWyrdSynthesisCore.textContent = spread.synthesis.coreAdvice;
+
+  // Reveal results
+  setTimeout(() => {
+    if (DOM.runeResultContainer) {
+      DOM.runeResultContainer.style.display = 'block';
+      if (animate) {
+        DOM.runeResultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+    if (DOM.btnCastRunes) {
+      DOM.btnCastRunes.disabled = false;
+      DOM.btnCastRunes.textContent = 'ᚱ เสี่ยงทายทอยหินรูน (Cast Runes)';
+    }
+    runeState.isCasting = false;
+  }, animate ? 600 : 0);
+
+  // Save to daily storage
+  const todayKey = 'LOOKLUCK_RUNE_' + new Date().toISOString().slice(0, 10);
+  try {
+    localStorage.setItem(todayKey, JSON.stringify(spread));
+  } catch (e) {}
+}
+
+function handleRestartRune() {
+  runeState.pickedCount = 0;
+  runeState.currentSpread = null;
+
+  if (DOM.txtRunePickedCount) DOM.txtRunePickedCount.textContent = '0';
+  [DOM.dotRune1, DOM.dotRune2, DOM.dotRune3].forEach(dot => {
+    if (dot) dot.classList.remove('active');
+  });
+
+  if (DOM.runePouchInstruction) {
+    DOM.runePouchInstruction.textContent = 'ตั้งจิตให้สงบนิ่ง แตะที่ถุงรูนเพื่อหยิบหินศักดิ์สิทธิ์ 3 ก้อน (หยิบแล้ว 0/3 ก้อน)';
+  }
+
+  if (DOM.threeNornsSpreadGrid) DOM.threeNornsSpreadGrid.style.display = 'none';
+  if (DOM.runeResultContainer) DOM.runeResultContainer.style.display = 'none';
+
+  if (DOM.runeSacredClothSection) {
+    DOM.runeSacredClothSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  if (DOM.btnCastRunes) {
+    DOM.btnCastRunes.disabled = false;
+    DOM.btnCastRunes.textContent = 'ᚱ ทอยหินรูนลงบนผืนผ้า (Cast Runes)';
+  }
+}
+
+function handleShareRune() {
+  if (!runeState.currentSpread || !runeState.currentSpread.positions) {
+    alert('กรุณาทอยหินรูนก่อนทำการแชร์ผล');
+    return;
+  }
+
+  const p = runeState.currentSpread.positions;
+  const syn = runeState.currentSpread.synthesis;
+
+  const shareText = `ᚱ ผลการพยากรณ์อักษรรูนนอร์ส (The Three Norns) บน Look&Luck:\n` +
+    `๑. อดีต (Urd): 【${p[0].drawn.rune.name} (${p[0].drawn.rune.runeChar})】 - ${p[0].drawn.statusText}\n` +
+    `๒. ปัจจุบัน (Verdandi): 【${p[1].drawn.rune.name} (${p[1].drawn.rune.runeChar})】 - ${p[1].drawn.statusText}\n` +
+    `๓. อนาคต (Skuld): 【${p[2].drawn.rune.name} (${p[2].drawn.rune.runeChar})】 - ${p[2].drawn.statusText}\n\n` +
+    `🌌 สังเคราะห์ชะตากรรม: ${syn.coreAdvice}\n\n` +
+    `ตรวจดวงชะตาและเช็กสีเสื้อมงคลเฉพาะบุคคลได้ที่ Look&Luck!`;
+
+  if (navigator.share) {
+    navigator.share({
+      title: 'Look&Luck - ผังอักษรรูน 3 นอร์น',
+      text: shareText
+    }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(shareText).then(() => {
+      alert('คัดลอกผลการทำนายอักษรรูนเรียบร้อยแล้ว! สามารถนำไปแชร์ให้เพื่อนได้เลย');
+    }).catch(() => {
+      alert(shareText);
+    });
+  }
+}
+
+// ---------------------------------------------------
+// RUNE LIBRARY MODAL & DETAIL INSPECT (PHASE 2)
+// ---------------------------------------------------
+
+function openRuneLibraryModal() {
+  if (DOM.modalRuneLibrary) {
+    DOM.modalRuneLibrary.style.display = 'flex';
+    renderRuneLibrary(runeState.activeAettFilter);
+  }
+}
+
+function closeRuneLibraryModal() {
+  if (DOM.modalRuneLibrary) {
+    DOM.modalRuneLibrary.style.display = 'none';
+  }
+}
+
+function renderRuneLibrary(aettFilter = 'all') {
+  runeState.activeAettFilter = aettFilter;
+  if (!DOM.runeLibraryGrid || typeof RuneEngine === 'undefined') return;
+
+  const runes = RuneEngine.getRunesByAett(aettFilter);
+  DOM.runeLibraryGrid.innerHTML = '';
+
+  runes.forEach(rune => {
+    const item = document.createElement('div');
+    item.className = 'rune-lib-item';
+    item.title = `คลิกเพื่อดูความหมายของ ${rune.name} (${rune.runeChar})`;
+    item.innerHTML = `
+      <span class="lib-item-glyph">${rune.runeChar}</span>
+      <span class="lib-item-name">${rune.name}</span>
+      <span class="lib-item-aett-tag">${rune.aett}</span>
+    `;
+
+    item.addEventListener('click', () => {
+      openRuneDetailModal(rune);
+    });
+
+    DOM.runeLibraryGrid.appendChild(item);
+  });
+}
+
+function openRuneDetailModal(rune) {
+  if (!rune || !DOM.modalRuneDetail) return;
+
+  if (DOM.dtlRuneModalTitle) DOM.dtlRuneModalTitle.textContent = `อักษรรูน: ${rune.name} (${rune.runeChar})`;
+  if (DOM.dtlGlyph) DOM.dtlGlyph.textContent = rune.runeChar;
+  if (DOM.dtlName) DOM.dtlName.textContent = `${rune.name} [${rune.transliteration}]`;
+  if (DOM.dtlAett) DOM.dtlAett.textContent = rune.aettTh;
+  if (DOM.dtlLiteral) DOM.dtlLiteral.textContent = `ความหมาย: ${rune.literalMeaning}`;
+  if (DOM.dtlElement) DOM.dtlElement.textContent = rune.element;
+  if (DOM.dtlDeity) DOM.dtlDeity.textContent = rune.deity;
+  if (DOM.dtlReversible) {
+    DOM.dtlReversible.textContent = rune.isReversible ? 'กลับหัวได้ (Merkstave)' : 'สมมาตร (ห้ามกลับหัว)';
+  }
+  if (DOM.dtlLore) DOM.dtlLore.textContent = rune.lore;
+
+  // Upright
+  if (DOM.dtlUprightKeywords) {
+    DOM.dtlUprightKeywords.innerHTML = '';
+    rune.upright.keywords.forEach(kw => {
+      const chip = document.createElement('span');
+      chip.className = 'norn-kw-chip';
+      chip.textContent = kw;
+      DOM.dtlUprightKeywords.appendChild(chip);
+    });
+  }
+  if (DOM.dtlUprightSummary) DOM.dtlUprightSummary.textContent = rune.upright.summary;
+  if (DOM.dtlUprightAdvice) DOM.dtlUprightAdvice.textContent = '💡 คำแนะนำ: ' + rune.upright.advice;
+
+  // Reversed
+  if (DOM.dtlReversedBlock) {
+    if (rune.isReversible && rune.reversed) {
+      DOM.dtlReversedBlock.style.display = 'block';
+      if (DOM.dtlReversedKeywords) {
+        DOM.dtlReversedKeywords.innerHTML = '';
+        rune.reversed.keywords.forEach(kw => {
+          const chip = document.createElement('span');
+          chip.className = 'norn-kw-chip';
+          chip.style.background = 'rgba(239, 68, 68, 0.15)';
+          chip.style.color = '#B91C1C';
+          chip.textContent = kw;
+          DOM.dtlReversedKeywords.appendChild(chip);
+        });
+      }
+      if (DOM.dtlReversedSummary) DOM.dtlReversedSummary.textContent = rune.reversed.summary;
+      if (DOM.dtlReversedAdvice) DOM.dtlReversedAdvice.textContent = '⚠️ ข้อควรระวัง: ' + rune.reversed.advice;
+    } else {
+      DOM.dtlReversedBlock.style.display = 'block';
+      if (DOM.dtlReversedKeywords) DOM.dtlReversedKeywords.innerHTML = '<span class="norn-kw-chip">Non-reversible</span>';
+      if (DOM.dtlReversedSummary) {
+        DOM.dtlReversedSummary.textContent = 'อักษรรูนตัวนี้มีสัญลักษณ์สมมาตรตามจารึกประวัติศาสตร์โบราณ จึงไม่มีการอ่านความหมายกลับหัว (Merkstave) จะคงพลังงานตามสภาวะสมดุลเสมอ';
+      }
+      if (DOM.dtlReversedAdvice) DOM.dtlReversedAdvice.textContent = '';
+    }
+  }
+
+  DOM.modalRuneDetail.style.display = 'flex';
+}
+
+function closeRuneDetailModal() {
+  if (DOM.modalRuneDetail) {
+    DOM.modalRuneDetail.style.display = 'none';
+  }
+}
+

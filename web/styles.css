@@ -2759,17 +2759,18 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 14px;
+  gap: 5px;
+  padding: 8px 6px;
   border-radius: var(--radius-full);
   border: none;
   background: transparent;
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: 0.76rem;
   font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
   transition: all 0.25s ease;
+  white-space: nowrap;
 }
 
 .btn-oracle-tab:hover {
@@ -3460,3 +3461,880 @@ body {
   line-height: 1.5;
   margin: 14px 0 18px;
 }
+
+/* ========================================================
+   RUNE CASTING & THE THREE NORNS (ศาสตร์พยากรณ์อักษรรูน)
+   ======================================================== */
+
+.rune-hero-card {
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: var(--radius-lg);
+  padding: 20px 18px;
+  margin-bottom: 18px;
+  color: #F8FAFC;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.4);
+}
+
+.rune-hero-card::before {
+  content: "ᚱ";
+  position: absolute;
+  right: -10px;
+  bottom: -20px;
+  font-size: 7rem;
+  color: rgba(212, 175, 55, 0.05);
+  pointer-events: none;
+  user-select: none;
+  font-family: serif;
+}
+
+.rune-hero-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.rune-badge {
+  display: inline-block;
+  background: rgba(212, 175, 55, 0.15);
+  color: var(--brand-gold-light);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
+.btn-rune-lore {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  color: #F5D061;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-rune-lore:hover {
+  background: rgba(212, 175, 55, 0.2);
+  transform: translateY(-1px);
+}
+
+.rune-hero-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #FDE047;
+  margin-bottom: 6px;
+  letter-spacing: 0.3px;
+}
+
+.rune-hero-desc {
+  font-size: 0.78rem;
+  color: #CBD5E1;
+  line-height: 1.5;
+  margin: 0 0 14px 0;
+}
+
+/* Topic Selector */
+.rune-topic-selector {
+  border-top: 1px dashed rgba(212, 175, 55, 0.25);
+  padding-top: 12px;
+}
+
+.rune-topic-label {
+  display: block;
+  font-size: 0.72rem;
+  color: #94A3B8;
+  margin-bottom: 8px;
+}
+
+.rune-topic-chips-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rune-topic-chip {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #E2E8F0;
+  font-size: 0.72rem;
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rune-topic-chip:hover {
+  border-color: rgba(212, 175, 55, 0.5);
+}
+
+.rune-topic-chip.active {
+  background: #D4AF37;
+  color: #0F172A;
+  border-color: #D4AF37;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.35);
+}
+
+/* Sacred Linen Cloth */
+.rune-cloth-card {
+  background: #0B0F17;
+  border: 1px solid #1E293B;
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.sacred-cloth-header {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.sacred-cloth-tag {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #D4AF37;
+  letter-spacing: 1.5px;
+}
+
+.sacred-cloth-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #F8FAFC;
+  margin: 2px 0 0;
+}
+
+.sacred-cloth-canvas {
+  background: radial-gradient(circle at center, #1E293B 0%, #0F172A 70%, #020617 100%);
+  border: 2px dashed rgba(212, 175, 55, 0.35);
+  border-radius: 12px;
+  padding: 24px 16px;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+
+.sacred-cloth-symbol {
+  font-size: 0.75rem;
+  letter-spacing: 6px;
+  color: rgba(212, 175, 55, 0.25);
+  margin-bottom: 14px;
+  user-select: none;
+}
+
+/* Rune Leather Pouch Interactive Area */
+.rune-pouch-area {
+  margin: 10px auto 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.rune-pouch-visual {
+  position: relative;
+  width: 84px;
+  height: 94px;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rune-pouch-visual:hover {
+  transform: scale(1.08);
+}
+
+.rune-pouch-visual:active {
+  transform: scale(0.94);
+}
+
+.rune-pouch-visual.bounce {
+  animation: pouchBounce 0.45s ease;
+}
+
+@keyframes pouchBounce {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.18) translateY(-6px); }
+  70% { transform: scale(0.92) translateY(2px); }
+  100% { transform: scale(1); }
+}
+
+.pouch-cord {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 6px;
+  background: #D4AF37;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  z-index: 3;
+}
+
+.pouch-bag {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 40% 35%, #78350F 0%, #451A03 80%, #291002 100%);
+  border: 2px solid rgba(212, 175, 55, 0.6);
+  border-radius: 38% 38% 46% 46%;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6), inset 0 2px 8px rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.pouch-rune-mark {
+  font-size: 1.8rem;
+  color: #FDE047;
+  text-shadow: 0 0 10px rgba(253, 224, 71, 0.8);
+  font-family: serif;
+}
+
+.rune-pouch-instruction {
+  font-size: 0.78rem;
+  color: #E2E8F0;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 280px;
+}
+
+.rune-picked-dots {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.picked-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.picked-dot.active {
+  background: #D4AF37;
+  border-color: #FDE047;
+  box-shadow: 0 0 8px #FDE047;
+  transform: scale(1.15);
+}
+
+.btn-cast-runes {
+  width: 100%;
+  max-width: 290px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
+  color: #0F172A;
+  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.3);
+}
+
+/* The Three Norns Spread on Cloth */
+.three-norns-spread-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 20px;
+  animation: fadeInSubtab 0.5s ease;
+}
+
+.norn-slot-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.norn-slot-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.norn-slot-badge {
+  font-size: 0.6rem;
+  color: #94A3B8;
+  letter-spacing: 0.3px;
+}
+
+.norn-slot-title strong {
+  font-size: 0.72rem;
+  color: #E2E8F0;
+}
+
+/* Runestone 3D Visual */
+.runestone-piece {
+  position: relative;
+  width: 76px;
+  height: 94px;
+  perspective: 600px;
+}
+
+.stone-body {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 45% 35%, #334155 0%, #1E293B 70%, #0F172A 100%);
+  border: 2px solid #D4AF37;
+  border-radius: 46% 54% 50% 50% / 40% 40% 60% 60%;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6), inset 0 2px 6px rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: dropStone 0.6s ease;
+}
+
+@keyframes dropStone {
+  0% { transform: translateY(-30px) scale(0.7); opacity: 0; }
+  70% { transform: translateY(4px) scale(1.05); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.runestone-piece.reversed .stone-body {
+  border-color: #E2B887;
+  background: radial-gradient(circle at 45% 35%, #3B2E2A 0%, #2A1D1A 70%, #17100E 100%);
+}
+
+.stone-glyph {
+  font-size: 2.1rem;
+  line-height: 1;
+  color: #FDE047;
+  text-shadow: 0 0 12px rgba(253, 224, 71, 0.8), 0 2px 4px rgba(0, 0, 0, 0.8);
+  font-family: serif;
+  transition: transform 0.4s ease;
+}
+
+.runestone-piece.reversed .stone-glyph {
+  transform: rotate(180deg);
+  color: #FB923C;
+  text-shadow: 0 0 10px rgba(251, 146, 60, 0.8);
+}
+
+.stone-name {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #F1F5F9;
+  margin-top: 4px;
+}
+
+.stone-status-tag {
+  font-size: 0.55rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(212, 175, 55, 0.2);
+  color: #FDE047;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.runestone-piece.reversed .stone-status-tag {
+  background: rgba(239, 68, 68, 0.25);
+  color: #FCA5A5;
+}
+
+/* Results Section & 3 Norn Cards */
+.rune-result-container {
+  margin-top: 24px;
+  animation: fadeInSubtab 0.4s ease;
+}
+
+.rune-results-header {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.rune-results-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: 4px;
+}
+
+.norn-detail-card {
+  background: #FFFFFF;
+  border-radius: var(--radius-lg);
+  padding: 18px 16px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.norn-detail-card.card-urd {
+  border-left: 4px solid #3B82F6;
+}
+
+.norn-detail-card.card-verdandi {
+  border-left: 4px solid #10B981;
+}
+
+.norn-detail-card.card-skuld {
+  border-left: 4px solid #8B5CF6;
+}
+
+.norn-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.norn-role-pill {
+  display: inline-block;
+  font-size: 0.64rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: #F1F5F9;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.norn-card-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.norn-stone-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #0F172A;
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid #D4AF37;
+}
+
+.badge-glyph {
+  font-size: 1.5rem;
+  color: #FDE047;
+  font-family: serif;
+}
+
+.badge-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.badge-text strong {
+  font-size: 0.75rem;
+  color: #FFFFFF;
+}
+
+.badge-orient {
+  font-size: 0.6rem;
+  color: #D4AF37;
+}
+
+.norn-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.norn-meta-item {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  background: #F8FAFC;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid #E2E8F0;
+}
+
+.norn-keywords-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+
+.norn-kw-chip {
+  font-size: 0.68rem;
+  background: rgba(212, 175, 55, 0.12);
+  color: #854D0E;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+}
+
+.reading-block {
+  margin-bottom: 10px;
+}
+
+.reading-subtitle {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.reading-paragraph {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.advice-block {
+  background: #FFFBEB;
+  border: 1px dashed #F59E0B;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: 8px;
+}
+
+.advice-block .reading-subtitle {
+  color: #92400E;
+}
+
+.advice-block .reading-paragraph {
+  color: #78350F;
+}
+
+/* Wyrd Synthesis Card */
+.rune-synthesis-card {
+  background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 100%);
+  border: 1.5px solid #D4AF37;
+  border-radius: var(--radius-lg);
+  padding: 20px 18px;
+  color: #F8FAFC;
+  margin-bottom: 20px;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.4);
+}
+
+.synthesis-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #D4AF37;
+}
+
+.synthesis-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #FDE047;
+  margin: 4px 0 14px 0;
+}
+
+.synthesis-stats-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.synthesis-stat-item {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.68rem;
+  color: #94A3B8;
+}
+
+.stat-value {
+  display: block;
+  font-size: 0.8rem;
+  color: #F1F5F9;
+  margin-top: 2px;
+}
+
+.synthesis-quote-box {
+  background: rgba(212, 175, 55, 0.1);
+  border-left: 3px solid #D4AF37;
+  padding: 10px 12px;
+  border-radius: 0 8px 8px 0;
+}
+
+.synthesis-quote {
+  font-size: 0.78rem;
+  color: #E2E8F0;
+  line-height: 1.5;
+  margin: 0;
+  font-style: italic;
+}
+
+.rune-actions-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+/* ========================================================
+   RUNE LIBRARY MODAL (สารานุกรม 24 รูน & ตำนานอิกดราซิล)
+   ======================================================== */
+.rune-library-modal-card {
+  max-width: 420px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 16px;
+  overflow-y: auto;
+}
+
+.odin-lore-card {
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  gap: 10px;
+  margin: 12px 0 14px;
+}
+
+.odin-lore-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.odin-lore-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #FDE047;
+  margin: 0 0 4px 0;
+}
+
+.odin-lore-desc {
+  font-size: 0.7rem;
+  color: #CBD5E1;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.aett-filter-bar {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  margin-bottom: 14px;
+}
+
+.btn-aett-tab {
+  background: #F1F5F9;
+  border: 1px solid #CBD5E1;
+  border-radius: var(--radius-full);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 5px 10px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.btn-aett-tab.active {
+  background: #0F172A;
+  color: #FDE047;
+  border-color: #D4AF37;
+}
+
+.rune-library-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.rune-lib-item {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 8px 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rune-lib-item:hover {
+  border-color: #D4AF37;
+  background: #FFFDF5;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+}
+
+.lib-item-glyph {
+  font-size: 1.6rem;
+  line-height: 1.1;
+  color: #1E293B;
+  font-family: serif;
+}
+
+.lib-item-name {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: 2px;
+}
+
+.lib-item-aett-tag {
+  font-size: 0.55rem;
+  color: var(--text-muted);
+}
+
+/* ========================================================
+   RUNE DETAIL MODAL (เจาะลึกรูนเดี่ยว)
+   ======================================================== */
+.rune-detail-modal-card {
+  max-width: 400px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 20px 18px;
+}
+
+.dtl-rune-hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 12px 0 16px;
+}
+
+.dtl-rune-stone {
+  width: 60px;
+  height: 74px;
+  background: radial-gradient(circle at 45% 35%, #334155 0%, #1E293B 70%, #0F172A 100%);
+  border: 2px solid #D4AF37;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dtl-rune-glyph {
+  font-size: 2.2rem;
+  color: #FDE047;
+  text-shadow: 0 0 10px rgba(253, 224, 71, 0.8);
+  font-family: serif;
+}
+
+.dtl-rune-headings {
+  display: flex;
+  flex-direction: column;
+}
+
+.dtl-rune-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.dtl-rune-aett {
+  font-size: 0.72rem;
+  color: #D4AF37;
+  font-weight: 600;
+}
+
+.dtl-rune-literal {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.dtl-rune-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.dtl-meta-box {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  padding: 6px 8px;
+  text-align: center;
+}
+
+.dtl-meta-lbl {
+  display: block;
+  font-size: 0.58rem;
+  color: var(--text-muted);
+}
+
+.dtl-meta-box strong {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--text-primary);
+  margin-top: 2px;
+}
+
+.dtl-section-block {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.dtl-section-block.upright-block {
+  border-left: 3px solid #10B981;
+}
+
+.dtl-section-block.reversed-block {
+  border-left: 3px solid #F59E0B;
+}
+
+.dtl-section-title {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px 0;
+}
+
+.dtl-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.dtl-section-text {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 6px 0;
+}
+
+.dtl-advice-text {
+  font-size: 0.72rem;
+  color: #854D0E;
+  background: #FEF3C7;
+  padding: 6px 8px;
+  border-radius: 6px;
+  margin: 0;
+  line-height: 1.45;
+}
+

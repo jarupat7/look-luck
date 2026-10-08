@@ -397,7 +397,7 @@
             <p class="section-desc">รวมศาสตร์พยากรณ์: ไพ่ทาโรต์สากล 78 ใบ &amp; เซียมซีวัดมังกรกมลาวาส (ไม้ปวย)</p>
           </div>
 
-          <!-- Oracle Sub-tab Navigation (ไพ่ทาโรต์ vs เซียมซี) -->
+          <!-- Oracle Sub-tab Navigation (ไพ่ทาโรต์ vs เซียมซี vs อักษรรูน) -->
           <div class="oracle-subtab-bar">
             <button type="button" class="btn-oracle-tab active" id="btnOracleTarot" data-sub="tarot">
               <span class="tab-icon">🔮</span>
@@ -406,6 +406,10 @@
             <button type="button" class="btn-oracle-tab" id="btnOracleSiamsi" data-sub="siamsi">
               <span class="tab-icon">🎋</span>
               <span>เซียมซีวัดมังกร (ไม้ปวย)</span>
+            </button>
+            <button type="button" class="btn-oracle-tab" id="btnOracleRune" data-sub="rune">
+              <span class="tab-icon">ᚱ</span>
+              <span>อักษรรูนนอร์ส (3 นอร์น)</span>
             </button>
           </div>
 
@@ -728,7 +732,370 @@
             </div>
 
           </div>
-        </section>
+
+          <!-- SUB-VIEW 3: RUNE CASTING (ศาสตร์พยากรณ์อักษรรูนนอร์ส) -->
+          <div class="oracle-subview" id="subviewRune" style="display: none;">
+            
+            <!-- Intro Hero Card -->
+            <div class="card rune-hero-card">
+              <div class="rune-hero-header">
+                <div class="rune-badge">ศาสตร์พยากรณ์นอร์ดิกโบราณ • 24 ELDER FUTHARK</div>
+                <button type="button" class="btn-rune-lore" id="btnOpenRuneLibrary">
+                  📜 สารานุกรม 24 รูน &amp; ตำนานอิกดราซิล
+                </button>
+              </div>
+              <h3 class="rune-hero-title">อักษรรูนแห่งเทพโอดิน &amp; 3 เทพีแห่งชะตากรรม</h3>
+              <p class="rune-hero-desc">
+                สืบทอดจากมหากาพย์เอ็ดดา (Poetic Edda) สุ่มผัง 3 ชิ้น <strong>The Three Norns (เออร์ด-แวร์ดันดิ-สกุลด์)</strong> 
+                เพื่อหยั่งรู้รากเหง้าอดีต สถานการณ์ปัจจุบัน และเจตจำนงแห่งอนาคต ด้วยกฎ Merkstave (กลับหัว) ตามหลักประวัติศาสตร์นอร์ส
+              </p>
+
+              <!-- Topic Selector Chips -->
+              <div class="rune-topic-selector">
+                <span class="rune-topic-label">ตั้งจิตอธิษฐาน &amp; เลือกหัวข้อที่ต้องการคำปรึกษา:</span>
+                <div class="rune-topic-chips-group">
+                  <button type="button" class="rune-topic-chip active" data-topic="general">🌐 ภาพรวมชีวิต</button>
+                  <button type="button" class="rune-topic-chip" data-topic="work">💼 ภารกิจ &amp; การงาน</button>
+                  <button type="button" class="rune-topic-chip" data-topic="finance">💰 ทรัพย์สิน &amp; โชคลาภ</button>
+                  <button type="button" class="rune-topic-chip" data-topic="love">💖 ความรัก &amp; ผูกพัน</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sacred Norse Cloth Casting Area (ผืนผ้าศักดิ์สิทธิ์) -->
+            <div class="card rune-cloth-card" id="runeSacredClothSection">
+              <div class="sacred-cloth-header">
+                <span class="sacred-cloth-tag">SACRED LINEN CLOTH</span>
+                <h4 class="sacred-cloth-title">ผืนผ้าลินินศักดิ์สิทธิ์ &amp; ถุงรูนหนังโบราณ</h4>
+              </div>
+
+              <!-- Sacred Cloth Container -->
+              <div class="sacred-cloth-canvas" id="sacredClothCanvas">
+                <div class="sacred-cloth-symbol">ᛟ ᚱ ᚦ ᚨ ᚷ ᛋ ᛏ ᛒ ᛖ ᛗ ᛚ ᛜ ᛞ</div>
+                <div class="sacred-cloth-compass"></div>
+
+                <!-- Stage 1: Pouch Interactive Area -->
+                <div class="rune-pouch-area" id="runePouchArea">
+                  <div class="rune-pouch-visual" id="runePouchVisual" title="แตะถุงรูนเพื่อล้วงหยิบหินรูน">
+                    <div class="pouch-cord"></div>
+                    <div class="pouch-bag">
+                      <span class="pouch-rune-mark">ᚱ</span>
+                    </div>
+                  </div>
+                  <div class="rune-pouch-info">
+                    <p class="rune-pouch-instruction" id="runePouchInstruction">
+                      ตั้งจิตให้สงบนิ่ง แตะที่ถุงรูนเพื่อหยิบหินศักดิ์สิทธิ์ 3 ก้อน (หยิบแล้ว <strong id="txtRunePickedCount">0</strong>/3 ก้อน)
+                    </p>
+                    <div class="rune-picked-dots" id="runePickedDots">
+                      <span class="picked-dot" id="dotRune1"></span>
+                      <span class="picked-dot" id="dotRune2"></span>
+                      <span class="picked-dot" id="dotRune3"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Casting Action Button -->
+                <div class="rune-cast-action-bar">
+                  <button type="button" class="btn-primary btn-cast-runes" id="btnCastRunes">
+                    ᚱ ทอยหินรูนลงบนผืนผ้า (Cast Runes)
+                  </button>
+                </div>
+
+                <!-- Stage 2: Three Norns Spread on Cloth (3 ก้อน แนวนอน) -->
+                <div class="three-norns-spread-grid" id="threeNornsSpreadGrid" style="display: none;">
+                  
+                  <!-- Slot 1: Urd (อดีต) -->
+                  <div class="norn-slot-wrap" id="slotWrap1">
+                    <div class="norn-slot-title">
+                      <span class="norn-slot-badge">๑. อดีต (Orlog)</span>
+                      <strong>เออร์ด (Urd)</strong>
+                    </div>
+                    <div class="runestone-piece" id="stonePiece1">
+                      <div class="stone-body" id="stoneBody1">
+                        <span class="stone-glyph" id="stoneGlyph1">ᚠ</span>
+                        <span class="stone-name" id="stoneName1">Fehu</span>
+                        <span class="stone-status-tag" id="stoneStatusTag1">ตรง</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Slot 2: Verdandi (ปัจจุบัน) -->
+                  <div class="norn-slot-wrap" id="slotWrap2">
+                    <div class="norn-slot-title">
+                      <span class="norn-slot-badge">๒. ปัจจุบัน (Wyrd)</span>
+                      <strong>แวร์ดันดิ (Verdandi)</strong>
+                    </div>
+                    <div class="runestone-piece" id="stonePiece2">
+                      <div class="stone-body" id="stoneBody2">
+                        <span class="stone-glyph" id="stoneGlyph2">ᚢ</span>
+                        <span class="stone-name" id="stoneName2">Uruz</span>
+                        <span class="stone-status-tag" id="stoneStatusTag2">ตรง</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Slot 3: Skuld (อนาคต) -->
+                  <div class="norn-slot-wrap" id="slotWrap3">
+                    <div class="norn-slot-title">
+                      <span class="norn-slot-badge">๓. อนาคต (Skuld)</span>
+                      <strong>สกุลด์ (Skuld)</strong>
+                    </div>
+                    <div class="runestone-piece" id="stonePiece3">
+                      <div class="stone-body" id="stoneBody3">
+                        <span class="stone-glyph" id="stoneGlyph3">ᚦ</span>
+                        <span class="stone-name" id="stoneName3">Thurisaz</span>
+                        <span class="stone-status-tag" id="stoneStatusTag3">ตรง</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Detailed Results Container (คำพยากรณ์เจาะลึก 3 นอร์น) -->
+            <div class="rune-result-container" id="runeResultContainer" style="display: none;">
+              
+              <div class="rune-results-header">
+                <span class="section-label">THE THREE NORNS READING</span>
+                <h3 class="rune-results-title">คำทำนายแห่ง 3 เทพีและเส้นด้ายชะตากรรม</h3>
+              </div>
+
+              <!-- Norn 1 Detail: Urd -->
+              <div class="card norn-detail-card card-urd" id="cardNorn1">
+                <div class="norn-card-header">
+                  <div class="norn-identity">
+                    <span class="norn-role-pill">ตำแหน่งที่ ๑ • อดีต / รากเหง้า (Orlog)</span>
+                    <h4 class="norn-card-title">เออร์ด (Urd) : ผู้ถักทอรากเหง้าชีวิต</h4>
+                  </div>
+                  <div class="norn-stone-badge" id="badgeStone1">
+                    <span class="badge-glyph" id="resGlyph1">ᚠ</span>
+                    <div class="badge-text">
+                      <strong id="resName1">Fehu</strong>
+                      <span class="badge-orient" id="resStatus1">ตั้งตรง</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="norn-meta-row">
+                  <span class="norn-meta-item" id="resAett1">ตระกูลแห่งเฟรย์</span>
+                  <span class="norn-meta-item" id="resElement1">ธาตุไฟ / ดิน</span>
+                  <span class="norn-meta-item" id="resLiteral1">ปศุสัตว์ / ทรัพย์สิน</span>
+                </div>
+                <div class="norn-keywords-wrap" id="resKeywords1">
+                  <!-- Keywords chips -->
+                </div>
+                <div class="norn-reading-body">
+                  <div class="reading-block">
+                    <span class="reading-subtitle">📖 สิ่งที่หล่อหลอมมาจากอดีต:</span>
+                    <p class="reading-paragraph" id="resReading1">-</p>
+                  </div>
+                  <div class="reading-block advice-block">
+                    <span class="reading-subtitle">💡 ข้อคิดและแนวทางปฏิบัติ:</span>
+                    <p class="reading-paragraph" id="resAdvice1">-</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Norn 2 Detail: Verdandi -->
+              <div class="card norn-detail-card card-verdandi" id="cardNorn2">
+                <div class="norn-card-header">
+                  <div class="norn-identity">
+                    <span class="norn-role-pill">ตำแหน่งที่ ๒ • ปัจจุบัน / ทางเลือก (Wyrd)</span>
+                    <h4 class="norn-card-title">แวร์ดันดิ (Verdandi) : ผู้ดูแลสถานการณ์ตรงหน้า</h4>
+                  </div>
+                  <div class="norn-stone-badge" id="badgeStone2">
+                    <span class="badge-glyph" id="resGlyph2">ᚢ</span>
+                    <div class="badge-text">
+                      <strong id="resName2">Uruz</strong>
+                      <span class="badge-orient" id="resStatus2">ตั้งตรง</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="norn-meta-row">
+                  <span class="norn-meta-item" id="resAett2">ตระกูลแห่งเฟรย์</span>
+                  <span class="norn-meta-item" id="resElement2">ธาตุดิน</span>
+                  <span class="norn-meta-item" id="resLiteral2">กระทิงป่า / พละกำลัง</span>
+                </div>
+                <div class="norn-keywords-wrap" id="resKeywords2">
+                  <!-- Keywords chips -->
+                </div>
+                <div class="norn-reading-body">
+                  <div class="reading-block">
+                    <span class="reading-subtitle">📖 สถานการณ์ที่เผชิญและการตัดสินใจขณะนี้:</span>
+                    <p class="reading-paragraph" id="resReading2">-</p>
+                  </div>
+                  <div class="reading-block advice-block">
+                    <span class="reading-subtitle">💡 ข้อคิดและแนวทางปฏิบัติ:</span>
+                    <p class="reading-paragraph" id="resAdvice2">-</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Norn 3 Detail: Skuld -->
+              <div class="card norn-detail-card card-skuld" id="cardNorn3">
+                <div class="norn-card-header">
+                  <div class="norn-identity">
+                    <span class="norn-role-pill">ตำแหน่งที่ ๓ • อนาคต / ผลลัพธ์ (Skuld)</span>
+                    <h4 class="norn-card-title">สกุลด์ (Skuld) : ผู้กุมแนวโน้มแห่งอนาคต</h4>
+                  </div>
+                  <div class="norn-stone-badge" id="badgeStone3">
+                    <span class="badge-glyph" id="resGlyph3">ᚦ</span>
+                    <div class="badge-text">
+                      <strong id="resName3">Thurisaz</strong>
+                      <span class="badge-orient" id="resStatus3">ตั้งตรง</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="norn-meta-row">
+                  <span class="norn-meta-item" id="resAett3">ตระกูลแห่งเฟรย์</span>
+                  <span class="norn-meta-item" id="resElement3">ธาตุไฟ</span>
+                  <span class="norn-meta-item" id="resLiteral3">ยักษ์ / ค้อนโยลเนียร์</span>
+                </div>
+                <div class="norn-keywords-wrap" id="resKeywords3">
+                  <!-- Keywords chips -->
+                </div>
+                <div class="norn-reading-body">
+                  <div class="reading-block">
+                    <span class="reading-subtitle">📖 แนวโน้มปลายทางและบทเรียนข้างหน้า:</span>
+                    <p class="reading-paragraph" id="resReading3">-</p>
+                  </div>
+                  <div class="reading-block advice-block">
+                    <span class="reading-subtitle">💡 ข้อคิดและแนวทางปฏิบัติ:</span>
+                    <p class="reading-paragraph" id="resAdvice3">-</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Wyrd Synthesis Card (บทสังเคราะห์พลังงาน) -->
+              <div class="card rune-synthesis-card" id="cardWyrdSynthesis">
+                <div class="synthesis-badge">WYRD SYNTHESIS</div>
+                <h4 class="synthesis-title">🌌 สังเคราะห์เส้นด้ายแห่งชะตากรรม</h4>
+                
+                <div class="synthesis-stats-row">
+                  <div class="synthesis-stat-item">
+                    <span class="stat-label">พลังงานตระกูลเด่น:</span>
+                    <strong class="stat-value" id="txtDominantAett">-</strong>
+                  </div>
+                  <div class="synthesis-stat-item">
+                    <span class="stat-label">สภาวะสมดุล:</span>
+                    <strong class="stat-value" id="txtEnergyTone">-</strong>
+                  </div>
+                </div>
+
+                <div class="synthesis-quote-box">
+                  <p class="synthesis-quote" id="txtWyrdSynthesisCore">-</p>
+                </div>
+              </div>
+
+              <!-- Result Action Buttons -->
+              <div class="rune-actions-row">
+                <button type="button" class="btn-primary" id="btnRestartRune">
+                  🔄 เสี่ยงทายรูนถามเรื่องใหม่
+                </button>
+                <button type="button" class="btn-secondary" id="btnShareRune">
+                  📤 แชร์ผลคำทำนายรูน
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- MODAL: RUNE LIBRARY (สารานุกรม 24 รูน & ตำนานอิกดราซิล - Phase 2) -->
+          <div class="modal-backdrop" id="modalRuneLibrary" style="display: none;">
+            <div class="modal-card rune-library-modal-card">
+              <div class="modal-header-row">
+                <h3 class="modal-title">ᚱ สารานุกรม 24 อักษรรูนโบราณ</h3>
+                <button type="button" class="btn-modal-close" id="btnCloseRuneLibrary">✕</button>
+              </div>
+
+              <!-- Odin's Sacrifice Lore Card -->
+              <div class="odin-lore-card">
+                <div class="odin-lore-icon">🌳</div>
+                <div class="odin-lore-content">
+                  <h5 class="odin-lore-title">ตำนานมหาเทพโอดิน &amp; ต้นไม้อิกดราซิล (Yggdrasil)</h5>
+                  <p class="odin-lore-desc">
+                    มหาเทพโอดิน (Allfather Odin) ได้ทรงสละพระองค์ด้วยการแทงหอกกุงเนียร์และแขวนคอห้อยหัวบนต้นไม้โลกอิกดราซิล 
+                    เป็นเวลาเก้าวันเก้าคืนโดยไม่เสวยอาหารหรือน้ำ จนเมื่อถึงขีดสุดแห่งความทุกข์เวทนา พระองค์ได้ทรงตระหนักรู้ 
+                    กรีดร้อง และก้มลงคว้าอักษรรูนขึ้นมาจากความมืดมิด เพื่อประทานปัญญาญาณศักดิ์สิทธิ์นี้แก่มวลมนุษย์
+                  </p>
+                </div>
+              </div>
+
+              <!-- Aett Filter Tabs -->
+              <div class="aett-filter-bar">
+                <button type="button" class="btn-aett-tab active" data-aett="all">ทั้งหมด (24)</button>
+                <button type="button" class="btn-aett-tab" data-aett="Freyr">เฟรย์ (Freyr 8)</button>
+                <button type="button" class="btn-aett-tab" data-aett="Heimdall">ไฮม์ดัลล์ (Heimdall 8)</button>
+                <button type="button" class="btn-aett-tab" data-aett="Tyr">เทียร์ (Tyr 8)</button>
+              </div>
+
+              <!-- 24 Runes Grid List -->
+              <div class="rune-library-grid" id="runeLibraryGrid">
+                <!-- Dynamically populated by JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- MODAL: RUNE DETAIL INSPECT (เจาะลึกรูนเดี่ยว) -->
+          <div class="modal-backdrop" id="modalRuneDetail" style="display: none;">
+            <div class="modal-card rune-detail-modal-card">
+              <div class="modal-header-row">
+                <h3 class="modal-title" id="dtlRuneModalTitle">รายละเอียดอักษรรูน</h3>
+                <button type="button" class="btn-modal-close" id="btnCloseRuneDetail">✕</button>
+              </div>
+
+              <div class="dtl-rune-hero">
+                <div class="dtl-rune-stone">
+                  <span class="dtl-rune-glyph" id="dtlGlyph">ᚠ</span>
+                </div>
+                <div class="dtl-rune-headings">
+                  <h4 class="dtl-rune-name" id="dtlName">Fehu</h4>
+                  <span class="dtl-rune-aett" id="dtlAett">ตระกูลแห่งเฟรย์ (Freyr's Aett)</span>
+                  <span class="dtl-rune-literal" id="dtlLiteral">ปศุสัตว์ / ทรัพย์สิน</span>
+                </div>
+              </div>
+
+              <div class="dtl-rune-meta-grid">
+                <div class="dtl-meta-box">
+                  <span class="dtl-meta-lbl">ธาตุประจำรูน:</span>
+                  <strong id="dtlElement">ไฟ / ดิน</strong>
+                </div>
+                <div class="dtl-meta-box">
+                  <span class="dtl-meta-lbl">ทวยเทพที่เกี่ยวข้อง:</span>
+                  <strong id="dtlDeity">เทพเฟรย์ &amp; เฟรยา</strong>
+                </div>
+                <div class="dtl-meta-box">
+                  <span class="dtl-meta-lbl">สถานะการกลับหัว:</span>
+                  <strong id="dtlReversible">กลับหัวได้ (Merkstave)</strong>
+                </div>
+              </div>
+
+              <!-- Lore Section -->
+              <div class="dtl-section-block">
+                <h5 class="dtl-section-title">📜 ปูมหลังและความหมายดั้งเดิม:</h5>
+                <p class="dtl-section-text" id="dtlLore">-</p>
+              </div>
+
+              <!-- Upright Meaning -->
+              <div class="dtl-section-block upright-block">
+                <h5 class="dtl-section-title">✨ ความหมายเมื่อตั้งตรง (Upright):</h5>
+                <div class="dtl-keywords" id="dtlUprightKeywords"></div>
+                <p class="dtl-section-text" id="dtlUprightSummary">-</p>
+                <p class="dtl-advice-text" id="dtlUprightAdvice">-</p>
+              </div>
+
+              <!-- Reversed Meaning (Merkstave) -->
+              <div class="dtl-section-block reversed-block" id="dtlReversedBlock">
+                <h5 class="dtl-section-title">⚠️ ความหมายเมื่อกลับหัว (Merkstave):</h5>
+                <div class="dtl-keywords" id="dtlReversedKeywords"></div>
+                <p class="dtl-section-text" id="dtlReversedSummary">-</p>
+                <p class="dtl-advice-text" id="dtlReversedAdvice">-</p>
+              </div>
+
+            </div>
+          </div>
 
         <!-- TAB 2: ตู้เสื้อผ้า & Personal Color -->
         <section class="tab-page" id="tabWardrobe">
@@ -1207,6 +1574,7 @@
 
   <script src="tarot-data.js?v=2.2.0"></script>
   <script src="siamsi-data.js?v=2.2.0"></script>
+  <script src="rune-data.js?v=2.2.0"></script>
   <script src="app.js?v=2.2.0"></script>
 </body>
 </html>
