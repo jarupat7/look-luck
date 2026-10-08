@@ -183,7 +183,7 @@
               </div>
               <div class="week-actions">
                 <button type="button" class="btn-quick-today active" id="btnQuickToday" title="กลับไปดูสีวันนี้">วันนี้</button>
-                <button type="button" class="btn-weekly-modal" id="btnOpenWeeklyModal" title="ดูสรุป 7 วัน">📅 ตาราง 7 วัน</button>
+                <button type="button" class="btn-weekly-modal" id="btnOpenWeeklyModal" title="ดูปฏิทินสีมงคลทั้งเดือน">📅 ปฏิทินสีมงคล (30 วัน)</button>
               </div>
             </div>
             
@@ -227,18 +227,18 @@
                 <span class="badge-target-day" id="badgeTargetDay">สำหรับ: วันจันทร์</span>
               </div>
               <h2 class="section-title" id="txtHeroDayTitle">สีมงคลประจำวันจันทร์</h2>
-              <p class="section-desc" id="txtHeroDayDesc">คำนวณตามพลังงานดาวประจำวัน ผสานความปลอดภัยตามวันเกิดของคุณ</p>
+              <p class="section-desc" id="txtHeroDayDesc">สรุปชุดสีมงคลเฉพาะบุคคลประจำวัน</p>
             </div>
 
-            <!-- กล่องแจ้งเตือนการกรองความปลอดภัยตามวันเกิด (Personalized Natal Protection Alert) -->
-            <div class="natal-protection-banner" id="boxPersonalizedNotice">
+            <!-- กล่องแจ้งเตือนการกรองความปลอดภัยตามวันเกิด (Personalized Natal Protection Alert - หัวข้อกระชับ) -->
+            <div class="natal-protection-banner compact-topic" id="boxPersonalizedNotice">
               <div class="protection-icon" id="iconProtectionNotice">🛡️</div>
               <div class="protection-text">
                 <div class="protection-title-row">
-                  <strong id="titleProtectionNotice">ระบบกรองดวงเฉพาะตัว (เกิดวันจันทร์):</strong>
+                  <strong id="titleProtectionNotice">ระบบกรองดวง (เกิดวันจันทร์):</strong>
                   <span class="protection-status-tag safe" id="tagProtectionStatus">ปลอดภัย 100%</span>
                 </div>
-                <p id="txtPersonalizedDetail">สีมงคลของวันนี้ไม่ขัดแย้งกับสีกาลกิณีประจำวันเกิดของคุณ สวมใส่ได้อย่างมั่นใจเต็มเปี่ยม</p>
+                <p id="txtPersonalizedDetail" class="protection-desc">ไร้สีกาลกิณีขัดแย้ง สวมใส่ได้อย่างมั่นใจ</p>
               </div>
             </div>
 
@@ -427,25 +427,42 @@
             </div>
           </div>
 
-          <!-- Dynamic Recommendation Card for Today -->
-          <div class="card outfit-advice-card">
+          <!-- Dynamic Recommendation Card for Today (หัวข้อกระชับ) -->
+          <div class="card outfit-advice-card compact-topic">
             <div class="card-tag" id="tagPersonalColorMatch">PERSONAL COLOR COMPATIBLE</div>
             <h4 class="advice-headline" id="txtAdviceTitle">แนะนำการแต่งกายเจรจางาน</h4>
-            <p class="advice-desc" id="txtAdviceDescription">แมตช์เสื้อเชิ้ตหรือเบลเซอร์สีส้มพีชกับกางเกงสแล็คสีครีม เสริมสร้อยหรือนาฬิกาสีทองนวล ช่วยเสริมความมั่นใจและการเจรจาต่อรองให้ราบรื่น</p>
+            
+            <div class="advice-topic-grid" id="adviceTopicGrid">
+              <div class="advice-topic-item">
+                <span class="topic-label">🎨 โทนสีแนะนำ:</span>
+                <strong class="topic-value" id="topicValColor">ส้ม, ครีม</strong>
+              </div>
+              <div class="advice-topic-item">
+                <span class="topic-label">👔 ชิ้นบน:</span>
+                <strong class="topic-value" id="topicValTop">เสื้อเชิ้ต / เบลเซอร์</strong>
+              </div>
+              <div class="advice-topic-item">
+                <span class="topic-label">👖 ชิ้นล่าง:</span>
+                <strong class="topic-value" id="topicValBottom">กางเกงสแล็คสีเบจ</strong>
+              </div>
+              <div class="advice-topic-item">
+                <span class="topic-label">✨ ทริกเสริม:</span>
+                <strong class="topic-value" id="topicValAcc">เครื่องประดับโทนทองนวล</strong>
+              </div>
+            </div>
             
             <div class="advice-color-bar" id="adviceColorBar">
               <!-- Dynamic color chips -->
             </div>
           </div>
 
-          <!-- Deity of the Day Card (เกร็ดความรู้เทวดานพเคราะห์) -->
-          <div class="card deity-card">
+          <!-- Deity of the Day Card (เกร็ดความรู้เทวดานพเคราะห์ - หัวข้อกระชับ) -->
+          <div class="card deity-card compact-topic">
             <div class="deity-badge">เทวดานพเคราะห์ประจำวัน</div>
             <div class="deity-header">
               <h4 class="deity-name" id="txtDeityName">พระจันทร์</h4>
               <span class="deity-trait" id="txtDeityTrait">พลังแห่งเสน่ห์ ความรักใคร่ และการปรับตัว</span>
             </div>
-            <p class="deity-story" id="txtDeityStory">สร้างจากเทพธิดา 15 นาง ห่อด้วยผ้าสีขาวนวล จึงมีสีกายขาวนวล อ่อนโยน มีเสน่ห์ เมตตามหานิยม</p>
           </div>
 
           <!-- Tarot Teaser Card (เชื่อมโยงไพ่ทาโรต์ประจำวัน) -->
@@ -872,28 +889,122 @@
 
     </div>
 
-    <!-- Modal: ตารางสรุปสีเสื้อมงคล 7 วัน (Weekly 7-Day Matrix) -->
+    <!-- Modal: ปฏิทินและตารางสรุปสีเสื้อมงคล (Monthly Calendar & Weekly Matrix) -->
     <div class="modal-overlay" id="modalWeeklyOverview">
-      <div class="modal-sheet weekly-modal-sheet">
+      <div class="modal-sheet weekly-modal-sheet calendar-modal-sheet">
         <div class="modal-drag-bar"></div>
         <button class="modal-close-btn" id="btnCloseWeeklyModal">&times;</button>
+        
         <div class="weekly-modal-header">
-          <span class="section-label">WEEKLY MATRIX 2569</span>
-          <h3 class="card-heading">ตารางสีเสื้อมงคล 7 วัน</h3>
-          <p class="card-subtext" id="txtWeeklyModalSubtitle">ปรับสมดุลเฉพาะบุคคลตามวันเกิดของคุณ</p>
+          <span class="section-label">LUCKY COLOR CALENDAR 2569</span>
+          <h3 class="card-heading" id="modalHeadingTitle">ปฏิทินสีเสื้อมงคลประจำเดือน</h3>
+          <p class="card-subtext" id="txtWeeklyModalSubtitle">ดูสีมงคลล่วงหน้าได้ตลอดทั้งเดือน ปรับตามวันเกิดของคุณ</p>
         </div>
 
-        <div class="weekly-table-container" id="weeklyTableContainer">
+        <!-- Toggle View: ปฏิทินรายเดือน (30 วัน) vs ตาราง 7 วัน -->
+        <div class="cal-view-toggle">
+          <button type="button" class="btn-cal-tab active" id="btnTabCalendarView" data-view="month">
+            📅 ปฏิทินรายเดือน (30 วัน)
+          </button>
+          <button type="button" class="btn-cal-tab" id="btnTabWeeklyView" data-view="week">
+            📋 สรุป 7 วัน
+          </button>
+        </div>
+
+        <!-- View 1: Monthly Calendar Grid -->
+        <div class="calendar-view-container" id="calendarViewContainer">
+          <!-- Month Navigator -->
+          <div class="month-navigator">
+            <button type="button" class="btn-month-nav" id="btnPrevMonth" title="เดือนก่อนหน้า">◀</button>
+            <div class="month-display-group">
+              <h4 class="month-label" id="currentMonthLabel">ตุลาคม 2569</h4>
+              <button type="button" class="btn-back-current-month" id="btnCurrentMonth" style="display:none;">กลับเดือนนี้</button>
+            </div>
+            <button type="button" class="btn-month-nav" id="btnNextMonth" title="เดือนถัดไป">▶</button>
+          </div>
+
+          <!-- Calendar Weekday Headers (อา - ส) -->
+          <div class="calendar-days-header">
+            <span>อา</span>
+            <span>จ</span>
+            <span>อ</span>
+            <span>พ</span>
+            <span>พฤ</span>
+            <span>ศ</span>
+            <span>ส</span>
+          </div>
+
+          <!-- Calendar Days Grid (Dynamic 28-35 cells) -->
+          <div class="calendar-grid" id="calendarGrid">
+            <!-- Rendered by JS -->
+          </div>
+
+          <!-- Selected Date Detail Box (Shows below calendar) -->
+          <div class="cal-selected-day-preview" id="calSelectedDayPreview">
+            <div class="cal-preview-header">
+              <strong id="calPreviewDateText">วันพุธที่ 14 ตุลาคม 2569</strong>
+              <span class="cal-preview-badge" id="calPreviewBadge">ปลอดภัย 100%</span>
+            </div>
+            <div class="cal-preview-colors-row">
+              <div class="cal-color-chip work">
+                <span class="chip-cat">💼 งาน/เดช</span>
+                <strong id="calPrevWork">เขียว, ส้ม</strong>
+              </div>
+              <div class="cal-color-chip money">
+                <span class="chip-cat">💰 เงิน/ศรี</span>
+                <strong id="calPrevMoney">ม่วง, ดำ</strong>
+              </div>
+              <div class="cal-color-chip love">
+                <span class="chip-cat">💖 รัก/เมตตา</span>
+                <strong id="calPrevLove">ฟ้า, น้ำเงิน</strong>
+              </div>
+              <div class="cal-color-chip kalakini">
+                <span class="chip-cat">⚠️ กาลกิณี</span>
+                <strong id="calPrevKala">ชมพู</strong>
+              </div>
+            </div>
+            <button type="button" class="btn-primary btn-apply-cal-date" id="btnApplyCalDate">
+              ✨ เลือกใช้วันนี้และดูสูตรแต่งตัวในหน้าหลัก
+            </button>
+          </div>
+        </div>
+
+        <!-- View 2: Weekly 7-Day Matrix -->
+        <div class="weekly-table-container" id="weeklyTableContainer" style="display: none;">
           <!-- Dynamic 7 Days Rows will be rendered by JavaScript -->
         </div>
 
-        <button class="btn-primary" id="btnDoneWeeklyModal" style="margin-top: 16px;">ปิดหน้าต่าง</button>
+        <button class="btn-secondary" id="btnDoneWeeklyModal" style="margin-top: 14px;">ปิดหน้าต่าง</button>
       </div>
     </div>
 
   </div>
 
-  <script src="tarot-data.js?v=2.0.2"></script>
-  <script src="app.js?v=2.0.2"></script>
+  <!-- ============================================== -->
+  <!-- GRAPHIC LOADING OVERLAY (แอนิเมชันกราฟฟิกรอโหลด) -->
+  <!-- ============================================== -->
+  <div class="loading-overlay" id="globalLoadingOverlay" style="display: none;">
+    <div class="loading-card">
+      <div class="mystic-spinner-container">
+        <div class="mystic-spinner-outer"></div>
+        <div class="mystic-spinner-middle"></div>
+        <div class="mystic-spinner-inner"></div>
+        <div class="mystic-spinner-center">🔮</div>
+      </div>
+      <h3 class="loading-title" id="loadingTitle">กำลังเชื่อมต่อและประมวลผลดวงชะตา</h3>
+      <p class="loading-status" id="loadingStatus">กำลังเชื่อมต่อ Google Sheets &amp; AI...</p>
+      
+      <div class="loading-progress-bar">
+        <div class="loading-progress-fill" id="loadingProgressFill" style="width: 25%;"></div>
+      </div>
+
+      <div class="loading-step-tips" id="loadingStepTips">
+        ✨ ระบบกำลังคำนวณสีมงคลเฉพาะบุคคลตามวันเกิดของคุณ...
+      </div>
+    </div>
+  </div>
+
+  <script src="tarot-data.js?v=2.1.0"></script>
+  <script src="app.js?v=2.1.0"></script>
 </body>
 </html>

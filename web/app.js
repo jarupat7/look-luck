@@ -178,6 +178,9 @@ const AppState = {
   bottomStyle: 'pants', // 'pants', 'skirt'
   todayDay: getTodayThaiDayName(), // วันนี้ตามปฏิทินจริง (Real-world today)
   selectedDay: getTodayThaiDayName(), // วันที่ผู้ใช้เลือกดู (Default = วันนี้)
+  selectedFullDate: new Date(), // ว/ด/ป ที่เลือก (Default = วันนี้)
+  calendarDate: new Date(), // เดือน/ปีที่กำลังดูในปฏิทิน
+  calSelectedPreviewDate: new Date(),
   apiUrl: API_URL,
   activeTab: 'tabHome'
 };
@@ -187,6 +190,13 @@ const DOM = {
   // Views
   viewAuth: document.getElementById('viewAuth'),
   viewMain: document.getElementById('viewMain'),
+
+  // Loading Graphic Overlay
+  globalLoadingOverlay: document.getElementById('globalLoadingOverlay'),
+  loadingTitle: document.getElementById('loadingTitle'),
+  loadingStatus: document.getElementById('loadingStatus'),
+  loadingProgressFill: document.getElementById('loadingProgressFill'),
+  loadingStepTips: document.getElementById('loadingStepTips'),
 
   // Auth Landing View
   btnTabLogin: document.getElementById('btnTabLogin'),
@@ -229,6 +239,31 @@ const DOM = {
   titleProtectionNotice: document.getElementById('titleProtectionNotice'),
   tagProtectionStatus: document.getElementById('tagProtectionStatus'),
   txtPersonalizedDetail: document.getElementById('txtPersonalizedDetail'),
+
+  // Monthly Calendar Modal Elements
+  modalHeadingTitle: document.getElementById('modalHeadingTitle'),
+  btnTabCalendarView: document.getElementById('btnTabCalendarView'),
+  btnTabWeeklyView: document.getElementById('btnTabWeeklyView'),
+  calendarViewContainer: document.getElementById('calendarViewContainer'),
+  btnPrevMonth: document.getElementById('btnPrevMonth'),
+  currentMonthLabel: document.getElementById('currentMonthLabel'),
+  btnCurrentMonth: document.getElementById('btnCurrentMonth'),
+  btnNextMonth: document.getElementById('btnNextMonth'),
+  calendarGrid: document.getElementById('calendarGrid'),
+  calSelectedDayPreview: document.getElementById('calSelectedDayPreview'),
+  calPreviewDateText: document.getElementById('calPreviewDateText'),
+  calPreviewBadge: document.getElementById('calPreviewBadge'),
+  calPrevWork: document.getElementById('calPrevWork'),
+  calPrevMoney: document.getElementById('calPrevMoney'),
+  calPrevLove: document.getElementById('calPrevLove'),
+  calPrevKala: document.getElementById('calPrevKala'),
+  btnApplyCalDate: document.getElementById('btnApplyCalDate'),
+
+  // Compact Outfit Advice Topics
+  topicValColor: document.getElementById('topicValColor'),
+  topicValTop: document.getElementById('topicValTop'),
+  topicValBottom: document.getElementById('topicValBottom'),
+  topicValAcc: document.getElementById('topicValAcc'),
 
   // Tab Home Elements
   txtWorkColors: document.getElementById('txtWorkColors'),
@@ -447,6 +482,8 @@ function setupEventListeners() {
       btn.addEventListener('click', () => {
         const day = btn.getAttribute('data-day');
         AppState.selectedDay = day;
+        AppState.selectedFullDate = null;
+        updateCurrentDate();
         updateDayPillsUI();
         updateDailyColorsAndAdvice();
       });
@@ -456,15 +493,19 @@ function setupEventListeners() {
   // --- Quick "วันนี้" Button ---
   if (DOM.btnQuickToday) {
     DOM.btnQuickToday.addEventListener('click', () => {
+      AppState.selectedFullDate = new Date();
+      AppState.calendarDate = new Date();
       AppState.selectedDay = AppState.todayDay;
+      updateCurrentDate();
       updateDayPillsUI();
       updateDailyColorsAndAdvice();
     });
   }
 
-  // --- Weekly 7-Day Overview Modal ---
+  // --- Monthly Calendar & 7-Day Overview Modal ---
   if (DOM.btnOpenWeeklyModal) {
     DOM.btnOpenWeeklyModal.addEventListener('click', () => {
+      renderMonthlyCalendar();
       renderWeeklyMatrix();
       if (DOM.modalWeeklyOverview) DOM.modalWeeklyOverview.classList.add('active');
     });
@@ -482,6 +523,46 @@ function setupEventListeners() {
   if (DOM.modalWeeklyOverview) {
     DOM.modalWeeklyOverview.addEventListener('click', (e) => {
       if (e.target === DOM.modalWeeklyOverview) DOM.modalWeeklyOverview.classList.remove('active');
+    });
+  }
+
+  // --- Calendar View Toggle: ปฏิทินรายเดือน vs สรุป 7 วัน ---
+  if (DOM.btnTabCalendarView && DOM.btnTabWeeklyView) {
+    DOM.btnTabCalendarView.addEventListener('click', () => {
+      DOM.btnTabCalendarView.classList.add('active');
+      DOM.btnTabWeeklyView.classList.remove('active');
+      if (DOM.calendarViewContainer) DOM.calendarViewContainer.style.display = 'flex';
+      if (DOM.weeklyTableContainer) DOM.weeklyTableContainer.style.display = 'none';
+      if (DOM.modalHeadingTitle) DOM.modalHeadingTitle.textContent = 'ปฏิทินสีเสื้อมงคลประจำเดือน';
+    });
+    DOM.btnTabWeeklyView.addEventListener('click', () => {
+      DOM.btnTabWeeklyView.classList.add('active');
+      DOM.btnTabCalendarView.classList.remove('active');
+      if (DOM.calendarViewContainer) DOM.calendarViewContainer.style.display = 'none';
+      if (DOM.weeklyTableContainer) DOM.weeklyTableContainer.style.display = 'block';
+      if (DOM.modalHeadingTitle) DOM.modalHeadingTitle.textContent = 'ตารางสีเสื้อมงคล 7 วัน';
+    });
+  }
+
+  // --- Calendar Navigation & Actions ---
+  if (DOM.btnPrevMonth) {
+    DOM.btnPrevMonth.addEventListener('click', () => {
+      changeCalendarMonth(-1);
+    });
+  }
+  if (DOM.btnNextMonth) {
+    DOM.btnNextMonth.addEventListener('click', () => {
+      changeCalendarMonth(1);
+    });
+  }
+  if (DOM.btnCurrentMonth) {
+    DOM.btnCurrentMonth.addEventListener('click', () => {
+      goToCurrentMonth();
+    });
+  }
+  if (DOM.btnApplyCalDate) {
+    DOM.btnApplyCalDate.addEventListener('click', () => {
+      applySelectedCalendarDate();
     });
   }
 
@@ -564,6 +645,33 @@ function switchMainAuthTab(mode) {
   }
 }
 
+let loadingTimer = null;
+
+function showLoading(title, initialStatus, initialTip) {
+  if (!DOM.globalLoadingOverlay) return;
+  if (DOM.loadingTitle) DOM.loadingTitle.textContent = title || 'กำลังประมวลผลดวงชะตา';
+  if (DOM.loadingStatus) DOM.loadingStatus.textContent = initialStatus || 'กำลังเชื่อมต่อ Google Sheets & AI...';
+  if (DOM.loadingProgressFill) DOM.loadingProgressFill.style.width = '20%';
+  if (DOM.loadingStepTips) DOM.loadingStepTips.textContent = initialTip || '✨ ระบบกำลังคำนวณสีมงคลเฉพาะบุคคลตามวันเกิดของคุณ...';
+  DOM.globalLoadingOverlay.style.display = 'flex';
+}
+
+function updateLoadingProgress(status, percent, tip) {
+  if (DOM.loadingStatus && status) DOM.loadingStatus.textContent = status;
+  if (DOM.loadingProgressFill && typeof percent === 'number') DOM.loadingProgressFill.style.width = `${percent}%`;
+  if (DOM.loadingStepTips && tip) DOM.loadingStepTips.textContent = tip;
+}
+
+function hideLoading() {
+  if (loadingTimer) {
+    clearInterval(loadingTimer);
+    loadingTimer = null;
+  }
+  if (DOM.globalLoadingOverlay) {
+    DOM.globalLoadingOverlay.style.display = 'none';
+  }
+}
+
 async function handleMainLogin() {
   const email = DOM.authLoginEmail.value.trim();
   const password = DOM.authLoginPassword.value;
@@ -581,6 +689,20 @@ async function handleMainLogin() {
     submitBtn.textContent = '⏳ กำลังเข้าสู่ระบบ...';
   }
 
+  showLoading('กำลังเข้าสู่ระบบ Look&Luck', '🔐 กำลังตรวจสอบข้อมูลผู้ใช้งาน...', '✨ กำลังค้นหาข้อมูลประวัติดวงชะตาและ Personal Color');
+
+  let step = 0;
+  const loginSteps = [
+    { s: '📊 กำลังดึงข้อมูลสมาชิกจาก Google Sheets...', p: 60, t: '✨ โหลดข้อมูลวันเกิด ลัคนา และ Personal Color' },
+    { s: '✨ กำลังจัดเตรียมระบบพยากรณ์สีมงคลประจำวัน...', p: 90, t: '✨ เตรียมพร้อมสูตรการแต่งกายสำหรับคุณ' }
+  ];
+  loadingTimer = setInterval(() => {
+    if (step < loginSteps.length) {
+      updateLoadingProgress(loginSteps[step].s, loginSteps[step].p, loginSteps[step].t);
+      step++;
+    }
+  }, 1400);
+
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
@@ -588,6 +710,8 @@ async function handleMainLogin() {
       body: JSON.stringify({ action: 'login', email, password })
     });
     const data = await res.json();
+    hideLoading();
+
     if (submitBtn) {
       submitBtn.disabled = false;
       submitBtn.textContent = originalBtnText;
@@ -614,6 +738,7 @@ async function handleMainLogin() {
       return;
     }
   } catch(err) {
+    hideLoading();
     if (submitBtn) {
       submitBtn.disabled = false;
       submitBtn.textContent = originalBtnText;
@@ -650,6 +775,21 @@ async function handleMainRegister() {
     submitBtn.textContent = '⏳ กำลังบันทึกข้อมูลสมาชิกลงชีต...';
   }
 
+  showLoading('กำลังบันทึกข้อมูลสมาชิกใหม่', '✨ กำลังประมวลผลดวงกำเนิดและ Personal Color...', '✨ กำลังวิเคราะห์พลังงานดาวและจับคู่สีมงคลเฉพาะบุคคล');
+
+  let step = 0;
+  const regSteps = [
+    { s: '📊 กำลังส่งข้อมูลไปยัง Google Sheets (DATA โชคดีทุกวัน)...', p: 48, t: '✨ กำลังเชื่อมโยงฐานข้อมูลคลาวด์อย่างปลอดภัย' },
+    { s: '🛡️ กำลังสร้างเกราะกรองสีกาลกิณีเฉพาะวันเกิดของคุณ...', p: 78, t: '✨ ตรวจสอบความปลอดภัย 100% ป้องกันสีขัดแย้ง' },
+    { s: '🎉 ใกล้เสร็จแล้ว กำลังเปิดบัญชีผู้ใช้ Look&Luck...', p: 96, t: '✨ ยินดีต้อนรับสู่โปรแกรมโชคดีทุกวันของคุณ' }
+  ];
+  loadingTimer = setInterval(() => {
+    if (step < regSteps.length) {
+      updateLoadingProgress(regSteps[step].s, regSteps[step].p, regSteps[step].t);
+      step++;
+    }
+  }, 1600);
+
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
@@ -668,6 +808,8 @@ async function handleMainRegister() {
     });
 
     const data = await res.json();
+    hideLoading();
+
     if (submitBtn) {
       submitBtn.disabled = false;
       submitBtn.textContent = originalBtnText;
@@ -694,6 +836,7 @@ async function handleMainRegister() {
       return;
     }
   } catch(err) {
+    hideLoading();
     if (submitBtn) {
       submitBtn.disabled = false;
       submitBtn.textContent = originalBtnText;
@@ -802,12 +945,14 @@ function updateDayPillsUI() {
 function updateCurrentDate() {
   const days = ['วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'];
   const months = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
-  const now = new Date();
-  const dayName = days[now.getDay()];
-  const dateNum = now.getDate();
-  const monthName = months[now.getMonth()];
-  const yearTh = now.getFullYear() + 543;
-  DOM.currentDateDisplay.textContent = `${dayName}ที่ ${dateNum} ${monthName} ${yearTh}`;
+  const targetDate = AppState.selectedFullDate || new Date();
+  const dayName = days[targetDate.getDay()];
+  const dateNum = targetDate.getDate();
+  const monthName = months[targetDate.getMonth()];
+  const yearTh = targetDate.getFullYear() + 543;
+  if (DOM.currentDateDisplay) {
+    DOM.currentDateDisplay.textContent = `${dayName}ที่ ${dateNum} ${monthName} ${yearTh}`;
+  }
 }
 
 function setBottomStyle(style) {
@@ -894,7 +1039,7 @@ function updateDailyColorsAndAdvice() {
         DOM.tagProtectionStatus.textContent = 'ปรับสีปลอดภัยแล้ว';
       }
       if (DOM.txtPersonalizedDetail) {
-        DOM.txtPersonalizedDetail.textContent = `เนื่องจากคุณเกิดวัน${userBirthDay} (มี ${evalData.natalKalakini} เป็นสีกาลกิณีประจำตัว) ระบบได้คัดกรองสีที่ขัดแย้งออก [${evalData.allConflicts.join(', ')}] และแนะนำเฉดสีที่ปลอดภัยเสริมดวงให้คุณแล้ว 100%!`;
+        DOM.txtPersonalizedDetail.textContent = `เกิดวัน${userBirthDay} (กาลกิณี: ${evalData.natalKalakini}) กรองสีที่ขัดแย้งออก [${evalData.allConflicts.join(', ')}] แนะนำเฉพาะเฉดสีที่ปลอดภัย 100%`;
       }
     } else {
       DOM.boxPersonalizedNotice.classList.remove('warning');
@@ -904,57 +1049,68 @@ function updateDailyColorsAndAdvice() {
         DOM.tagProtectionStatus.textContent = 'ปลอดภัย 100%';
       }
       if (DOM.txtPersonalizedDetail) {
-        DOM.txtPersonalizedDetail.textContent = `สีมงคลประจำวัน${targetDay}ส่งพลังเกื้อหนุนดีเยี่ยมกับวันเกิดของคุณ ไร้สีกาลกิณีขัดแย้ง สวมใส่ได้อย่างมั่นใจเต็มร้อย`;
+        DOM.txtPersonalizedDetail.textContent = `สีมงคลวัน${targetDay}เกื้อหนุนดวงชะตา ไร้สีกาลกิณีขัดแย้ง สวมใส่ได้อย่างมั่นใจ`;
       }
     }
   }
 
-  // 4. คำแนะนำการแต่งกายตามเป้าหมาย (Goal)
+  // 4. คำแนะนำการแต่งกายตามเป้าหมาย (Goal) - รูปแบบหัวข้อกระชับ
   let activeColors = evalData.activeCat.safeName;
   let activeHex = evalData.activeCat.safeHex;
   let headline = '';
-  const userGender = user.gender || 'female';
+  const userGender = (user && user.gender) || 'female';
   let bottomText = '';
   if (userGender === 'male') {
-    bottomText = 'กางเกงสแล็คหรือกางเกงชิโน่สีเบจ/ครีม';
+    bottomText = 'กางเกงสแล็คหรือชิโน่สีเบจ/ครีม';
   } else if (userGender === 'female') {
     bottomText = AppState.bottomStyle === 'skirt' ? 'กระโปรงทรงเอสีเบจ/ครีม' : 'กางเกงสแล็คทรงโมเดิร์นสีเบจ/ครีม';
   } else {
     bottomText = 'กางเกงขายาวทรงกระบอกหรือกระโปรงมินิมอลสีเบจ';
   }
 
+  let topText = '';
+  let accText = '';
+
   if (goal === 'work') {
-    headline = `แนะนำลุคเสริมการงาน &amp; เจรจาในวัน${targetDay} (เดช)`;
-    outfitDesc = userGender === 'male'
-      ? `เลือกสวมใส่เสื้อเชิ้ตหรือเสื้อโปโลสี ${activeColors} จับคู่กับ${bottomText} ให้บุคลิกดูภูมิฐาน ทรงอำนาจ และเจรจาราบรื่น`
-      : `เลือกสวมใส่เสื้อเชิ้ตหรือเบลเซอร์สี ${activeColors} จับคู่กับ${bottomText} ให้บุคลิกดูสง่างาม มีบารมี และเจรจาสำเร็จ`;
+    headline = `👔 เสริมการงาน & เจรจา (เดช)`;
+    topText = userGender === 'male' ? `เสื้อเชิ้ต/โปโลสี${activeColors.split(',')[0] || activeColors}` : `เสื้อเชิ้ต/เบลเซอร์สี${activeColors.split(',')[0] || activeColors}`;
+    accText = 'นาฬิกาโลหะสีทอง/เงิน หรือกระเป๋าหนังทรงสุภาพ';
   } else if (goal === 'money') {
-    headline = `แนะนำลุคเรียกทรัพย์ &amp; โชคลาภในวัน${targetDay} (ศรี)`;
-    outfitDesc = `ดึงดูดเงินทองด้วยเสื้อผ้ากลุ่มสี ${activeColors} จับคู่กับ${bottomText} เสริมเครื่องประดับเพื่อรวมพลังความมั่งคั่ง`;
+    headline = `💰 เรียกทรัพย์ & โชคลาภพุ่ง (ศรี)`;
+    topText = userGender === 'male' ? `เสื้อเชิ้ต/สเวตเตอร์สี${activeColors.split(',')[0] || activeColors}` : `เสื้อเบลาส์/คาร์ดิแกนสี${activeColors.split(',')[0] || activeColors}`;
+    accText = 'กระเป๋าสตางค์โทนนำโชค หรือเครื่องประดับโทนสว่างแวววาว';
   } else if (goal === 'love') {
-    headline = `แนะนำลุคเสริมความรัก &amp; เสน่ห์เมตตาในวัน${targetDay}`;
-    outfitDesc = `สวมใส่เสื้อผ้าโทนสีละมุน ${activeColors} ดีไซน์สบายตา จับคู่กับ${bottomText} ช่วยให้ผู้คนรอบข้างรู้สึกเข้าถึงง่ายและเกิดความรักใคร่เอ็นดู`;
+    headline = `💖 เสน่ห์เมตตา & ผู้ใหญ่เอ็นดู`;
+    topText = userGender === 'male' ? `เสื้อเชิ้ตคอจีน/โปโลสี${activeColors.split(',')[0] || activeColors}` : `เสื้อโทนละมุน/เดรสสี${activeColors.split(',')[0] || activeColors}`;
+    accText = 'สร้อยคอหรือต่างหูมินิมอล น้ำหอมกลิ่นดอกไม้สดชื่น';
   } else {
     activeColors = 'ขาว, ครีม, เทาอ่อน, เขียวธรรมชาติ';
     activeHex = ['#FFFDD0', '#E0E0E0', '#81C784'];
-    headline = `แนะนำลุควันพักผ่อน &amp; ผ่อนคลายจิตใจในวัน${targetDay}`;
-    outfitDesc = `เน้นเสื้อผ้าเนื้อผ้าคอตตอนหรือลินินสี ${activeColors} สวมคู่กับ${bottomText} เพื่อบำบัดความเหนื่อยล้า คืนพลังงานบริสุทธิ์ให้ร่างกาย`;
+    headline = `🌿 ผ่อนคลายกายใจ & สมดุลพลัง`;
+    topText = 'เสื้อยืดคอตตอน/เสื้อลินินเนื้อโปร่งสบาย';
+    accText = 'แว่นกันแดดทรงคลาสสิก รองเท้าสนีกเกอร์ใส่สบาย';
   }
 
-  // Personal Color Adaptation
+  // Personal Color Note
   let seasonNote = '';
   if (season === 'Spring') {
-    seasonNote = ' (ปรับสำหรับ Warm Tone สว่าง: แนะนำเลือกเฉดที่สดใสสว่างและอบอุ่น เช่น ส้มคอรัลหรือเหลืองนวล)';
+    seasonNote = 'Spring: เน้นเฉดสดใสสว่าง';
   } else if (season === 'Autumn') {
-    seasonNote = ' (ปรับสำหรับ Warm Tone ลึก: แนะนำเลือกเฉดเอิร์ธโทนลึก เช่น เทอราคอตตาหรือช็อกโกแลต)';
+    seasonNote = 'Autumn: เน้นเฉดเอิร์ธโทนลึก';
   } else if (season === 'Summer') {
-    seasonNote = ' (ปรับสำหรับ Cool Tone สว่าง: แนะนำเลือกเฉดพาสเทลนุ่มนวล เช่น ลาเวนเดอร์หรือฟ้าเบบี้บลู)';
+    seasonNote = 'Summer: เน้นเฉดพาสเทลนุ่มนวล';
   } else {
-    seasonNote = ' (ปรับสำหรับ Cool Tone คมชัด: แนะนำเลือกเฉดที่มีคอนทราสต์ชัดเจน เช่น รอยัลบลูหรือเบอร์กันดี)';
+    seasonNote = 'Winter: เน้นเฉดคอนทราสต์ชัดเจน';
   }
 
-  DOM.txtAdviceTitle.innerHTML = headline;
-  DOM.txtAdviceDescription.textContent = outfitDesc + seasonNote;
+  if (DOM.txtAdviceTitle) DOM.txtAdviceTitle.innerHTML = headline;
+  if (DOM.txtAdviceDescription) DOM.txtAdviceDescription.textContent = `${topText} แมตช์คู่กับ${bottomText} (${seasonNote})`;
+
+  // กรอกข้อมูลลงหัวข้อย่อยแบบกะทัดรัด (Compact Topics)
+  if (DOM.topicValColor) DOM.topicValColor.textContent = activeColors;
+  if (DOM.topicValTop) DOM.topicValTop.textContent = topText;
+  if (DOM.topicValBottom) DOM.topicValBottom.textContent = bottomText;
+  if (DOM.topicValAcc) DOM.topicValAcc.textContent = accText;
 
   // 5. อัปเดตสีเสื้อเวกเตอร์ SVG
   if (activeHex.length > 0 && DOM.pathShirt) {
@@ -965,31 +1121,190 @@ function updateDailyColorsAndAdvice() {
   updateFlatlayCaption();
 
   // Render color dots
-  DOM.adviceColorBar.innerHTML = '';
-  activeHex.forEach(hex => {
-    const dot = document.createElement('div');
-    dot.className = 'advice-color-dot';
-    dot.style.backgroundColor = hex;
-    dot.title = hex;
-    DOM.adviceColorBar.appendChild(dot);
-  });
+  if (DOM.adviceColorBar) {
+    DOM.adviceColorBar.innerHTML = '';
+    activeHex.forEach(hex => {
+      const dot = document.createElement('div');
+      dot.className = 'advice-color-dot';
+      dot.style.backgroundColor = hex;
+      dot.title = hex;
+      DOM.adviceColorBar.appendChild(dot);
+    });
+  }
 
-  // 6. เทวดานพเคราะห์ประจำวันเป้าหมาย
+  // 6. เทวดานพเคราะห์ประจำวันเป้าหมาย (หัวข้อกระชับ)
   const cleanTarget = (targetDay === 'พุธ (กลางวัน)' || targetDay === 'พุธ (กลางคืน)') ? 'พุธ (กลางวัน)' : targetDay;
   const deity = LOCAL_DEITY_TRIVIA[cleanTarget] || LOCAL_DEITY_TRIVIA['จันทร์'];
-  DOM.txtDeityName.textContent = deity.name;
-  DOM.txtDeityTrait.textContent = deity.trait;
-  DOM.txtDeityStory.textContent = deity.story;
+  if (DOM.txtDeityName) DOM.txtDeityName.textContent = deity.name;
+  if (DOM.txtDeityTrait) DOM.txtDeityTrait.textContent = deity.trait;
+  if (DOM.txtDeityStory) DOM.txtDeityStory.textContent = deity.story;
 
   // 7. กระเป๋าสตางค์และอัญมณี (อิงตามวันเกิดของผู้ใช้เพื่อพลังงานเฉพาะตัว)
   const wg = LOCAL_WALLETS[userBirthDay] || LOCAL_WALLETS['จันทร์'];
-  DOM.txtWalletLucky.textContent = wg.walletLucky;
-  DOM.txtWalletAvoid.textContent = `เลี่ยง: ${wg.walletAvoid}`;
-  DOM.txtGemstone.textContent = wg.gem;
-  DOM.txtGemstoneProp.textContent = wg.gemProp;
+  if (DOM.txtWalletLucky) DOM.txtWalletLucky.textContent = wg.walletLucky;
+  if (DOM.txtWalletAvoid) DOM.txtWalletAvoid.textContent = `เลี่ยง: ${wg.walletAvoid}`;
+  if (DOM.txtGemstone) DOM.txtGemstone.textContent = wg.gem;
+  if (DOM.txtGemstoneProp) DOM.txtGemstoneProp.textContent = wg.gemProp;
 
   // 8. อัปเดตกราฟเรดาร์
   renderRadarChart();
+}
+
+/**
+ * ปฏิทินสีเสื้อมงคลรายเดือน (Monthly Calendar 30-31 วัน)
+ */
+function renderMonthlyCalendar() {
+  if (!DOM.calendarGrid) return;
+  const user = AppState.currentUser;
+  const userBirthDay = (user && user.birthDay) ? user.birthDay : 'จันทร์';
+  const calDate = AppState.calendarDate || new Date();
+  const year = calDate.getFullYear();
+  const month = calDate.getMonth(); // 0-indexed
+
+  const thaiMonths = [
+    'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+    'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+  ];
+  const dayNames = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+
+  // อัปเดตป้ายชื่อเดือน-ปี
+  if (DOM.currentMonthLabel) {
+    DOM.currentMonthLabel.textContent = `${thaiMonths[month]} ${year + 543}`;
+  }
+
+  // วันแรกของเดือน (0 = วันอาทิตย์, 6 = วันเสาร์) และจำนวนวันทั้งหมด
+  const firstDayIndex = new Date(year, month, 1).getDay();
+  const totalDays = new Date(year, month + 1, 0).getDate();
+
+  DOM.calendarGrid.innerHTML = '';
+
+  const today = new Date();
+  const isThisMonth = (today.getFullYear() === year && today.getMonth() === month);
+  const todayDateNum = today.getDate();
+
+  // สร้างช่องว่าง Padding ด้านหน้า
+  for (let i = 0; i < firstDayIndex; i++) {
+    const emptyCell = document.createElement('div');
+    emptyCell.className = 'cal-day-cell empty';
+    DOM.calendarGrid.appendChild(emptyCell);
+  }
+
+  // วันที่กำลังเลือกดู Preview ใน Modal
+  const previewDate = AppState.calSelectedPreviewDate || (AppState.selectedFullDate || today);
+  const isPreviewThisMonth = (previewDate.getFullYear() === year && previewDate.getMonth() === month);
+  const previewDayNum = isPreviewThisMonth ? previewDate.getDate() : -1;
+
+  // วนลูปสร้างช่องวันในเดือน (1 ถึง totalDays)
+  for (let d = 1; d <= totalDays; d++) {
+    const thisDateObj = new Date(year, month, d);
+    const dayOfWeek = thisDateObj.getDay();
+    const dayThaiName = dayNames[dayOfWeek];
+
+    // ประเมินสีมงคลตามวันนั้น
+    const evalData = evaluateTransitingColors(dayThaiName, userBirthDay, 'work');
+
+    const cell = document.createElement('div');
+    cell.className = 'cal-day-cell';
+    if (isThisMonth && d === todayDateNum) {
+      cell.classList.add('today');
+    }
+    if (d === previewDayNum) {
+      cell.classList.add('selected');
+    }
+
+    const workHex = (evalData.work.safeHex && evalData.work.safeHex[0]) || '#2E7D32';
+    const moneyHex = (evalData.money.safeHex && evalData.money.safeHex[0]) || '#F59E0B';
+    const loveHex = (evalData.love.safeHex && evalData.love.safeHex[0]) || '#EC4899';
+
+    cell.innerHTML = `
+      <span class="cal-day-num">${d}</span>
+      <div class="cal-dots-row">
+        <span class="cal-dot" style="background-color: ${workHex};" title="งาน"></span>
+        <span class="cal-dot" style="background-color: ${moneyHex};" title="เงิน"></span>
+        <span class="cal-dot" style="background-color: ${loveHex};" title="รัก"></span>
+      </div>
+    `;
+
+    cell.addEventListener('click', () => {
+      AppState.calSelectedPreviewDate = thisDateObj;
+      const allCells = DOM.calendarGrid.querySelectorAll('.cal-day-cell');
+      allCells.forEach(c => c.classList.remove('selected'));
+      cell.classList.add('selected');
+
+      renderCalendarPreview(thisDateObj);
+    });
+
+    DOM.calendarGrid.appendChild(cell);
+  }
+
+  // อัปเดตการแสดงผลกล่อง Preview
+  renderCalendarPreview(previewDate);
+}
+
+function renderCalendarPreview(dateObj) {
+  if (!DOM.calSelectedDayPreview) return;
+  const user = AppState.currentUser;
+  const userBirthDay = (user && user.birthDay) ? user.birthDay : 'จันทร์';
+  const targetDate = dateObj || AppState.calSelectedPreviewDate || (AppState.selectedFullDate || new Date());
+
+  const thaiMonths = [
+    'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+    'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+  ];
+  const dayNames = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+
+  const d = targetDate.getDate();
+  const m = targetDate.getMonth();
+  const y = targetDate.getFullYear();
+  const dayThaiName = dayNames[targetDate.getDay()];
+
+  const today = new Date();
+  const isToday = (today.getFullYear() === y && today.getMonth() === m && today.getDate() === d);
+
+  if (DOM.calPreviewDateText) {
+    DOM.calPreviewDateText.textContent = `วัน${dayThaiName}ที่ ${d} ${thaiMonths[m]} ${y + 543}`;
+  }
+  if (DOM.calPreviewBadge) {
+    DOM.calPreviewBadge.style.display = isToday ? 'inline-block' : 'none';
+  }
+
+  // คำนวณสีสำหรับวันเป้าหมาย
+  const evalData = evaluateTransitingColors(dayThaiName, userBirthDay, 'work');
+  if (DOM.calPrevWork) DOM.calPrevWork.textContent = evalData.work.safeName;
+  if (DOM.calPrevMoney) DOM.calPrevMoney.textContent = evalData.money.safeName;
+  if (DOM.calPrevLove) DOM.calPrevLove.textContent = evalData.love.safeName;
+  if (DOM.calPrevKala) DOM.calPrevKala.textContent = evalData.dayRules.kalakini.name;
+}
+
+function changeCalendarMonth(offset) {
+  if (!AppState.calendarDate) AppState.calendarDate = new Date();
+  const cur = AppState.calendarDate;
+  AppState.calendarDate = new Date(cur.getFullYear(), cur.getMonth() + offset, 1);
+  renderMonthlyCalendar();
+}
+
+function goToCurrentMonth() {
+  const today = new Date();
+  AppState.calendarDate = new Date(today.getFullYear(), today.getMonth(), 1);
+  AppState.calSelectedPreviewDate = today;
+  renderMonthlyCalendar();
+}
+
+function applySelectedCalendarDate() {
+  const selectedDate = AppState.calSelectedPreviewDate || new Date();
+  const dayNames = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+  const dayName = dayNames[selectedDate.getDay()];
+
+  AppState.selectedFullDate = selectedDate;
+  AppState.selectedDay = dayName;
+
+  updateCurrentDate();
+  updateDayPillsUI();
+  updateDailyColorsAndAdvice();
+
+  if (DOM.modalWeeklyOverview) {
+    DOM.modalWeeklyOverview.classList.remove('active');
+  }
 }
 
 /**
@@ -1048,6 +1363,8 @@ function renderWeeklyMatrix() {
 
     card.addEventListener('click', () => {
       AppState.selectedDay = day;
+      AppState.selectedFullDate = null;
+      updateCurrentDate();
       updateDayPillsUI();
       updateDailyColorsAndAdvice();
       if (DOM.modalWeeklyOverview) DOM.modalWeeklyOverview.classList.remove('active');
@@ -1124,16 +1441,16 @@ function renderRadarChart() {
     else DOM.radarScoreLevel.textContent = 'เกณฑ์ปานกลาง';
   }
 
-  // คำทำนายเชิงลึกตามมิติที่เด่นที่สุด
+  // คำทำนายเชิงลึกตามมิติที่เด่นที่สุด (หัวข้อกระชับ)
   if (DOM.radarInsightText) {
     if (goal === 'money' || scores.money >= 92) {
-      DOM.radarInsightText.textContent = `วันนี้คลื่นพลังการเงิน (${scores.money}%) พุ่งสูงเป็นพิเศษ แนะนำสวมใส่สีเสริมทรัพย์เพื่อกระตุ้นโชคลาภและการค้าขาย`;
+      DOM.radarInsightText.textContent = `⚡ พลังการเงิน (${scores.money}%) โดดเด่นเป็นพิเศษ แนะนำสวมใส่สีเสริมทรัพย์`;
     } else if (goal === 'work' || scores.work >= 92) {
-      DOM.radarInsightText.textContent = `วันนี้คลื่นพลังอำนาจบารมี (${scores.work}%) โดดเด่น หนุนนำให้การเจรจาและการตัดสินใจได้รับความเชื่อมั่น`;
+      DOM.radarInsightText.textContent = `⚡ พลังอำนาจบารมี (${scores.work}%) โดดเด่น หนุนนำการเจรจาประสบผลสำเร็จ`;
     } else if (goal === 'love' || scores.love >= 92) {
-      DOM.radarInsightText.textContent = `วันนี้เสน่ห์เมตตามหานิยม (${scores.love}%) ส่องประกาย ช่วยให้การประสานงานและการออกเดตราบรื่นน่าประทับใจ`;
+      DOM.radarInsightText.textContent = `⚡ พลังเสน่ห์เมตตา (${scores.love}%) ส่องประกาย ผู้คนรอบข้างรักใคร่เอ็นดู`;
     } else {
-      DOM.radarInsightText.textContent = `วันนี้ความสมดุลกายใจ (${scores.health}%) และสติปัญญา (${scores.wisdom}%) ยอดเยี่ยม เหมาะแก่การวางแผนระยะยาว`;
+      DOM.radarInsightText.textContent = `⚡ พลังกายใจ (${scores.health}%) & สติปัญญา (${scores.wisdom}%) สมดุลดีเยี่ยม`;
     }
   }
 
