@@ -378,6 +378,31 @@
             </div>
           </div>
 
+          <!-- Dynamic Recommendation Card (โชว์เฉพาะหัวข้อกระชับ ในหน้า Home) -->
+          <div class="card outfit-advice-card compact-topic" id="cardHomeOutfitAdvice">
+            <div class="card-tag" id="tagPersonalColorMatch">PERSONAL COLOR COMPATIBLE</div>
+            <h4 class="advice-headline" id="txtAdviceTitle">แนะนำการแต่งกายเจรจางาน</h4>
+            
+            <div class="advice-topic-grid" id="adviceTopicGrid">
+              <div class="advice-topic-item">
+                <span class="topic-label">🎨 โทนสีแนะนำ:</span>
+                <strong class="topic-value" id="topicValColor">ส้ม, ครีม</strong>
+              </div>
+              <div class="advice-topic-item">
+                <span class="topic-label">👔 ชิ้นบน:</span>
+                <strong class="topic-value" id="topicValTop">เสื้อเชิ้ต / เบลเซอร์</strong>
+              </div>
+              <div class="advice-topic-item">
+                <span class="topic-label">👖 ชิ้นล่าง:</span>
+                <strong class="topic-value" id="topicValBottom">กางเกงสแล็คสีเบจ</strong>
+              </div>
+              <div class="advice-topic-item">
+                <span class="topic-label">✨ ทริกเสริม:</span>
+                <strong class="topic-value" id="topicValAcc">เครื่องประดับโทนทองนวล</strong>
+              </div>
+            </div>
+          </div>
+
           <!-- Deity of the Day Card (เกร็ดความรู้เทวดานพเคราะห์ - หัวข้อกระชับ) -->
           <div class="card deity-card compact-topic">
             <div class="deity-badge">เทวดานพเคราะห์ประจำวัน</div>
@@ -1097,12 +1122,14 @@
             </div>
           </div>
 
-        <!-- TAB 2: ตู้เสื้อผ้า & Personal Color -->
+        </section>
+
+        <!-- TAB 3: ตู้เสื้อผ้า & Personal Color (พร้อมคำแนะนำและดวง 5 มิติฉบับเต็ม) -->
         <section class="tab-page" id="tabWardrobe">
           <div class="card-header-fashion">
-            <span class="section-label">SMART WARDROBE</span>
+            <span class="section-label">SMART WARDROBE &amp; STYLING</span>
             <h2 class="section-title">ตู้เสื้อผ้า &amp; Personal Color</h2>
-            <p class="section-desc">จับคู่สีมงคลเข้ากับอันเดอร์โทนผิวของคุณอย่างลงตัว</p>
+            <p class="section-desc">วิเคราะห์การแต่งกายเฉพาะบุคคล เจาะลึกสูตรสี และคลื่นพลังงาน 5 มิติ</p>
           </div>
 
           <!-- Personal Color Season Selector -->
@@ -1153,32 +1180,43 @@
             </div>
           </div>
 
-          <!-- Dynamic Recommendation Card (PERSONAL COLOR COMPATIBLE) -->
-          <div class="card outfit-advice-card compact-topic">
-            <div class="card-tag" id="tagPersonalColorMatch">PERSONAL COLOR COMPATIBLE</div>
-            <h4 class="advice-headline" id="txtAdviceTitle">แนะนำการแต่งกายเจรจางาน</h4>
+          <!-- Full Outfit Styling & Personal Color Detail Card (รายละเอียดฉบับเต็มในหน้าตู้เสื้อผ้า) -->
+          <div class="card outfit-advice-card wardrobe-detail-card" id="cardWardrobeDetailedAdvice">
+            <div class="card-tag">PERSONAL COLOR &amp; FULL STYLING DETAILS</div>
+            <h4 class="advice-headline" id="txtWardrobeAdviceTitle">แนะนำการแต่งกายและสูตรแมตช์ชุดฉบับสมบูรณ์</h4>
+            <p class="advice-desc" id="txtWardrobeAdviceDesc">
+              คำนวณสูตรการแต่งกายเฉพาะบุคคล แมตช์เสื้อและท่อนล่างให้รับกับพลังงานประจำวันและอันเดอร์โทนผิวของคุณอย่างสมบูรณ์แบบ
+            </p>
             
-            <div class="advice-topic-grid" id="adviceTopicGrid">
+            <!-- Full Topic Breakdown -->
+            <div class="advice-topic-grid">
               <div class="advice-topic-item">
                 <span class="topic-label">🎨 โทนสีแนะนำ:</span>
-                <strong class="topic-value" id="topicValColor">ส้ม, ครีม</strong>
+                <strong class="topic-value" id="topicWardrobeColor">ส้ม, ครีม</strong>
               </div>
               <div class="advice-topic-item">
                 <span class="topic-label">👔 ชิ้นบน:</span>
-                <strong class="topic-value" id="topicValTop">เสื้อเชิ้ต / เบลเซอร์</strong>
+                <strong class="topic-value" id="topicWardrobeTop">เสื้อเชิ้ต / เบลเซอร์</strong>
               </div>
               <div class="advice-topic-item">
                 <span class="topic-label">👖 ชิ้นล่าง:</span>
-                <strong class="topic-value" id="topicValBottom">กางเกงสแล็คสีเบจ</strong>
+                <strong class="topic-value" id="topicWardrobeBottom">กางเกงสแล็คสีเบจ</strong>
               </div>
               <div class="advice-topic-item">
                 <span class="topic-label">✨ ทริกเสริม:</span>
-                <strong class="topic-value" id="topicValAcc">เครื่องประดับโทนทองนวล</strong>
+                <strong class="topic-value" id="topicWardrobeAcc">เครื่องประดับโทนทองนวล</strong>
               </div>
             </div>
-            
-            <div class="advice-color-bar" id="adviceColorBar">
-              <!-- Dynamic color chips -->
+
+            <!-- Dynamic Color Bar -->
+            <div class="advice-color-bar" id="wardrobeAdviceColorBar"></div>
+
+            <!-- Deity Full Mythology & Lore in Wardrobe -->
+            <div class="wardrobe-deity-lore-box" id="wardrobeDeityLoreBox">
+              <span class="lore-label">🪐 อิทธิพลดาวและเทวดานพเคราะห์:</span>
+              <p class="lore-desc" id="txtWardrobeDeityStory">
+                สร้างจากเทพธิดา 15 นาง ห่อด้วยผ้าสีขาวนวล จึงมีสีกายขาวนวล อ่อนโยน มีเสน่ห์ เมตตามหานิยม
+              </p>
             </div>
           </div>
 
@@ -1572,9 +1610,9 @@
     </div>
   </div>
 
-  <script src="tarot-data.js?v=2.2.0"></script>
-  <script src="siamsi-data.js?v=2.2.0"></script>
-  <script src="rune-data.js?v=2.2.0"></script>
-  <script src="app.js?v=2.2.0"></script>
+  <script src="tarot-data.js?v=2.3.1"></script>
+  <script src="siamsi-data.js?v=2.3.1"></script>
+  <script src="rune-data.js?v=2.3.1"></script>
+  <script src="app.js?v=2.3.1"></script>
 </body>
 </html>

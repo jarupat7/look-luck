@@ -289,6 +289,23 @@ const DOM = {
   txtAdviceTitle: document.getElementById('txtAdviceTitle'),
   txtAdviceDescription: document.getElementById('txtAdviceDescription'),
   adviceColorBar: document.getElementById('adviceColorBar'),
+  topicValColor: document.getElementById('topicValColor'),
+  topicValTop: document.getElementById('topicValTop'),
+  topicValBottom: document.getElementById('topicValBottom'),
+  topicValAcc: document.getElementById('topicValAcc'),
+  cardHomeOutfitAdvice: document.getElementById('cardHomeOutfitAdvice'),
+
+  // Wardrobe Detailed Advice & Lore
+  cardWardrobeDetailedAdvice: document.getElementById('cardWardrobeDetailedAdvice'),
+  txtWardrobeAdviceTitle: document.getElementById('txtWardrobeAdviceTitle'),
+  txtWardrobeAdviceDesc: document.getElementById('txtWardrobeAdviceDesc'),
+  topicWardrobeColor: document.getElementById('topicWardrobeColor'),
+  topicWardrobeTop: document.getElementById('topicWardrobeTop'),
+  topicWardrobeBottom: document.getElementById('topicWardrobeBottom'),
+  topicWardrobeAcc: document.getElementById('topicWardrobeAcc'),
+  wardrobeAdviceColorBar: document.getElementById('wardrobeAdviceColorBar'),
+  txtWardrobeDeityStory: document.getElementById('txtWardrobeDeityStory'),
+
   txtDeityName: document.getElementById('txtDeityName'),
   txtDeityTrait: document.getElementById('txtDeityTrait'),
   txtDeityStory: document.getElementById('txtDeityStory'),
@@ -309,7 +326,6 @@ const DOM = {
   itemScoreHealth: document.getElementById('itemScoreHealth'),
   itemScoreWisdom: document.getElementById('itemScoreWisdom'),
 
-  
   // Tab Wardrobe
   seasonCards: document.querySelectorAll('.season-card'),
   
@@ -726,9 +742,19 @@ function setupEventListeners() {
   }
 
   // --- Oracle Subtab Toggling (Tarot vs Siamsi vs Rune) ---
-  if (DOM.btnOracleTarot) DOM.btnOracleTarot.addEventListener('click', () => switchOracleSubtab('tarot'));
-  if (DOM.btnOracleSiamsi) DOM.btnOracleSiamsi.addEventListener('click', () => switchOracleSubtab('siamsi'));
-  if (DOM.btnOracleRune) DOM.btnOracleRune.addEventListener('click', () => switchOracleSubtab('rune'));
+  const oracleTabBar = document.querySelector('.oracle-subtab-bar');
+  if (oracleTabBar) {
+    oracleTabBar.addEventListener('click', (e) => {
+      const btn = e.target.closest('.btn-oracle-tab');
+      if (!btn) return;
+      const sub = btn.getAttribute('data-sub');
+      if (sub) switchOracleSubtab(sub);
+    });
+  } else {
+    if (DOM.btnOracleTarot) DOM.btnOracleTarot.addEventListener('click', () => switchOracleSubtab('tarot'));
+    if (DOM.btnOracleSiamsi) DOM.btnOracleSiamsi.addEventListener('click', () => switchOracleSubtab('siamsi'));
+    if (DOM.btnOracleRune) DOM.btnOracleRune.addEventListener('click', () => switchOracleSubtab('rune'));
+  }
 
   // --- Tarot Listeners ---
   if (DOM.btnHomeOpenTarot) {
@@ -1321,14 +1347,33 @@ function updateDailyColorsAndAdvice() {
     seasonNote = 'Winter: เน้นเฉดคอนทราสต์ชัดเจน';
   }
 
+  // 4.1 กรอกข้อมูลการแต่งกายลงหัวข้อย่อยกระชับในหน้า Home (Compact Topics)
   if (DOM.txtAdviceTitle) DOM.txtAdviceTitle.innerHTML = headline;
-  if (DOM.txtAdviceDescription) DOM.txtAdviceDescription.textContent = `${topText} แมตช์คู่กับ${bottomText} (${seasonNote})`;
-
-  // กรอกข้อมูลลงหัวข้อย่อยแบบกะทัดรัด (Compact Topics)
   if (DOM.topicValColor) DOM.topicValColor.textContent = activeColors;
   if (DOM.topicValTop) DOM.topicValTop.textContent = topText;
   if (DOM.topicValBottom) DOM.topicValBottom.textContent = bottomText;
   if (DOM.topicValAcc) DOM.topicValAcc.textContent = accText;
+
+  // 4.2 กรอกข้อมูลรายละเอียดฉบับเต็มในหน้าตู้เสื้อผ้า (Wardrobe Full Detail)
+  if (DOM.txtWardrobeAdviceTitle) DOM.txtWardrobeAdviceTitle.innerHTML = headline;
+  if (DOM.txtWardrobeAdviceDesc) {
+    DOM.txtWardrobeAdviceDesc.textContent = `${topText} แมตช์คู่กับ${bottomText} (${seasonNote}) เสริมพลังด้วย${accText} เหมาะอย่างยิ่งสำหรับการแต่งกายในวัน${targetDay} เพื่อความเป็นสิริมงคล เสริมภาพลักษณ์ และดึงดูดพลังบวกเฉพาะบุคคล`;
+  }
+  if (DOM.topicWardrobeColor) DOM.topicWardrobeColor.textContent = activeColors;
+  if (DOM.topicWardrobeTop) DOM.topicWardrobeTop.textContent = topText;
+  if (DOM.topicWardrobeBottom) DOM.topicWardrobeBottom.textContent = bottomText;
+  if (DOM.topicWardrobeAcc) DOM.topicWardrobeAcc.textContent = accText;
+
+  if (DOM.wardrobeAdviceColorBar) {
+    DOM.wardrobeAdviceColorBar.innerHTML = '';
+    activeHex.forEach(hex => {
+      const dot = document.createElement('div');
+      dot.className = 'advice-color-dot';
+      dot.style.backgroundColor = hex;
+      dot.title = hex;
+      DOM.wardrobeAdviceColorBar.appendChild(dot);
+    });
+  }
 
   // 5. อัปเดตสีเสื้อเวกเตอร์ SVG
   if (activeHex.length > 0 && DOM.pathShirt) {
@@ -1338,24 +1383,12 @@ function updateDailyColorsAndAdvice() {
   if (DOM.pathSkirt) DOM.pathSkirt.setAttribute('fill', '#E8DFD8');
   updateFlatlayCaption();
 
-  // Render color dots
-  if (DOM.adviceColorBar) {
-    DOM.adviceColorBar.innerHTML = '';
-    activeHex.forEach(hex => {
-      const dot = document.createElement('div');
-      dot.className = 'advice-color-dot';
-      dot.style.backgroundColor = hex;
-      dot.title = hex;
-      DOM.adviceColorBar.appendChild(dot);
-    });
-  }
-
-  // 6. เทวดานพเคราะห์ประจำวันเป้าหมาย (หัวข้อกระชับ)
+  // 6. เทวดานพเคราะห์ประจำวันเป้าหมาย (Home: หัวข้อกระชับ, Wardrobe: ตำนานฉบับเต็ม)
   const cleanTarget = (targetDay === 'พุธ (กลางวัน)' || targetDay === 'พุธ (กลางคืน)') ? 'พุธ (กลางวัน)' : targetDay;
   const deity = LOCAL_DEITY_TRIVIA[cleanTarget] || LOCAL_DEITY_TRIVIA['จันทร์'];
   if (DOM.txtDeityName) DOM.txtDeityName.textContent = deity.name;
   if (DOM.txtDeityTrait) DOM.txtDeityTrait.textContent = deity.trait;
-  if (DOM.txtDeityStory) DOM.txtDeityStory.textContent = deity.story;
+  if (DOM.txtWardrobeDeityStory) DOM.txtWardrobeDeityStory.textContent = deity.story;
 
   // 7. กระเป๋าสตางค์และอัญมณี (อิงตามวันเกิดของผู้ใช้เพื่อพลังงานเฉพาะตัว)
   const wg = LOCAL_WALLETS[userBirthDay] || LOCAL_WALLETS['จันทร์'];
@@ -2344,6 +2377,11 @@ function displayRuneSpread(spread, animate = true) {
       } else {
         pieceEl.classList.remove('reversed');
       }
+      pieceEl.style.cursor = 'pointer';
+      pieceEl.title = `แตะเพื่อดูรายละเอียดเชิงลึกของ ${drawn.rune.name} (${drawn.rune.runeChar})`;
+      pieceEl.onclick = () => {
+        openRuneDetailModal(drawn.rune);
+      };
     }
   };
 
