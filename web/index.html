@@ -351,11 +351,33 @@
             </div>
           </div>
 
+          <!-- Dynamic Astrological & Context Bar (30-Day Anti-Fatigue Indicators) -->
+          <div class="card astro-context-card" id="cardAstroContext">
+            <div class="astro-context-row">
+              <div class="astro-pill" id="pillLunarPhase" title="อิทธิพลข้างขึ้น-ข้างแรม">
+                <span class="astro-pill-icon" id="iconLunarPhase">🌓</span>
+                <span class="astro-pill-text" id="txtLunarPhase">ขึ้น ๘ ค่ำ (โทนสว่าง)</span>
+              </div>
+              <div class="astro-pill" id="pillKaalYoke" title="กาลโยคประจำวัน">
+                <span class="astro-pill-icon" id="iconKaalYoke">🏆</span>
+                <span class="astro-pill-text" id="txtKaalYoke">วันธงชัย (Solid Color)</span>
+              </div>
+              <div class="astro-pill" id="pillWeather" title="สภาพอากาศและเนื้อผ้า">
+                <span class="astro-pill-icon" id="iconWeather">☀️</span>
+                <span class="astro-pill-text" id="txtWeather">แดดจัด (ผ้าโปร่งเบา)</span>
+              </div>
+              <div class="astro-pill" id="pillNumerology" title="เลขศาสตร์ประจำวัน">
+                <span class="astro-pill-icon">🔢</span>
+                <span class="astro-pill-text" id="txtNumerology">เลขศาสตร์: ดาวศุกร์ (ฟ้า)</span>
+              </div>
+            </div>
+          </div>
+
           <!-- Goal Selection Chips (สิ่งที่อยากเสริมวันนี้) -->
           <div class="section-container">
             <div class="section-title-wrap">
-              <h3 class="subsection-title">เลือกสิ่งที่อยากเสริมวันนี้</h3>
-              <span class="subsection-sub">ระบบจะปรับสูตรสีและชุดให้ตรงเป้าหมาย</span>
+              <h3 class="subsection-title">เลือกเป้าหมายหลักวันนี้</h3>
+              <span class="subsection-sub">สูตรสีมหาทักษาหลักจะปรับตามเป้าหมาย</span>
             </div>
 
             <div class="chips-scroll">
@@ -374,6 +396,38 @@
               <button class="chip-btn" data-goal="casual">
                 <span class="chip-icon">🌿</span>
                 <span class="chip-label">พักผ่อนสบาย</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Micro-Intentions Chips (เป้าหมายย่อยเจาะจงรายวัน) -->
+          <div class="section-container micro-intentions-section">
+            <div class="section-title-wrap">
+              <div class="section-badge-tiny">ANTI-FATIGUE 30 DAYS</div>
+              <h3 class="subsection-title">สถานการณ์เฉพาะกิจวันนี้ (Micro-Intention)</h3>
+              <span class="subsection-sub">เลือกสถานการณ์จริงเพื่อปรับสไตล์ ชิ้นไอเทม และเทคนิคการใส่ไม่ซ้ำวัน</span>
+            </div>
+
+            <div class="chips-scroll micro-chips-scroll">
+              <button class="chip-btn micro-chip-btn active" data-micro="present_boss">
+                <span class="chip-icon">📊</span>
+                <span class="chip-label">พรีเซนต์งานเจ้านาย</span>
+              </button>
+              <button class="chip-btn micro-chip-btn" data-micro="collect_debt">
+                <span class="chip-icon">🤝</span>
+                <span class="chip-label">เจรจาปิดดีล / ทวงหนี้</span>
+              </button>
+              <button class="chip-btn micro-chip-btn" data-micro="romantic_date">
+                <span class="chip-icon">🌹</span>
+                <span class="chip-label">ออกเดต / ดินเนอร์</span>
+              </button>
+              <button class="chip-btn micro-chip-btn" data-micro="team_meeting">
+                <span class="chip-icon">💡</span>
+                <span class="chip-label">ประชุมทีมระดมไอเดีย</span>
+              </button>
+              <button class="chip-btn micro-chip-btn" data-micro="chill_cafe">
+                <span class="chip-icon">☕</span>
+                <span class="chip-label">แวะคาเฟ่ / ถ่ายรูป</span>
               </button>
             </div>
           </div>
@@ -1211,6 +1265,35 @@
             <!-- Dynamic Color Bar -->
             <div class="advice-color-bar" id="wardrobeAdviceColorBar"></div>
 
+            <!-- Anti-Fatigue 30-Day Engine Breakdown Box -->
+            <div class="wardrobe-anti-fatigue-box" id="wardrobeAntiFatigueBox">
+              <div class="anti-fatigue-header">
+                <span class="anti-fatigue-tag">ANTI-FATIGUE 30-DAY ENGINE</span>
+                <span class="anti-fatigue-subtag" id="txtAntiFatigueProportion">สัดส่วน 60-30-10</span>
+              </div>
+              <p class="anti-fatigue-technique" id="txtAntiFatigueTechnique">
+                ✨ คำนวณตามข้างขึ้น-ข้างแรม และกาลโยคประจำวันเพื่อสร้างความหลากหลายไม่ซ้ำจำเจตลอดทั้งเดือน
+              </p>
+              <div class="anti-fatigue-factors-grid">
+                <div class="factor-item">
+                  <span class="factor-lbl">🌓 ดิถีจันทรคติ:</span>
+                  <strong class="factor-val" id="valFactorLunar">ขึ้น ๘ ค่ำ (Light &amp; Pastel)</strong>
+                </div>
+                <div class="factor-item">
+                  <span class="factor-lbl">🏆 กาลโยคประจำปี:</span>
+                  <strong class="factor-val" id="valFactorKaal">วันธงชัย (Solid Color)</strong>
+                </div>
+                <div class="factor-item">
+                  <span class="factor-lbl">🔢 เลขศาสตร์รายวัน:</span>
+                  <strong class="factor-val" id="valFactorNumerology">คู่สีรอง: ดาวศุกร์</strong>
+                </div>
+                <div class="factor-item">
+                  <span class="factor-lbl">🌤️ สภาพอากาศ/ผ้า:</span>
+                  <strong class="factor-val" id="valFactorWeather">แดดจัด (ผ้าโปร่งสบาย)</strong>
+                </div>
+              </div>
+            </div>
+
             <!-- Deity Full Mythology & Lore in Wardrobe -->
             <div class="wardrobe-deity-lore-box" id="wardrobeDeityLoreBox">
               <span class="lore-label">🪐 อิทธิพลดาวและเทวดานพเคราะห์:</span>
@@ -1569,6 +1652,13 @@
                 <strong id="calPrevKala">ชมพู</strong>
               </div>
             </div>
+            <!-- Cal Preview Anti-Fatigue 30-Day Badge Row -->
+            <div class="cal-preview-astro-info" id="calPreviewAstroInfo">
+              <span class="cal-astro-badge" id="calPrevLunarBadge">🌓 ขึ้น ๘ ค่ำ</span>
+              <span class="cal-astro-badge" id="calPrevKaalBadge">🏆 วันธงชัย</span>
+              <span class="cal-astro-badge" id="calPrevNumBadge">🔢 เลขศาสตร์: 3</span>
+              <span class="cal-astro-badge" id="calPrevPropBadge">สัดส่วน 60-30-10</span>
+            </div>
             <button type="button" class="btn-primary btn-apply-cal-date" id="btnApplyCalDate">
               ✨ เลือกใช้วันนี้และดูสูตรแต่งตัวในหน้าหลัก
             </button>
@@ -1610,9 +1700,10 @@
     </div>
   </div>
 
-  <script src="tarot-data.js?v=2.3.1"></script>
-  <script src="siamsi-data.js?v=2.3.1"></script>
-  <script src="rune-data.js?v=2.3.1"></script>
-  <script src="app.js?v=2.3.1"></script>
+  <script src="tarot-data.js?v=2.4.0"></script>
+  <script src="siamsi-data.js?v=2.4.0"></script>
+  <script src="rune-data.js?v=2.4.0"></script>
+  <script src="anti-fatigue-engine.js?v=2.4.0"></script>
+  <script src="app.js?v=2.4.0"></script>
 </body>
 </html>

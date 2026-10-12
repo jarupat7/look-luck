@@ -175,6 +175,7 @@ const AppState = {
     token: null
   },
   currentGoal: 'work', // 'work', 'money', 'love', 'casual'
+  currentMicroIntention: 'present_boss', // 'present_boss', 'collect_debt', 'romantic_date', 'team_meeting', 'chill_cafe'
   bottomStyle: 'pants', // 'pants', 'skirt'
   todayDay: getTodayThaiDayName(), // วันนี้ตามปฏิทินจริง (Real-world today)
   selectedDay: getTodayThaiDayName(), // วันที่ผู้ใช้เลือกดู (Default = วันนี้)
@@ -295,6 +296,17 @@ const DOM = {
   topicValAcc: document.getElementById('topicValAcc'),
   cardHomeOutfitAdvice: document.getElementById('cardHomeOutfitAdvice'),
 
+  // Anti-Fatigue 30-Day Astrological & Context Indicators
+  cardAstroContext: document.getElementById('cardAstroContext'),
+  iconLunarPhase: document.getElementById('iconLunarPhase'),
+  txtLunarPhase: document.getElementById('txtLunarPhase'),
+  iconKaalYoke: document.getElementById('iconKaalYoke'),
+  txtKaalYoke: document.getElementById('txtKaalYoke'),
+  iconWeather: document.getElementById('iconWeather'),
+  txtWeather: document.getElementById('txtWeather'),
+  txtNumerology: document.getElementById('txtNumerology'),
+  microChipBtns: document.querySelectorAll('.micro-chip-btn'),
+
   // Wardrobe Detailed Advice & Lore
   cardWardrobeDetailedAdvice: document.getElementById('cardWardrobeDetailedAdvice'),
   txtWardrobeAdviceTitle: document.getElementById('txtWardrobeAdviceTitle'),
@@ -305,6 +317,21 @@ const DOM = {
   topicWardrobeAcc: document.getElementById('topicWardrobeAcc'),
   wardrobeAdviceColorBar: document.getElementById('wardrobeAdviceColorBar'),
   txtWardrobeDeityStory: document.getElementById('txtWardrobeDeityStory'),
+
+  // Wardrobe Anti-Fatigue Factor Box
+  wardrobeAntiFatigueBox: document.getElementById('wardrobeAntiFatigueBox'),
+  txtAntiFatigueProportion: document.getElementById('txtAntiFatigueProportion'),
+  txtAntiFatigueTechnique: document.getElementById('txtAntiFatigueTechnique'),
+  valFactorLunar: document.getElementById('valFactorLunar'),
+  valFactorKaal: document.getElementById('valFactorKaal'),
+  valFactorNumerology: document.getElementById('valFactorNumerology'),
+  valFactorWeather: document.getElementById('valFactorWeather'),
+
+  // Calendar Modal Preview Astro Badges
+  calPrevLunarBadge: document.getElementById('calPrevLunarBadge'),
+  calPrevKaalBadge: document.getElementById('calPrevKaalBadge'),
+  calPrevNumBadge: document.getElementById('calPrevNumBadge'),
+  calPrevPropBadge: document.getElementById('calPrevPropBadge'),
 
   txtDeityName: document.getElementById('txtDeityName'),
   txtDeityTrait: document.getElementById('txtDeityTrait'),
@@ -596,6 +623,18 @@ function setupEventListeners() {
       updateDailyColorsAndAdvice();
     });
   });
+
+  // --- Micro-Intentions Chips (Anti-Fatigue 30-Day Situations) ---
+  if (DOM.microChipBtns) {
+    DOM.microChipBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        DOM.microChipBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        AppState.currentMicroIntention = btn.getAttribute('data-micro');
+        updateDailyColorsAndAdvice();
+      });
+    });
+  }
 
   // --- Personal Color Season Cards in Wardrobe ---
   DOM.seasonCards.forEach(card => {
@@ -1298,41 +1337,85 @@ function updateDailyColorsAndAdvice() {
     }
   }
 
-  // 4. คำแนะนำการแต่งกายตามเป้าหมาย (Goal) - รูปแบบหัวข้อกระชับ
+  // 4. คำนวณอัลกอริทึม "สีมงคลที่ไม่ซ้ำกันใน 30 วัน" (Anti-Fatigue Algorithm)
+  const targetDateObj = AppState.selectedFullDate || new Date();
+  let antiFatigueData = null;
+
+  if (typeof AntiFatigueEngine !== 'undefined') {
+    antiFatigueData = AntiFatigueEngine.generateAntiFatigueOutfit(
+      targetDateObj,
+      evalData,
+      user,
+      {
+        microIntention: AppState.currentMicroIntention || 'present_boss',
+        bottomStyle: AppState.bottomStyle || 'pants'
+      }
+    );
+  }
+
+  // 4.1 อัปเดต Indicators ด้านโหราศาสตร์ & บริบทในหน้า Home (Astro Context Bar)
+  if (antiFatigueData) {
+    if (DOM.iconLunarPhase) DOM.iconLunarPhase.textContent = antiFatigueData.lunar.icon;
+    if (DOM.txtLunarPhase) DOM.txtLunarPhase.textContent = `${antiFatigueData.lunar.phaseName} (${antiFatigueData.lunar.isWaxing ? 'สว่าง/พาสเทล' : 'เข้ม/เอิร์ธโทน'})`;
+    
+    if (DOM.iconKaalYoke) DOM.iconKaalYoke.textContent = antiFatigueData.kaalYoke.type === 'thongchai' ? '🏆' : (antiFatigueData.kaalYoke.type === 'athibodi' ? '👑' : (antiFatigueData.kaalYoke.type === 'ubaat' ? '⚡' : '🛡️'));
+    if (DOM.txtKaalYoke) DOM.txtKaalYoke.textContent = antiFatigueData.kaalYoke.badge;
+    
+    if (DOM.iconWeather) DOM.iconWeather.textContent = antiFatigueData.weather.icon;
+    if (DOM.txtWeather) DOM.txtWeather.textContent = `${antiFatigueData.weather.label.split(' ')[0]} (${antiFatigueData.weather.clothingType.split('/')[0].trim()})`;
+    
+    if (DOM.txtNumerology) DOM.txtNumerology.textContent = `เลขศาสตร์: ${antiFatigueData.numerology.secondaryColor} (ดาว${antiFatigueData.numerology.planet})`;
+  }
+
+  // 4.2 เลือกเฉดสีและคำแนะนำชิ้นเสื้อผ้า
   let activeColors = evalData.activeCat.safeName;
   let activeHex = evalData.activeCat.safeHex;
   let headline = '';
   const userGender = (user && user.gender) || 'female';
   let bottomText = '';
-  if (userGender === 'male') {
-    bottomText = 'กางเกงสแล็คหรือชิโน่สีเบจ/ครีม';
-  } else if (userGender === 'female') {
-    bottomText = AppState.bottomStyle === 'skirt' ? 'กระโปรงทรงเอสีเบจ/ครีม' : 'กางเกงสแล็คทรงโมเดิร์นสีเบจ/ครีม';
-  } else {
-    bottomText = 'กางเกงขายาวทรงกระบอกหรือกระโปรงมินิมอลสีเบจ';
-  }
-
   let topText = '';
   let accText = '';
 
-  if (goal === 'work') {
-    headline = `👔 เสริมการงาน & เจรจา (เดช)`;
-    topText = userGender === 'male' ? `เสื้อเชิ้ต/โปโลสี${activeColors.split(',')[0] || activeColors}` : `เสื้อเชิ้ต/เบลเซอร์สี${activeColors.split(',')[0] || activeColors}`;
-    accText = 'นาฬิกาโลหะสีทอง/เงิน หรือกระเป๋าหนังทรงสุภาพ';
-  } else if (goal === 'money') {
-    headline = `💰 เรียกทรัพย์ & โชคลาภพุ่ง (ศรี)`;
-    topText = userGender === 'male' ? `เสื้อเชิ้ต/สเวตเตอร์สี${activeColors.split(',')[0] || activeColors}` : `เสื้อเบลาส์/คาร์ดิแกนสี${activeColors.split(',')[0] || activeColors}`;
-    accText = 'กระเป๋าสตางค์โทนนำโชค หรือเครื่องประดับโทนสว่างแวววาว';
-  } else if (goal === 'love') {
-    headline = `💖 เสน่ห์เมตตา & ผู้ใหญ่เอ็นดู`;
-    topText = userGender === 'male' ? `เสื้อเชิ้ตคอจีน/โปโลสี${activeColors.split(',')[0] || activeColors}` : `เสื้อโทนละมุน/เดรสสี${activeColors.split(',')[0] || activeColors}`;
-    accText = 'สร้อยคอหรือต่างหูมินิมอล น้ำหอมกลิ่นดอกไม้สดชื่น';
+  if (antiFatigueData) {
+    // ใช้อัลกอริทึม Anti-Fatigue 30 วัน
+    const pShade = antiFatigueData.primaryShade;
+    const sShade = antiFatigueData.secondaryShade;
+    activeColors = `${pShade.name} (${pShade.hex}), ผสมคู่สีรอง ${sShade.name}`;
+    activeHex = [pShade.hex, sShade.hex, ...(evalData.activeCat.safeHex.slice(0, 2))];
+
+    topText = antiFatigueData.topPiece;
+    bottomText = antiFatigueData.bottomPiece;
+    accText = antiFatigueData.accessoryPiece;
+    headline = `✨ ${antiFatigueData.micro.icon} ${antiFatigueData.micro.label} (${antiFatigueData.proportion.ruleTitle})`;
   } else {
-    activeColors = 'ขาว, ครีม, เทาอ่อน, เขียวธรรมชาติ';
-    activeHex = ['#FFFDD0', '#E0E0E0', '#81C784'];
-    headline = `🌿 ผ่อนคลายกายใจ & สมดุลพลัง`;
-    topText = 'เสื้อยืดคอตตอน/เสื้อลินินเนื้อโปร่งสบาย';
-    accText = 'แว่นกันแดดทรงคลาสสิก รองเท้าสนีกเกอร์ใส่สบาย';
+    // Fallback โหมดเดิม
+    if (userGender === 'male') {
+      bottomText = 'กางเกงสแล็คหรือชิโน่สีเบจ/ครีม';
+    } else if (userGender === 'female') {
+      bottomText = AppState.bottomStyle === 'skirt' ? 'กระโปรงทรงเอสีเบจ/ครีม' : 'กางเกงสแล็คทรงโมเดิร์นสีเบจ/ครีม';
+    } else {
+      bottomText = 'กางเกงขายาวทรงกระบอกหรือกระโปรงมินิมอลสีเบจ';
+    }
+
+    if (goal === 'work') {
+      headline = `👔 เสริมการงาน & เจรจา (เดช)`;
+      topText = userGender === 'male' ? `เสื้อเชิ้ต/โปโลสี${activeColors.split(',')[0] || activeColors}` : `เสื้อเชิ้ต/เบลเซอร์สี${activeColors.split(',')[0] || activeColors}`;
+      accText = 'นาฬิกาโลหะสีทอง/เงิน หรือกระเป๋าหนังทรงสุภาพ';
+    } else if (goal === 'money') {
+      headline = `💰 เรียกทรัพย์ & โชคลาภพุ่ง (ศรี)`;
+      topText = userGender === 'male' ? `เสื้อเชิ้ต/สเวตเตอร์สี${activeColors.split(',')[0] || activeColors}` : `เสื้อเบลาส์/คาร์ดิแกนสี${activeColors.split(',')[0] || activeColors}`;
+      accText = 'กระเป๋าสตางค์โทนนำโชค หรือเครื่องประดับโทนสว่างแวววาว';
+    } else if (goal === 'love') {
+      headline = `💖 เสน่ห์เมตตา & ผู้ใหญ่เอ็นดู`;
+      topText = userGender === 'male' ? `เสื้อเชิ้ตคอจีน/โปโลสี${activeColors.split(',')[0] || activeColors}` : `เสื้อโทนละมุน/เดรสสี${activeColors.split(',')[0] || activeColors}`;
+      accText = 'สร้อยคอหรือต่างหูมินิมอล น้ำหอมกลิ่นดอกไม้สดชื่น';
+    } else {
+      activeColors = 'ขาว, ครีม, เทาอ่อน, เขียวธรรมชาติ';
+      activeHex = ['#FFFDD0', '#E0E0E0', '#81C784'];
+      headline = `🌿 ผ่อนคลายกายใจ & สมดุลพลัง`;
+      topText = 'เสื้อยืดคอตตอน/เสื้อลินินเนื้อโปร่งสบาย';
+      accText = 'แว่นกันแดดทรงคลาสสิก รองเท้าสนีกเกอร์ใส่สบาย';
+    }
   }
 
   // Personal Color Note
@@ -1347,22 +1430,36 @@ function updateDailyColorsAndAdvice() {
     seasonNote = 'Winter: เน้นเฉดคอนทราสต์ชัดเจน';
   }
 
-  // 4.1 กรอกข้อมูลการแต่งกายลงหัวข้อย่อยกระชับในหน้า Home (Compact Topics)
+  // 4.3 กรอกข้อมูลการแต่งกายลงหัวข้อย่อยกระชับในหน้า Home (Compact Topics)
   if (DOM.txtAdviceTitle) DOM.txtAdviceTitle.innerHTML = headline;
   if (DOM.topicValColor) DOM.topicValColor.textContent = activeColors;
   if (DOM.topicValTop) DOM.topicValTop.textContent = topText;
   if (DOM.topicValBottom) DOM.topicValBottom.textContent = bottomText;
   if (DOM.topicValAcc) DOM.topicValAcc.textContent = accText;
 
-  // 4.2 กรอกข้อมูลรายละเอียดฉบับเต็มในหน้าตู้เสื้อผ้า (Wardrobe Full Detail)
+  // 4.4 กรอกข้อมูลรายละเอียดฉบับเต็มในหน้าตู้เสื้อผ้า (Wardrobe Full Detail)
   if (DOM.txtWardrobeAdviceTitle) DOM.txtWardrobeAdviceTitle.innerHTML = headline;
   if (DOM.txtWardrobeAdviceDesc) {
-    DOM.txtWardrobeAdviceDesc.textContent = `${topText} แมตช์คู่กับ${bottomText} (${seasonNote}) เสริมพลังด้วย${accText} เหมาะอย่างยิ่งสำหรับการแต่งกายในวัน${targetDay} เพื่อความเป็นสิริมงคล เสริมภาพลักษณ์ และดึงดูดพลังบวกเฉพาะบุคคล`;
+    let extraAdvice = '';
+    if (antiFatigueData) {
+      extraAdvice = ` | ${antiFatigueData.stylingTechnique} (${antiFatigueData.weather.toneSuggestion})`;
+    }
+    DOM.txtWardrobeAdviceDesc.textContent = `${topText} แมตช์คู่กับ${bottomText} (${seasonNote}) เสริมพลังด้วย${accText} เหมาะอย่างยิ่งสำหรับการแต่งกายในวัน${targetDay} ${extraAdvice}`;
   }
   if (DOM.topicWardrobeColor) DOM.topicWardrobeColor.textContent = activeColors;
   if (DOM.topicWardrobeTop) DOM.topicWardrobeTop.textContent = topText;
   if (DOM.topicWardrobeBottom) DOM.topicWardrobeBottom.textContent = bottomText;
   if (DOM.topicWardrobeAcc) DOM.topicWardrobeAcc.textContent = accText;
+
+  // 4.5 ป้อนค่ากล่อง Anti-Fatigue 30-Day Breakdown ในหน้าตู้เสื้อผ้า
+  if (antiFatigueData) {
+    if (DOM.txtAntiFatigueProportion) DOM.txtAntiFatigueProportion.textContent = antiFatigueData.proportion.proportionText;
+    if (DOM.txtAntiFatigueTechnique) DOM.txtAntiFatigueTechnique.textContent = antiFatigueData.stylingTechnique;
+    if (DOM.valFactorLunar) DOM.valFactorLunar.textContent = `${antiFatigueData.lunar.phaseName} • ${antiFatigueData.lunar.toneText.split(':')[1].trim()}`;
+    if (DOM.valFactorKaal) DOM.valFactorKaal.textContent = `${antiFatigueData.kaalYoke.title} • ${antiFatigueData.kaalYoke.desc}`;
+    if (DOM.valFactorNumerology) DOM.valFactorNumerology.textContent = `วันที่ ${antiFatigueData.numerology.dayNum} (รวม=${antiFatigueData.numerology.singleDigit}) -> คู่สีรอง: ${antiFatigueData.numerology.secondaryColor} (${antiFatigueData.numerology.stylingTip})`;
+    if (DOM.valFactorWeather) DOM.valFactorWeather.textContent = `${antiFatigueData.weather.label} • ${antiFatigueData.weather.clothingType}`;
+  }
 
   if (DOM.wardrobeAdviceColorBar) {
     DOM.wardrobeAdviceColorBar.innerHTML = '';
@@ -1525,6 +1622,15 @@ function renderCalendarPreview(dateObj) {
   if (DOM.calPrevMoney) DOM.calPrevMoney.textContent = evalData.money.safeName;
   if (DOM.calPrevLove) DOM.calPrevLove.textContent = evalData.love.safeName;
   if (DOM.calPrevKala) DOM.calPrevKala.textContent = evalData.dayRules.kalakini.name;
+
+  // Anti-Fatigue Badges ในปฏิทิน
+  if (typeof AntiFatigueEngine !== 'undefined') {
+    const astro = AntiFatigueEngine.generateAntiFatigueOutfit(targetDate, evalData, user);
+    if (DOM.calPrevLunarBadge) DOM.calPrevLunarBadge.textContent = `${astro.lunar.icon} ${astro.lunar.phaseName} (${astro.lunar.isWaxing ? 'สว่าง' : 'เข้ม'})`;
+    if (DOM.calPrevKaalBadge) DOM.calPrevKaalBadge.textContent = astro.kaalYoke.badge;
+    if (DOM.calPrevNumBadge) DOM.calPrevNumBadge.textContent = `เลขศาสตร์: ${astro.numerology.secondaryColor}`;
+    if (DOM.calPrevPropBadge) DOM.calPrevPropBadge.textContent = `สัดส่วน: ${astro.proportion.focusName}`;
+  }
 }
 
 function changeCalendarMonth(offset) {
